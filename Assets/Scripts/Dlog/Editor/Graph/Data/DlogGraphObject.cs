@@ -32,6 +32,15 @@ namespace Dlog {
             set => isDirty = value;
         }
 
+        public bool WasUndoRedoPerformed => objectVersion != fileVersion;
+
+        public void RegisterCompleteObjectUndo(string name) {
+            Undo.RegisterCompleteObjectUndo(this, name);
+            fileVersion++;
+            objectVersion++;
+            isDirty = true;
+        }
+
         public void OnBeforeSerialize() {
             if(dlogGraph == null) return;
 
@@ -40,20 +49,26 @@ namespace Dlog {
         }
 
         public void OnAfterDeserialize() {
-            if(dlogGraph != null) return;
+            if(DlogGraph != null) return;
+            DlogGraph = Deserialize();
+        }
 
+        public void HandleUndoRedo() {
+            if (!WasUndoRedoPerformed) {
+                Debug.LogError("Trying to handle undo/redo when undo/redo was not performed", this);
+                return;
+            }
+
+            var deserialized = Deserialize();
+            dlogGraph.ReplaceWith(deserialized);
+        }
+
+        private DlogGraphData Deserialize() {
             var deserialized = JsonUtility.FromJson<DlogGraphData>(serializedGraph);
             deserialized.AssetGuid = AssetGuid;
             objectVersion = fileVersion;
             serializedGraph = "";
-            dlogGraph = deserialized;
-        }
-
-        public void RegisterCompleteObjectUndo(string name) {
-            Undo.RegisterCompleteObjectUndo(this, name);
-            fileVersion++;
-            objectVersion++;
-            isDirty = true;
+            return deserialized;
         }
 
         public void RecalculateAssetGuid(string assetPath) {

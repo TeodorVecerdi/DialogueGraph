@@ -1,0 +1,17 @@
+{
+    "AssetGuid": "3b337b4073be998459f8fc3f498d05b6",
+    "IsBlackboardVisible": false,
+    "nodes": [
+        {
+            "GUID": "c56c11df-a64d-42aa-b807-16d58a13b8dc",
+            "Type": "TestNode",
+            "Expanded": true,
+            "Position": {
+                "x": 430.0,
+                "y": 223.0
+            },
+            "NodeData": "{\"expanded\":true}"
+        }
+    ],
+    "edges": []
+}

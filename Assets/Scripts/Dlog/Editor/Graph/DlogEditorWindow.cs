@@ -15,20 +15,25 @@ namespace Dlog {
     public class DlogEditorWindow : EditorWindow {
         public DlogGraphView Graph;
 
-        public bool IsDirty {
-            get {
-                var current = JsonUtility.ToJson(dlogObject.DlogGraph, true);
-                var saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(selectedAssetGuid));
-                return !string.Equals(current, saved, StringComparison.Ordinal);
-            }
-        }
         private string selectedAssetGuid;
         private DlogGraphObject dlogObject;
         private DlogWindowEvents windowEvents;
 
+        private bool deleted;
+
         public string SelectedAssetGuid {
             get => selectedAssetGuid;
             set => selectedAssetGuid = value;
+        }
+        public DlogGraphObject GraphObject => dlogObject;
+        public bool IsDirty {
+            get {
+                if (deleted) return false;
+                
+                var current = JsonUtility.ToJson(dlogObject.DlogGraph, true);
+                var saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(selectedAssetGuid));
+                return !string.Equals(current, saved, StringComparison.Ordinal);
+            }
         }
 
         public void BuildWindow() {
@@ -44,6 +49,35 @@ namespace Dlog {
             Refresh();
         }
 
+        private void Update() {
+
+            if (focusedWindow == this && deleted) {
+                Debug.Log("Graph deleted");
+                Close();
+            }
+
+            if (dlogObject == null) {
+                Debug.Log("Graph Object is null");
+                Close();
+            }
+
+            var wasUndoRedoPerformed = dlogObject.WasUndoRedoPerformed;
+            if (wasUndoRedoPerformed) {
+                Debug.Log("Undo/Redo performed");
+                Graph.HandleChanges();
+                dlogObject.DlogGraph.ClearChanges();
+                dlogObject.HandleUndoRedo();
+            }
+
+            if (dlogObject.IsDirty || wasUndoRedoPerformed) {
+                UpdateTitle();
+                dlogObject.IsDirty = false;
+            }
+            
+            Graph.HandleChanges();
+            dlogObject.DlogGraph.ClearChanges();
+        }
+
         public void SetDlogObject(DlogGraphObject dlogObject) {
             SelectedAssetGuid = dlogObject.AssetGuid;
             this.dlogObject = dlogObject;
@@ -53,13 +87,17 @@ namespace Dlog {
             UpdateTitle();
         }
 
+        public void GraphDeleted() {
+            deleted = true;
+        }
+
         private void UpdateTitle() {
             var asset = AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(selectedAssetGuid));
             titleContent.text = asset.name.Split('/').Last() + (IsDirty ? "*" : "");
         }
 
         private void BuildGraph() {
-            Graph = new DlogGraphView(this) {
+            Graph = new DlogGraphView(this, dlogObject) {
                 name = "Dlog Graph",
                 IsBlackboardVisible = dlogObject.IsBlackboardVisible
             };

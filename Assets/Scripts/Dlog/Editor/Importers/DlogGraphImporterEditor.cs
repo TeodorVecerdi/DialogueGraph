@@ -31,7 +31,10 @@ namespace Dlog {
                 return false;
 
             var dlogObject = SaveUtility.LoadAtPath(assetPath);
-            if (string.IsNullOrEmpty(dlogObject.AssetGuid)) dlogObject.RecalculateAssetGuid(assetPath);
+            if (string.IsNullOrEmpty(dlogObject.AssetGuid)) {
+                dlogObject.RecalculateAssetGuid(assetPath);
+                SaveUtility.Save(dlogObject);
+            }
 
             foreach (var activeWindow in Resources.FindObjectsOfTypeAll<DlogEditorWindow>()) {
                 if (activeWindow.SelectedAssetGuid != guid)
