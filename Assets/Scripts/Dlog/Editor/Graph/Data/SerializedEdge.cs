@@ -1,11 +1,29 @@
 using System;
+using UnityEditor.Graphs;
+using UnityEngine;
+using Edge = UnityEditor.Experimental.GraphView.Edge;
 
 namespace Dlog {
     [Serializable]
     public class SerializedEdge {
-        public string FromGUID;
-        public string ToGUID;
-        public int FromIndex;
-        public int ToIndex;
+        [SerializeField] public string Input;
+        [SerializeField] public string Output;
+        [SerializeField] public string InputPort;
+        [SerializeField] public string OutputPort;
+
+        public Edge Edge;
+        public DlogGraphView GraphView;
+
+        
+
+        public void BuildEdge(DlogGraphView graphView) {
+            GraphView = graphView;
+            var inputNode = GraphView.nodes.ToList().Find(node => node.viewDataKey == Input) as TempNode;
+            var outputNode = GraphView.nodes.ToList().Find(node => node.viewDataKey == Output) as TempNode;
+            var inputPort = inputNode.Owner.GuidPortDictionary[InputPort];
+            var outputPort = outputNode.Owner.GuidPortDictionary[OutputPort];
+            Edge = inputPort.ConnectTo(outputPort);
+            Edge.userData = this;
+        }
     }
 }

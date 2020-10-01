@@ -1,49 +1,74 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Debug = UnityEngine.Debug;
 
 namespace Dlog {
     [Serializable]
     public class SerializedNode : ISerializationCallbackReceiver {
         [SerializeField] public string GUID;
         [SerializeField] public string Type;
-        [SerializeField] public bool Expanded;
-        [SerializeField] public Vector2 Position;
+        [SerializeField] public NodeDrawState DrawState;
         [SerializeField] public string NodeData;
+        [SerializeField] public List<string> PortData;
+        [NonSerialized] public Dictionary<string, Port> GuidPortDictionary;
 
-        private Type type;
+        public DlogGraphView GraphView;
         public TempNode Node;
 
-        public SerializedNode(Type type, Vector2 position) {
-            Type = type.Name;
-            Position = position;
+        public SerializedNode(Type type, Rect position) {
+            Type = type.FullName;
+            DrawState.Position = position;
+            DrawState.Expanded = true;
             GUID = Guid.NewGuid().ToString();
-            Expanded = true;
-            Node = (TempNode) Activator.CreateInstance(type);
+        }
+
+        public void BuildNode(DlogGraphView graphView, EdgeConnectorListener edgeConnectorListener) {
+            GraphView = graphView;
+            Node = (TempNode) Activator.CreateInstance(System.Type.GetType(Type));
+            Node.InitializeNode(edgeConnectorListener);
             Node.GUID = GUID;
             Node.viewDataKey = GUID;
             Node.Owner = this;
-            Node.SetPosition(new Rect(Position, DlogGraphView.DefaultNodeSize));
-            Node.OnCreateFromSearchWindow(position);
+            Node.SetExpandedWithoutNotify(DrawState.Expanded);
+            Node.SetPosition(DrawState.Position);
+            Node.Refresh();
+
+            if ((PortData == null || PortData.Count == 0) && Node.Ports.Count != 0 || (PortData != null && PortData.Count != Node.Ports.Count)) {
+                // GET
+                PortData = new List<string>();
+                foreach (var port in Node.Ports) {
+                    PortData.Add(port.viewDataKey);
+                }
+            } else {
+                // SET
+                if (PortData == null)
+                    throw new InvalidDataException("Serialized port data somehow ended up as null when it was not supposed to.");
+                for (var i = 0; i < PortData.Count; i++) {
+                    Node.Ports[i].viewDataKey = PortData[i];
+                }
+            }
+
+            // Build dictionary
+            GuidPortDictionary = new Dictionary<string, Port>();
+            foreach (var port in Node.Ports) {
+                GuidPortDictionary.Add(port.viewDataKey, port);
+            }
         }
 
         public void OnBeforeSerialize() {
-            var stackFrames = new StackTrace().GetFrames();
-            var s = $"SerializedNode::OnBeforeSerialize called from: {stackFrames[1].GetFileName()}::{stackFrames[1].GetMethod().Name}";
-            for (int i = 2; i < stackFrames.Length; i++) {
-                s += $", {stackFrames[1].GetFileName()}::{stackFrames[1].GetMethod().Name}";
+            if (Node != null) {
+                Node.OnNodeSerialized();
+                NodeData = Node.GetNodeData();
             }
-            Debug.Log(s);
-            Expanded = Node.expanded;
-            Position = Node.GetPosition().position;
-            NodeData = Node.GetNodeData();
-            Node.OnNodeSerialized();
         }
 
         public void OnAfterDeserialize() {
-            
+            if (Node != null) {
+                Node.OnNodeDeserialized();
+                Node.SetNodeData(NodeData);
+            }
         }
     }
 }

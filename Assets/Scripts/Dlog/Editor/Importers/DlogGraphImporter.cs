@@ -11,7 +11,7 @@ namespace Dlog {
             var fileIcon = Resources.Load<Texture2D>(ResourcesUtility.IconBig);
             if (string.IsNullOrEmpty(dlogObject.AssetGuid) || dlogObject.AssetGuid != AssetDatabase.AssetPathToGUID(ctx.assetPath)) {
                 dlogObject.RecalculateAssetGuid(ctx.assetPath);
-                SaveUtility.Save(dlogObject);
+                SaveUtility.Save(dlogObject, false);
             }
             ctx.AddObjectToAsset("MainAsset", dlogObject, fileIcon);
             ctx.SetMainObject(dlogObject);

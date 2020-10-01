@@ -35,6 +35,7 @@ namespace Dlog {
         public bool WasUndoRedoPerformed => objectVersion != fileVersion;
 
         public void RegisterCompleteObjectUndo(string name) {
+            Debug.Log($"Registered complete object undo with data:\n{dlogGraph.DebugString()}");
             Undo.RegisterCompleteObjectUndo(this, name);
             fileVersion++;
             objectVersion++;

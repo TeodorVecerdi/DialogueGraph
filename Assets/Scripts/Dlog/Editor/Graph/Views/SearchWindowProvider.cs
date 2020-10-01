@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,8 +12,7 @@ namespace Dlog {
         private DlogGraphView graphView;
         private Texture2D icon;
         public List<NodeEntry> CurrentNodeEntries;
-        public bool NodeNeedsRepositioning { get; private set; }
-        public Vector2 TargetPosition { get; private set; }
+        public Port ConnectedPort;
         public bool RegenerateEntries { get; set; }
 
         public void Initialize(DlogEditorWindow editorWindow, DlogGraphView graphView) {
@@ -64,7 +64,24 @@ namespace Dlog {
         }
 
         private void AddEntries(Type nodeType, string[] title, List<NodeEntry> nodeEntries) {
-            nodeEntries.Add(new NodeEntry(nodeType, title));
+            if (ConnectedPort == null) {
+                nodeEntries.Add(new NodeEntry(nodeType, title, -1));
+                return;
+            }
+
+            var node = (TempNode)Activator.CreateInstance(nodeType);
+            node.InitializeNode(null);
+            var portIndices = new List<int>();
+            for(var i = 0; i < node.Ports.Count; i++) portIndices.Add(i);
+            portIndices.RemoveAll(portIndex => ConnectedPort.portType != node.Ports[portIndex].portType || ConnectedPort.direction == node.Ports[portIndex].direction);
+            foreach (var portIndex in portIndices) {
+                var newTitle = new string[title.Length];
+                for (int i = 0; i < title.Length - 1; i++)
+                    newTitle[i] = title[i];
+                newTitle[title.Length-1] = title[title.Length - 1] + $" ({node.Ports[portIndex].portName})";
+                
+                nodeEntries.Add(new NodeEntry(nodeType, newTitle, portIndex));
+            }
         }
 
         public Searcher LoadSearchWindow() {
@@ -119,28 +136,37 @@ namespace Dlog {
 
             var nodeEntry = (selectedEntry as SearchNodeItem).NodeEntry;
             var nodeType = nodeEntry.Type;
-            Debug.Log($"Node type: {nodeType}");
-            
             
             var windowMousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, mousePosition);
             var graphMousePosition = graphView.contentViewContainer.WorldToLocal(windowMousePosition);
-            var node = new SerializedNode(nodeType, graphMousePosition);
+            var node = new SerializedNode(nodeType, new Rect(graphMousePosition, DlogGraphView.DefaultNodeSize));
 
-            editorWindow.GraphObject.RegisterCompleteObjectUndo("Add " + node.Type);
-            editorWindow.GraphObject.DlogGraph.AddNode(node);
-            
-            // TODO: Add port dragging support
+            graphView.DlogObject.RegisterCompleteObjectUndo("Add " + node.Type);
+            graphView.DlogObject.DlogGraph.AddNode(node);
+
+            if (ConnectedPort != null) {
+                node.BuildNode(graphView, null);
+                var edge = new SerializedEdge {
+                    Output = ConnectedPort.node.viewDataKey,
+                    Input = node.GUID,
+                    OutputPort = ConnectedPort.viewDataKey,
+                    InputPort = node.PortData[nodeEntry.CompatiblePortIndex]
+                };
+                graphView.DlogObject.DlogGraph.AddEdge(edge);
+            }
             
             return true;
         }
 
         public readonly struct NodeEntry : IEquatable<NodeEntry> {
-            public readonly string[] Title;
             public readonly Type Type;
+            public readonly string[] Title;
+            public readonly int CompatiblePortIndex;
 
-            public NodeEntry(Type type, string[] title) {
+            public NodeEntry(Type type, string[] title, int compatiblePortIndex) {
                 Type = type;
                 Title = title;
+                CompatiblePortIndex = compatiblePortIndex;
             }
 
             public bool Equals(NodeEntry other) {

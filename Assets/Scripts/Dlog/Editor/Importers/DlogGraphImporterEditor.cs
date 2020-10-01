@@ -33,15 +33,16 @@ namespace Dlog {
             var dlogObject = SaveUtility.LoadAtPath(assetPath);
             if (string.IsNullOrEmpty(dlogObject.AssetGuid)) {
                 dlogObject.RecalculateAssetGuid(assetPath);
-                SaveUtility.Save(dlogObject);
+                SaveUtility.Save(dlogObject, false);
             }
 
             foreach (var activeWindow in Resources.FindObjectsOfTypeAll<DlogEditorWindow>()) {
                 if (activeWindow.SelectedAssetGuid != guid)
                     continue;
 
+                // TODO: Ask user if they want to replace the current window (maybe ask to save before opening with cancel button)
                 activeWindow.SetDlogObject(dlogObject);
-                activeWindow.Refresh();
+                activeWindow.BuildWindow();
                 activeWindow.Focus();
                 return true;
             }

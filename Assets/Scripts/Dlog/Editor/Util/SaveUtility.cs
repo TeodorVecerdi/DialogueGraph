@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Dlog {
     public static class SaveUtility {
@@ -27,7 +29,7 @@ namespace Dlog {
 
             var jsonString = JsonUtility.ToJson(dlogObject.DlogGraph, true);
             File.WriteAllText(assetPath, jsonString);
-            if (refreshAsset) AssetDatabase.ImportAsset(assetPath);
+            if (refreshAsset) AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
 
             return true;
         }
