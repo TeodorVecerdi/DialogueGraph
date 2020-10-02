@@ -21,7 +21,7 @@ namespace Dlog {
         public override bool expanded {
             get => base.expanded;
             set {
-                Owner.GraphView.DlogObject.RegisterCompleteObjectUndo("Expanded state changed");
+                Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Expanded state changed");
                 base.expanded = value;
                 Owner.DrawState.Expanded = value;
             }

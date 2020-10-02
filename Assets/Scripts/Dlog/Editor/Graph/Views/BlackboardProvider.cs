@@ -7,8 +7,8 @@ using UnityEngine.UIElements;
 
 namespace Dlog {
     public class BlackboardProvider {
+        private static readonly Texture2D exposedIcon = Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed");
         public Blackboard Blackboard { get; private set; }
-        public static readonly Texture2D exposedIcon = Resources.Load<Texture2D>("GraphView/Nodes/BlackboardFieldExposed");
         private readonly DlogGraphView graphView;
         private readonly Dictionary<string, BlackboardRow> inputRows;
         private readonly BlackboardSection sectionA;

@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Dlog {
     public class EdgeConnectorListener : IEdgeConnectorListener {
-        private DlogGraphView graphView;
+        private EditorView editorView;
         private SearchWindowProvider searchWindowProvider;
 
-        public EdgeConnectorListener(DlogGraphView graphView, SearchWindowProvider searchWindowProvider) {
-            this.graphView = graphView;
+        public EdgeConnectorListener(EditorView editorView, SearchWindowProvider searchWindowProvider) {
+            this.editorView = editorView;
             this.searchWindowProvider = searchWindowProvider;
         }
         
@@ -16,13 +16,13 @@ namespace Dlog {
             var port = edge.output?.edgeConnector.edgeDragHelper.draggedPort ?? edge.input?.edgeConnector.edgeDragHelper.draggedPort;
             searchWindowProvider.ConnectedPort = port;
             searchWindowProvider.RegenerateEntries = true;
-            SearcherWindow.Show(graphView.EditorWindow, searchWindowProvider.LoadSearchWindow(), item => searchWindowProvider.OnSelectEntry(item, position), position, null);
+            SearcherWindow.Show(editorView.EditorWindow, searchWindowProvider.LoadSearchWindow(), item => searchWindowProvider.OnSelectEntry(item, position), position, null);
             searchWindowProvider.RegenerateEntries = true;
         }
 
         public void OnDrop(GraphView graphView, Edge edge) {
-            this.graphView.DlogObject.RegisterCompleteObjectUndo("Connect edge");
-            this.graphView.DlogObject.DlogGraph.AddEdge(edge);
+            editorView.DlogObject.RegisterCompleteObjectUndo("Connect edge");
+            editorView.DlogObject.DlogGraph.AddEdge(edge);
         }
     }
 }

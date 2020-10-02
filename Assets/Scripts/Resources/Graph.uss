@@ -1,4 +1,28 @@
-﻿GridBackground {
+﻿BlackboardRow.hovered #pill #selection-border {
+    background-color: rgba(68, 192, 255, 0.4);
+    border-color: #44C0FF;
+    border-width: 2px;
+    left: 1px;
+    right: 1px;
+    top: 1px;
+    bottom: 1px;
+}
+
+EditorView {
+    flex-direction: column;
+    flex: 1;
+}
+
+EditorView > #content {
+    flex-direction: row;
+    flex: 1;
+}
+
+EditorView > #content > DlogGraphView {
+    flex: 1;
+}
+
+EditorView > #content > DlogGraphView > GridBackground {
     --grid-background-color: #282828;
     --line-color: rgba(55, 55, 55, 0.2);
     --thick-line-color: rgba(20, 20, 20, 0.6);

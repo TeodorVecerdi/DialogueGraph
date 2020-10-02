@@ -14,7 +14,7 @@ namespace Dlog {
         [SerializeField] public List<string> PortData;
         [NonSerialized] public Dictionary<string, Port> GuidPortDictionary;
 
-        public DlogGraphView GraphView;
+        public EditorView EditorView;
         public TempNode Node;
 
         public SerializedNode(Type type, Rect position) {
@@ -24,8 +24,8 @@ namespace Dlog {
             GUID = Guid.NewGuid().ToString();
         }
 
-        public void BuildNode(DlogGraphView graphView, EdgeConnectorListener edgeConnectorListener) {
-            GraphView = graphView;
+        public void BuildNode(EditorView editorView, EdgeConnectorListener edgeConnectorListener) {
+            EditorView = editorView;
             Node = (TempNode) Activator.CreateInstance(System.Type.GetType(Type));
             Node.InitializeNode(edgeConnectorListener);
             Node.GUID = GUID;

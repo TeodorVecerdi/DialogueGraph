@@ -9,15 +9,15 @@ using UnityEngine.UIElements;
 namespace Dlog {
     public class SearchWindowProvider : ScriptableObject {
         private DlogEditorWindow editorWindow;
-        private DlogGraphView graphView;
+        private EditorView editorView;
         private Texture2D icon;
         public List<NodeEntry> CurrentNodeEntries;
         public Port ConnectedPort;
         public bool RegenerateEntries { get; set; }
 
-        public void Initialize(DlogEditorWindow editorWindow, DlogGraphView graphView) {
+        public void Initialize(DlogEditorWindow editorWindow, EditorView editorView) {
             this.editorWindow = editorWindow;
-            this.graphView = graphView;
+            this.editorView = editorView;
 
             GenerateNodeEntries();
             icon = new Texture2D(1, 1);
@@ -138,21 +138,21 @@ namespace Dlog {
             var nodeType = nodeEntry.Type;
             
             var windowMousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, mousePosition);
-            var graphMousePosition = graphView.contentViewContainer.WorldToLocal(windowMousePosition);
-            var node = new SerializedNode(nodeType, new Rect(graphMousePosition, DlogGraphView.DefaultNodeSize));
+            var graphMousePosition = editorView.GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
+            var node = new SerializedNode(nodeType, new Rect(graphMousePosition, EditorView.DefaultNodeSize));
 
-            graphView.DlogObject.RegisterCompleteObjectUndo("Add " + node.Type);
-            graphView.DlogObject.DlogGraph.AddNode(node);
+            editorView.DlogObject.RegisterCompleteObjectUndo("Add " + node.Type);
+            editorView.DlogObject.DlogGraph.AddNode(node);
 
             if (ConnectedPort != null) {
-                node.BuildNode(graphView, null);
+                node.BuildNode(editorView, null);
                 var edge = new SerializedEdge {
                     Output = ConnectedPort.node.viewDataKey,
                     Input = node.GUID,
                     OutputPort = ConnectedPort.viewDataKey,
                     InputPort = node.PortData[nodeEntry.CompatiblePortIndex]
                 };
-                graphView.DlogObject.DlogGraph.AddEdge(edge);
+                editorView.DlogObject.DlogGraph.AddEdge(edge);
             }
             
             return true;

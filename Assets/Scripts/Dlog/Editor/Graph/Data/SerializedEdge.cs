@@ -12,14 +12,14 @@ namespace Dlog {
         [SerializeField] public string OutputPort;
 
         public Edge Edge;
-        public DlogGraphView GraphView;
+        public EditorView EditorView;
 
         
 
-        public void BuildEdge(DlogGraphView graphView) {
-            GraphView = graphView;
-            var inputNode = GraphView.nodes.ToList().Find(node => node.viewDataKey == Input) as TempNode;
-            var outputNode = GraphView.nodes.ToList().Find(node => node.viewDataKey == Output) as TempNode;
+        public void BuildEdge(EditorView editorView) {
+            EditorView = editorView;
+            var inputNode = editorView.GraphView.nodes.ToList().Find(node => node.viewDataKey == Input) as TempNode;
+            var outputNode = editorView.GraphView.nodes.ToList().Find(node => node.viewDataKey == Output) as TempNode;
             var inputPort = inputNode.Owner.GuidPortDictionary[InputPort];
             var outputPort = outputNode.Owner.GuidPortDictionary[OutputPort];
             Edge = inputPort.ConnectTo(outputPort);
