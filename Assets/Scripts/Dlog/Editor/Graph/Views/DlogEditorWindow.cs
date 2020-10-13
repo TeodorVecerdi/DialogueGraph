@@ -31,7 +31,7 @@ namespace Dlog {
         public bool IsDirty {
             get {
                 if (deleted) return false;
-                
+                if (dlogObject == null) return false;
                 var current = JsonUtility.ToJson(dlogObject.DlogGraph, true);
                 var saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(selectedAssetGuid));
                 return !string.Equals(current, saved, StringComparison.Ordinal);
@@ -63,6 +63,7 @@ namespace Dlog {
                 Debug.Log("Graph Object is null");
                 // TODO: Attempt to recover
                 Close();
+                return;
             }
 
             if (editorView == null && dlogObject != null) {
@@ -120,7 +121,7 @@ namespace Dlog {
 
         #region Window Events
         private void SaveAsset() {
-            SaveUtility.Save(dlogObject);
+            DlogUtility.SaveGraph(dlogObject);
             UpdateTitle();
         }
 
@@ -134,7 +135,7 @@ namespace Dlog {
                 var savePath = EditorUtility.SaveFilePanelInProject("Save As...", Path.GetFileNameWithoutExtension(assetPath), DlogGraphImporter.Extension, "", directoryPath);
                 savePath = savePath.Replace(Application.dataPath, "Assets");
                 if (savePath != directoryPath && !string.IsNullOrEmpty(savePath)) {
-                    if (SaveUtility.CreateFile(savePath, dlogObject)) {
+                    if (DlogUtility.CreateFile(savePath, dlogObject)) {
                         dlogObject.RecalculateAssetGuid(savePath);
                         DlogGraphImporterEditor.OpenEditorWindow(savePath);
                     }

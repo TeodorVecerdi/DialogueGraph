@@ -7,16 +7,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Dlog {
-    // Temporary class until I get to the implementation of nodes
-    public abstract class TempNode : Node {
+    public abstract class AbstractNode : Node {
         public SerializedNode Owner { get; set; }
         public string GUID;
-        public List<Port> Ports = new List<Port>();
-
-        // public readonly List<TempPort> InputPorts = new List<TempPort>();
-        // public readonly List<TempPort> OutputPorts = new List<TempPort>();
-        // public readonly Dictionary<Port, TempPort> InputPortDictionary = new Dictionary<Port, TempPort>();
-        // public readonly Dictionary<Port, TempPort> OutputPortDictionary = new Dictionary<Port, TempPort>();
+        public readonly List<Port> Ports = new List<Port>();
 
         public override bool expanded {
             get => base.expanded;
@@ -28,13 +22,15 @@ namespace Dlog {
         }
 
         [Obsolete("Use TempPort.Create instead.", true)]
-        public void InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) {}
+        public new void InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) {}
 
         [Obsolete("Use AddPort instead of manually adding ports to the container.", true)]
-        public VisualElement inputContainer { get; private set; }
+        // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
+        public new VisualElement inputContainer { get; private set; }
 
         [Obsolete("Use AddPort instead of manually adding ports to the container.", true)]
-        public VisualElement outputContainer { get; private set; }
+        // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
+        public new VisualElement outputContainer { get; private set; }
 
         protected void AddPort(Port port) {
             var isInput = port.direction == Direction.Input;
@@ -66,9 +62,9 @@ namespace Dlog {
             base.expanded = value;
         }
 
-        public virtual JObject SetNodeData(string jsonData) {
+        public virtual void SetNodeData(string jsonData) {
+            if(jsonData == null) return;
             var root = JObject.Parse(jsonData);
-            return root;
         }
 
         public virtual string GetNodeData() {
@@ -78,7 +74,5 @@ namespace Dlog {
 
         public virtual void OnNodeSerialized() { }
         public virtual void OnNodeDeserialized() { }
-
-        public virtual void OnCreateFromSearchWindow(Vector2 nodePosition) { }
     }
 }

@@ -30,10 +30,10 @@ namespace Dlog {
             if (extension != DlogGraphImporter.Extension)
                 return false;
 
-            var dlogObject = SaveUtility.LoadAtPath(assetPath);
+            var dlogObject = DlogUtility.LoadGraphAtPath(assetPath);
             if (string.IsNullOrEmpty(dlogObject.AssetGuid)) {
                 dlogObject.RecalculateAssetGuid(assetPath);
-                SaveUtility.Save(dlogObject, false);
+                DlogUtility.SaveGraph(dlogObject, false);
             }
 
             foreach (var activeWindow in Resources.FindObjectsOfTypeAll<DlogEditorWindow>()) {

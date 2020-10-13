@@ -15,7 +15,7 @@ namespace Dlog {
         [NonSerialized] public Dictionary<string, Port> GuidPortDictionary;
 
         public EditorView EditorView;
-        public TempNode Node;
+        public AbstractNode Node;
 
         public SerializedNode(Type type, Rect position) {
             Type = type.FullName;
@@ -24,17 +24,24 @@ namespace Dlog {
             GUID = Guid.NewGuid().ToString();
         }
 
-        public void BuildNode(EditorView editorView, EdgeConnectorListener edgeConnectorListener) {
+        public void BuildNode(EditorView editorView, EdgeConnectorListener edgeConnectorListener, bool buildPortData = true) {
             EditorView = editorView;
-            Node = (TempNode) Activator.CreateInstance(System.Type.GetType(Type));
+            if(Node == null)
+                Node = (AbstractNode) Activator.CreateInstance(System.Type.GetType(Type));
             Node.InitializeNode(edgeConnectorListener);
             Node.GUID = GUID;
             Node.viewDataKey = GUID;
             Node.Owner = this;
             Node.SetExpandedWithoutNotify(DrawState.Expanded);
             Node.SetPosition(DrawState.Position);
+            Node.SetNodeData(NodeData);
             Node.Refresh();
 
+            if (buildPortData) 
+                BuildPortData();
+        }
+
+        public void BuildPortData() {
             if ((PortData == null || PortData.Count == 0) && Node.Ports.Count != 0 || (PortData != null && PortData.Count != Node.Ports.Count)) {
                 // GET
                 PortData = new List<string>();

@@ -17,7 +17,7 @@ namespace Dlog {
             dlogObject.Initialize(dlogGraph);
             dlogObject.DlogGraph.AssetGuid = AssetDatabase.GetAssetPath(instanceId);
             dlogObject.AssetGuid = dlogObject.DlogGraph.AssetGuid;
-            SaveUtility.CreateFile(pathName, dlogObject, false);
+            DlogUtility.CreateFile(pathName, dlogObject, false);
             AssetDatabase.ImportAsset(pathName);
         }
     }

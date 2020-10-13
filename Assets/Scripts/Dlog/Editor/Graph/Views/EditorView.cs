@@ -28,11 +28,12 @@ namespace Dlog {
         public DlogEditorWindow EditorWindow => editorWindow;
         public DlogGraphObject DlogObject => dlogObject;
         public DlogGraphView GraphView => graphView;
+        public EdgeConnectorListener EdgeConnectorListener => edgeConnectorListener;
 
         public EditorView(DlogEditorWindow editorWindow, DlogGraphObject dlogObject) {
             this.dlogObject = dlogObject;
             this.editorWindow = editorWindow;
-            this.AddStyleSheet("Graph");
+            this.AddStyleSheet("Styles/Graph");
             
             
             var toolbar = new IMGUIContainer(() => {
@@ -72,7 +73,7 @@ namespace Dlog {
                 graphView.Insert(0, grid);
                 grid.StretchToParentSize();
                 
-                blackboardProvider = new BlackboardProvider(graphView);
+                blackboardProvider = new BlackboardProvider(this);
                 graphView.Add(blackboardProvider.Blackboard);
                 
                 graphView.graphViewChanged += OnGraphViewChanged;
@@ -96,7 +97,7 @@ namespace Dlog {
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange) {
             if (graphViewChange.movedElements != null) {
                 editorWindow.GraphObject.RegisterCompleteObjectUndo("Moved elements");
-                foreach (var node in graphViewChange.movedElements.OfType<TempNode>()) {
+                foreach (var node in graphViewChange.movedElements.OfType<AbstractNode>()) {
                     var rect = node.parent.ChangeCoordinatesTo(graphView.contentViewContainer, node.GetPosition());
                     node.Owner.DrawState.Position = rect;
                 }
@@ -112,7 +113,7 @@ namespace Dlog {
 
             if (graphViewChange.elementsToRemove != null) {
                 editorWindow.GraphObject.RegisterCompleteObjectUndo("Removed elements");
-                foreach (var node in graphViewChange.elementsToRemove.OfType<TempNode>()) {
+                foreach (var node in graphViewChange.elementsToRemove.OfType<AbstractNode>()) {
                     dlogObject.DlogGraph.RemoveNode(node.Owner);
                 }
 
@@ -121,9 +122,9 @@ namespace Dlog {
                     dlogObject.DlogGraph.RemoveEdge((SerializedEdge)edge.userData);
                 }
 
-                /*var edgesToRemove = graphViewChange.elementsToRemove.OfType<Edge>().ToList();
-                foreach (var edgeToRemove in edgesToRemove)
-                    graphViewChange.elementsToRemove.Remove(edgeToRemove);*/
+                foreach (var property in graphViewChange.elementsToRemove.OfType<BlackboardField>()) {
+                    DlogObject.DlogGraph.RemoveProperty(property.userData as AbstractProperty);
+                }
             }
 
             return graphViewChange;
@@ -149,13 +150,20 @@ namespace Dlog {
             graphView.graphElements.ToList().OfType<Edge>().ToList().ForEach(graphView.RemoveElement);
             graphView.graphElements.ToList().OfType<Group>().ToList().ForEach(graphView.RemoveElement);
             graphView.graphElements.ToList().OfType<StickyNote>().ToList().ForEach(graphView.RemoveElement);
+            graphView.graphElements.ToList().OfType<BlackboardRow>().ToList().ForEach(graphView.RemoveElement);
 
             // Create & add graph elements 
-            dlogObject.DlogGraph.Nodes.ForEach(AddNode);
+            dlogObject.DlogGraph.Nodes.ForEach(node => AddNode(node));
             dlogObject.DlogGraph.Edges.ForEach(AddEdge);
+            dlogObject.DlogGraph.Properties.ForEach(AddProperty);
         }
 
         public void HandleChanges() {
+
+            if(dlogObject.DlogGraph.AddedProperties.Any() || dlogObject.DlogGraph.RemovedProperties.Any())
+                searchWindowProvider.RegenerateEntries = true;
+            blackboardProvider.HandleChanges();
+            
             foreach (var removedNode in dlogObject.DlogGraph.RemovedNodes) {
                 RemoveNode(removedNode);
             }
@@ -195,6 +203,10 @@ namespace Dlog {
             if (edgeToRemove.Edge != null) {
                 graphView.RemoveElement(edgeToRemove.Edge);
             }
+        }
+
+        public void AddProperty(AbstractProperty property) {
+            blackboardProvider.AddInputRow(property);
         }
 
         public void Dispose() {

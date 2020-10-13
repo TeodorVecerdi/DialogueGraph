@@ -35,13 +35,22 @@ namespace Dlog {
         public void GenerateNodeEntries() {
             // First build up temporary data structure containing group & title as an array of strings (the last one is the actual title) and associated node type.
             var nodeEntries = new List<NodeEntry>();
-            foreach (var type in TypeCache.GetTypesDerivedFrom<TempNode>()) {
+            foreach (var type in TypeCache.GetTypesDerivedFrom<AbstractNode>()) {
                 if (!type.IsClass || type.IsAbstract)
                     continue;
 
                 if (type.GetCustomAttributes(typeof(TitleAttribute), false) is TitleAttribute[] attrs && attrs.Length > 0) {
                     AddEntries(type, attrs[0].Title, nodeEntries);
                 }
+            }
+
+            foreach (var property in editorView.DlogObject.DlogGraph.Properties) {
+                var node = new SerializedNode(typeof(PropertyNode), new Rect(Vector2.zero, EditorView.DefaultNodeSize));
+                node.BuildNode(editorView, editorView.EdgeConnectorListener, false);
+                var propertyNode = node.Node as PropertyNode;
+                propertyNode.PropertyGuid = property.GUID;
+                node.BuildPortData();
+                AddEntries(node, new[] {"Properties", "Property: " + property.DisplayName}, nodeEntries);
             }
 
             nodeEntries.Sort((entry1, entry2) => {
@@ -63,23 +72,42 @@ namespace Dlog {
             CurrentNodeEntries = nodeEntries;
         }
 
+        private void AddEntries(SerializedNode node, string[] title, List<NodeEntry> nodeEntries) {
+            if (ConnectedPort == null) {
+                nodeEntries.Add(new NodeEntry(node, title, -1));
+                return;
+            }
+
+            var portIndices = new List<int>();
+            for (var i = 0; i < node.Node.Ports.Count; i++) portIndices.Add(i);
+            portIndices.RemoveAll(portIndex => ConnectedPort.portType != node.Node.Ports[portIndex].portType || ConnectedPort.direction == node.Node.Ports[portIndex].direction);
+            foreach (var portIndex in portIndices) {
+                var newTitle = new string[title.Length];
+                for (int i = 0; i < title.Length - 1; i++)
+                    newTitle[i] = title[i];
+                newTitle[title.Length - 1] = title[title.Length - 1] + $" ({node.Node.Ports[portIndex].portName})";
+
+                nodeEntries.Add(new NodeEntry(node, newTitle, portIndex));
+            }
+        }
+
         private void AddEntries(Type nodeType, string[] title, List<NodeEntry> nodeEntries) {
             if (ConnectedPort == null) {
                 nodeEntries.Add(new NodeEntry(nodeType, title, -1));
                 return;
             }
 
-            var node = (TempNode)Activator.CreateInstance(nodeType);
+            var node = (AbstractNode) Activator.CreateInstance(nodeType);
             node.InitializeNode(null);
             var portIndices = new List<int>();
-            for(var i = 0; i < node.Ports.Count; i++) portIndices.Add(i);
+            for (var i = 0; i < node.Ports.Count; i++) portIndices.Add(i);
             portIndices.RemoveAll(portIndex => ConnectedPort.portType != node.Ports[portIndex].portType || ConnectedPort.direction == node.Ports[portIndex].direction);
             foreach (var portIndex in portIndices) {
                 var newTitle = new string[title.Length];
                 for (int i = 0; i < title.Length - 1; i++)
                     newTitle[i] = title[i];
-                newTitle[title.Length-1] = title[title.Length - 1] + $" ({node.Ports[portIndex].portName})";
-                
+                newTitle[title.Length - 1] = title[title.Length - 1] + $" ({node.Ports[portIndex].portName})";
+
                 nodeEntries.Add(new NodeEntry(nodeType, newTitle, portIndex));
             }
         }
@@ -130,16 +158,22 @@ namespace Dlog {
         }
 
         public bool OnSelectEntry(SearcherItem selectedEntry, Vector2 mousePosition) {
-            if (selectedEntry == null || (selectedEntry as SearchNodeItem).NodeEntry.Type == null) {
+            if (selectedEntry == null || ((selectedEntry as SearchNodeItem).NodeEntry.Type == null && (selectedEntry as SearchNodeItem).NodeEntry.Node == null)) {
                 return false;
             }
 
             var nodeEntry = (selectedEntry as SearchNodeItem).NodeEntry;
-            var nodeType = nodeEntry.Type;
-            
             var windowMousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, mousePosition);
             var graphMousePosition = editorView.GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
-            var node = new SerializedNode(nodeType, new Rect(graphMousePosition, EditorView.DefaultNodeSize));
+            
+            SerializedNode node;
+            if (nodeEntry.Node != null) {
+                node = nodeEntry.Node;
+                node.DrawState.Position.position = graphMousePosition;
+            } else {
+                var nodeType = nodeEntry.Type;
+                node = new SerializedNode(nodeType, new Rect(graphMousePosition, EditorView.DefaultNodeSize));
+            }
 
             editorView.DlogObject.RegisterCompleteObjectUndo("Add " + node.Type);
             editorView.DlogObject.DlogGraph.AddNode(node);
@@ -154,19 +188,28 @@ namespace Dlog {
                 };
                 editorView.DlogObject.DlogGraph.AddEdge(edge);
             }
-            
+
             return true;
         }
 
-        public readonly struct NodeEntry : IEquatable<NodeEntry> {
+        public struct NodeEntry : IEquatable<NodeEntry> {
             public readonly Type Type;
             public readonly string[] Title;
             public readonly int CompatiblePortIndex;
+            public SerializedNode Node;
 
             public NodeEntry(Type type, string[] title, int compatiblePortIndex) {
                 Type = type;
                 Title = title;
                 CompatiblePortIndex = compatiblePortIndex;
+                Node = null;
+            }
+
+            public NodeEntry(SerializedNode node, string[] title, int compatiblePortIndex) {
+                Node = node;
+                Title = title;
+                CompatiblePortIndex = compatiblePortIndex;
+                Type = Type.GetType(node.Type);
             }
 
             public bool Equals(NodeEntry other) {
