@@ -13,6 +13,7 @@ namespace Dlog {
                 port.AddManipulator(port.m_EdgeConnector);
             }
 
+            port.viewDataKey = Guid.NewGuid().ToString();
             port.portName = name;
             return port;
         }

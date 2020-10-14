@@ -11,6 +11,8 @@ namespace Dlog {
         public SerializedNode Owner { get; set; }
         public string GUID;
         public readonly List<Port> Ports = new List<Port>();
+        
+        protected EdgeConnectorListener EdgeConnectorListener;
 
         public override bool expanded {
             get => base.expanded;
@@ -24,13 +26,15 @@ namespace Dlog {
         [Obsolete("Use TempPort.Create instead.", true)]
         public new void InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) {}
 
-        [Obsolete("Use AddPort instead of manually adding ports to the container.", true)]
-        // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
-        public new VisualElement inputContainer { get; private set; }
+        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
 
-        [Obsolete("Use AddPort instead of manually adding ports to the container.", true)]
         // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
-        public new VisualElement outputContainer { get; private set; }
+        protected new VisualElement inputContainer => base.inputContainer;
+
+        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
+
+        // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
+        protected new VisualElement outputContainer => base.outputContainer;
 
         protected void AddPort(Port port) {
             var isInput = port.direction == Direction.Input;
@@ -39,18 +43,19 @@ namespace Dlog {
             } else {
                 base.outputContainer.Add(port);
             }
-
-            port.viewDataKey = Guid.NewGuid().ToString();
             Ports.Add(port);
         }
 
-        public abstract void InitializeNode(EdgeConnectorListener edgeConnectorListener);
+        public virtual void InitializeNode(EdgeConnectorListener edgeConnectorListener) {
+            EdgeConnectorListener = edgeConnectorListener;
+        }
 
         protected void Initialize(string nodeTitle, Rect nodePosition) {
             base.title = nodeTitle;
             base.SetPosition(nodePosition);
             GUID = Guid.NewGuid().ToString();
             viewDataKey = GUID;
+            this.AddStyleSheet("Styles/Node");
         }
 
         public void Refresh() {

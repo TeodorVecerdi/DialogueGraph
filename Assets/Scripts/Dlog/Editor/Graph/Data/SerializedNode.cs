@@ -26,30 +26,36 @@ namespace Dlog {
 
         public void BuildNode(EditorView editorView, EdgeConnectorListener edgeConnectorListener, bool buildPortData = true) {
             EditorView = editorView;
-            if(Node == null)
-                Node = (AbstractNode) Activator.CreateInstance(System.Type.GetType(Type));
+            Node = (AbstractNode) Activator.CreateInstance(System.Type.GetType(Type));
             Node.InitializeNode(edgeConnectorListener);
             Node.GUID = GUID;
             Node.viewDataKey = GUID;
             Node.Owner = this;
             Node.SetExpandedWithoutNotify(DrawState.Expanded);
             Node.SetPosition(DrawState.Position);
-            Node.SetNodeData(NodeData);
+            if (!string.IsNullOrEmpty(NodeData))
+                Node.SetNodeData(NodeData);
             Node.Refresh();
 
-            if (buildPortData) 
+            if (buildPortData)
                 BuildPortData();
         }
 
         public void BuildPortData() {
-            if ((PortData == null || PortData.Count == 0) && Node.Ports.Count != 0 || (PortData != null && PortData.Count != Node.Ports.Count)) {
+            if ((Node.Ports == null || Node.Ports.Count == 0) && (PortData == null || PortData.Count == 0)) {
+                return;
+            }
+
+            if ((PortData == null || PortData.Count == 0) && Node.Ports.Count != 0 || (PortData != null && PortData.Count != Node.Ports.Count && Node.Ports.Count != 0)) {
                 // GET
+                Debug.Log($"Got new port data{Type}");
                 PortData = new List<string>();
                 foreach (var port in Node.Ports) {
                     PortData.Add(port.viewDataKey);
                 }
             } else {
                 // SET
+                Debug.Log($"Updated port guids for port{Type}");
                 if (PortData == null)
                     throw new InvalidDataException("Serialized port data somehow ended up as null when it was not supposed to.");
                 for (var i = 0; i < PortData.Count; i++) {
@@ -65,17 +71,18 @@ namespace Dlog {
         }
 
         public void OnBeforeSerialize() {
-            if (Node != null) {
-                Node.OnNodeSerialized();
-                NodeData = Node.GetNodeData();
-            }
+            if (Node == null)
+                return;
+            Node.OnNodeSerialized();
+            NodeData = Node.GetNodeData();
         }
 
         public void OnAfterDeserialize() {
-            if (Node != null) {
-                Node.OnNodeDeserialized();
+            if (Node == null)
+                return;
+            Node.OnNodeDeserialized();
+            if (!string.IsNullOrEmpty(NodeData))
                 Node.SetNodeData(NodeData);
-            }
         }
     }
 }

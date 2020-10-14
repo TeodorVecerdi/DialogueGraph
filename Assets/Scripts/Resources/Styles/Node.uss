@@ -1,0 +1,43 @@
+#conversation-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+#conversation-container #conversation-item {
+    flex: 1 0;
+}
+
+#conversation-container #conversation-item.message {
+    flex-basis: auto;
+    white-space: normal;
+}
+#conversation-item.message Label {
+    min-width: auto;
+    align-self: center;
+}
+#conversation-item.message TextInput {
+    margin-left: 8px;
+    min-width: 80px;
+    max-width: 200px;
+}
+
+
+#conversation-container #conversation-item.branch-port {
+    flex-basis: auto;
+    align-self: center;
+}
+#conversation-container #conversation-item.trigger-port {
+    flex-basis: 75%;
+}
+
+#divider.horizontal-divider {
+    margin-bottom: 6px;
+    margin-top: 4px;
+}
+
+#lineTitle {
+    margin-left: 3px;
+    -unity-font-style: bold;
+    -unity-text-align: upper-left;
+}
