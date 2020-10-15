@@ -13,6 +13,27 @@ namespace Dlog {
             this.editorView = editorView;
             RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
             RegisterCallback<DragPerformEvent>(OnDragPerformed);
+            serializeGraphElements += SerializeGraphElements;
+            unserializeAndPaste += UnserializeAndPaste;
+        }
+
+        private void UnserializeAndPaste(string operation, string data) {
+            editorView.DlogObject.RegisterCompleteObjectUndo(operation);
+            var copyPasteData = CopyPasteData.FromJson(data);
+            this.InsertCopyPasteData(copyPasteData);
+        }
+
+        private string SerializeGraphElements(IEnumerable<GraphElement> elements) {
+            var nodes = elements.OfType<AbstractNode>().Select(x => x.Owner);
+            var edges = elements.OfType<Edge>().Select(x => x.userData).OfType<SerializedEdge>();
+            var properties = selection.OfType<BlackboardField>().Select(x => x.userData as AbstractProperty);
+
+            // Collect the property nodes and get the corresponding properties
+            var propertyNodeGuids = nodes.OfType<PropertyNode>().Select(x => x.PropertyGuid);
+            var metaProperties = editorView.DlogObject.DlogGraph.Properties.Where(x => propertyNodeGuids.Contains(x.GUID));
+
+            var copyPasteData = new CopyPasteData(editorView, nodes, edges, properties, metaProperties);
+            return JsonUtility.ToJson(copyPasteData, true);
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt) {
@@ -35,8 +56,7 @@ namespace Dlog {
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter) {
             var compatiblePorts = new List<Port>();
             ports.ForEach(port => {
-                if (startPort != port && startPort.node != port.node && port.direction != startPort.direction) {
-                    // TODO: Add type check for ports
+                if (startPort != port && startPort.node != port.node && port.direction != startPort.direction && (startPort as DlogPort).IsCompatibleWith(port as DlogPort)) {
                     compatiblePorts.Add(port);
                 }
             });

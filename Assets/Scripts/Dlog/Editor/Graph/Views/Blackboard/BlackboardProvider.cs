@@ -49,7 +49,10 @@ namespace Dlog {
                 property.DisplayName = newText;
                 editorView.DlogObject.DlogGraph.SanitizePropertyName(property);
                 field.text = property.DisplayName;
-                // TODO: Change name of created property nodes
+                var modifiedNodes = editorView.DlogObject.DlogGraph.Nodes.Where(node => node.Node is PropertyNode propertyNode && propertyNode.PropertyGuid == property.GUID).Select(node => node.Node as PropertyNode);
+                foreach (var modifiedNode in modifiedNodes) {
+                    modifiedNode?.Update(property);
+                }
             }
         }
 
@@ -105,7 +108,6 @@ namespace Dlog {
 
             var expandButton = row.Q<Button>("expandButton");
             expandButton.RegisterCallback<MouseDownEvent>(evt => OnExpanded(evt, property), TrickleDown.TrickleDown);
-
             inputRows[property.GUID] = row;
             if (create) {
                 row.expanded = true;

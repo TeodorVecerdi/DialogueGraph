@@ -48,14 +48,12 @@ namespace Dlog {
 
             if ((PortData == null || PortData.Count == 0) && Node.Ports.Count != 0 || (PortData != null && PortData.Count != Node.Ports.Count && Node.Ports.Count != 0)) {
                 // GET
-                Debug.Log($"Got new port data{Type}");
                 PortData = new List<string>();
                 foreach (var port in Node.Ports) {
                     PortData.Add(port.viewDataKey);
                 }
             } else {
                 // SET
-                Debug.Log($"Updated port guids for port{Type}");
                 if (PortData == null)
                     throw new InvalidDataException("Serialized port data somehow ended up as null when it was not supposed to.");
                 for (var i = 0; i < PortData.Count; i++) {

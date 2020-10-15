@@ -7,7 +7,7 @@ namespace Dlog {
         public ActorProperty() {
             DisplayName = "Actor";
             Type = PropertyType.Actor;
-            Value = new ActorData {Name = "New Actor"};
+            Value = new ActorData {Name = "Unnamed Actor"};
         }
 
         public override AbstractProperty Copy() {

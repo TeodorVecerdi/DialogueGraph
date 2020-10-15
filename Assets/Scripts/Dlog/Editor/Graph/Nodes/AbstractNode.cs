@@ -11,7 +11,7 @@ namespace Dlog {
         public SerializedNode Owner { get; set; }
         public string GUID;
         public readonly List<Port> Ports = new List<Port>();
-        
+
         protected EdgeConnectorListener EdgeConnectorListener;
 
         public override bool expanded {
@@ -24,26 +24,27 @@ namespace Dlog {
         }
 
         [Obsolete("Use TempPort.Create instead.", true)]
-        public new void InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) {}
-
-        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
+        public new void InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) { }
 
         // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
+        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
         protected new VisualElement inputContainer => base.inputContainer;
 
-        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
-
         // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
+        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
         protected new VisualElement outputContainer => base.outputContainer;
 
-        protected void AddPort(Port port) {
+        protected void AddPort(Port port, bool alsoAddToHierarchy = true) {
+            Ports.Add(port);
+            
+            if(!alsoAddToHierarchy) return;
             var isInput = port.direction == Direction.Input;
             if (isInput) {
                 base.inputContainer.Add(port);
             } else {
                 base.outputContainer.Add(port);
             }
-            Ports.Add(port);
+
         }
 
         public virtual void InitializeNode(EdgeConnectorListener edgeConnectorListener) {
@@ -67,10 +68,7 @@ namespace Dlog {
             base.expanded = value;
         }
 
-        public virtual void SetNodeData(string jsonData) {
-            if(jsonData == null) return;
-            var root = JObject.Parse(jsonData);
-        }
+        public virtual void SetNodeData(string jsonData) { }
 
         public virtual string GetNodeData() {
             var root = new JObject();

@@ -3,10 +3,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 
 namespace Dlog {
-    [Title("Property")]
     public class PropertyNode : AbstractNode {
         private string propertyGuid;
         private EdgeConnectorListener edgeConnectorListener;
@@ -23,7 +21,7 @@ namespace Dlog {
         }
 
         public override void InitializeNode(EdgeConnectorListener edgeConnectorListener) {
-            Initialize("I AM PROPERTY", EditorView.DefaultNodePosition);
+            Initialize("", EditorView.DefaultNodePosition);
             this.edgeConnectorListener = edgeConnectorListener;
             Refresh();
         }
@@ -44,19 +42,33 @@ namespace Dlog {
         }
 
         private void CreatePorts(AbstractProperty property) {
+            Port createdPort;
             switch (property.Type) {
                 case PropertyType.Trigger:
-                    AddPort(DlogPort.Create(property.DisplayName, Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(object), edgeConnectorListener));
+                    createdPort = DlogPort.Create("", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Trigger, edgeConnectorListener); 
                     break;
                 case PropertyType.Check:
-                    AddPort(DlogPort.Create(property.DisplayName, Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(object), edgeConnectorListener));
+                    createdPort = DlogPort.Create("", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Check, edgeConnectorListener);
                     break;
                 case PropertyType.Actor:
-                    AddPort(DlogPort.Create(property.DisplayName, Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(object), edgeConnectorListener));
+                    createdPort = DlogPort.Create("", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Actor, edgeConnectorListener);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            AddPort(createdPort, false);
+            if(createdPort.direction == Direction.Output)
+                titleContainer.Add(createdPort);
+            else {
+                titleContainer.Insert(0, createdPort);
+                titleContainer.AddToClassList("property-port-input");
+            }
+            Update(property);
+            Refresh();
+        }
+
+        public void Update(AbstractProperty property) {
+            title = property.DisplayName;
             Refresh();
         }
     }

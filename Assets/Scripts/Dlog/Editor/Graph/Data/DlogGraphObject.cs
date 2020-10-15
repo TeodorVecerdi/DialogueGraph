@@ -58,9 +58,9 @@ namespace Dlog {
                 Debug.LogError("Trying to handle undo/redo when undo/redo was not performed", this);
                 return;
             }
-
             var deserialized = Deserialize();
             dlogGraph.ReplaceWith(deserialized);
+            // Undo.PerformUndo();
         }
 
         private DlogGraphData Deserialize() {

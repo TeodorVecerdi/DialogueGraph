@@ -1,7 +1,11 @@
+/**
+ * @section Conversation Line
+ */
 #conversation-container {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
+    padding-left: 8px;
 }
 
 #conversation-container #conversation-item {
@@ -12,32 +16,105 @@
     flex-basis: auto;
     white-space: normal;
 }
+
 #conversation-item.message Label {
     min-width: auto;
     align-self: center;
 }
+
 #conversation-item.message TextInput {
     margin-left: 8px;
-    min-width: 80px;
+    min-width: 100px;
     max-width: 200px;
 }
-
 
 #conversation-container #conversation-item.branch-port {
     flex-basis: auto;
     align-self: center;
 }
+
 #conversation-container #conversation-item.trigger-port {
+    flex-basis: 90%;
+}
+
+NpcNode #conversation-container #conversation-item.trigger-port {
     flex-basis: 75%;
+}
+#conversation-container #conversation-item.check-port {
+    flex-basis: auto;
+    padding-left: 0;
+}
+
+#conversation-container #conversation-item.remove-button {
+    flex-basis: 5%;
+    min-width: 0;
+}
+
+#lineTitle {
+    align-self: center;
+    padding-bottom: 8px;
+    -unity-font-style: bold;
+    -unity-text-align: upper-left;
+}
+
+/*
+ * @section General Node
+ */
+
+#title-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+#npc-title-port-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+#npc-title-port-container DlogPort {
+    height: 24px;
+}
+
+NpcNode #title {
+    height: auto;
+}
+
+#title-label {
+    -unity-font-style: bold;
+    margin-left: 16px;
+}
+
+PropertyNode #title-label {
+    margin-left: 6px;
+    /*margin-right: -4px;*/
+}
+
+PropertyNode #collapse-button {
+    display: none;
+}
+
+PropertyNode #title {
+    align-items: center;
+}
+
+PropertyNode #title.property-port-input #title-label {
+    margin-left: 0px;
+    margin-right: 6px;
+}
+
+/*
+ * @section Misc
+ */
+.flex-break {
+    height: 0;
+    flex-basis: 100%;
 }
 
 #divider.horizontal-divider {
     margin-bottom: 6px;
     margin-top: 4px;
-}
-
-#lineTitle {
-    margin-left: 3px;
-    -unity-font-style: bold;
-    -unity-text-align: upper-left;
 }

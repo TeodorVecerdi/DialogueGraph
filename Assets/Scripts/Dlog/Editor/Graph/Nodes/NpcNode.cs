@@ -9,24 +9,26 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Dlog {
-    public class LineDataSelf {
+    public class LineDataNpc {
         public string Line;
         public string PortGuidA;
         public string PortGuidB;
+        public string PortGuidC;
     }
 
-    [Title("Self")]
-    public class SelfNode : AbstractNode {
-        public List<LineDataSelf> Lines = new List<LineDataSelf>();
+    [Title("NPC")]
+    public class NpcNode : AbstractNode {
+        public List<LineDataNpc> Lines = new List<LineDataNpc>();
 
         private bool first = true;
 
         public override void InitializeNode(EdgeConnectorListener edgeConnectorListener) {
             base.InitializeNode(edgeConnectorListener);
-            Initialize("Self", EditorView.DefaultNodePosition);
+            Initialize("NPC", EditorView.DefaultNodePosition);
 
             var button = new Button(() => AddConversationPort(true)) {text = "Create Dialogue Line"};
             extensionContainer.Add(button);
+            
             var titleLabel = this.Q<Label>("title-label");
             var titleElement = this.Q("title");
             var titleC = UIElementsFactory.VisualElement<VisualElement>("title-container", null);
@@ -35,11 +37,15 @@ namespace Dlog {
             titleElement.Insert(0, titleC);
             var lineLabel = new Label {name = "lineTitle", text = "Lines"};
             outputContainer.Add(lineLabel);
-                
-            
+            var titlePortContainer = UIElementsFactory.VisualElement<VisualElement>("npc-title-port-container", null);
+
             var branchPort = DlogPort.Create("Branch", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Branch, edgeConnectorListener);
-            titleC.Insert(0, branchPort);
+            var actorPort = DlogPort.Create("Actor", Orientation.Horizontal, Direction.Input, Port.Capacity.Single, PortType.Actor, edgeConnectorListener);
+            titlePortContainer.Add(branchPort);
+            titlePortContainer.Add(actorPort);
+            titleC.Insert(0, titlePortContainer);
             AddPort(branchPort, false);
+            AddPort(actorPort, false);
             Refresh();
         }
 
@@ -47,7 +53,7 @@ namespace Dlog {
             if (string.IsNullOrEmpty(jsonData)) return;
             base.SetNodeData(jsonData);
             var data = JObject.Parse(jsonData);
-            var lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(data.Value<string>("lines"));
+            var lines = JsonConvert.DeserializeObject<List<LineDataNpc>>(data.Value<string>("lines"));
             Lines.Clear();
             Lines.AddRange(lines);
             for (int i = 0; i < Lines.Count; i++) {
@@ -68,7 +74,7 @@ namespace Dlog {
             if (create) {
                 Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Created Dialogue Line");
                 index = Lines.Count;
-                Lines.Add(new LineDataSelf {Line = ""});
+                Lines.Add(new LineDataNpc {Line = ""});
             }
 
             var message = UIElementsFactory.TextField("conversation-item", "Line", new[] {"message"}, null, null, true);
@@ -82,14 +88,19 @@ namespace Dlog {
             var triggerPort = DlogPort.Create("Trigger", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Trigger, EdgeConnectorListener);
             triggerPort.name = "conversation-item";
             triggerPort.AddToClassList("trigger-port");
+            var checkPort = DlogPort.Create("Check", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Check, EdgeConnectorListener);
+            checkPort.name = "conversation-item";
+            checkPort.AddToClassList("check-port");
 
             var flexBreak = UIElementsFactory.FlexBreaker();
             if (create) {
                 Lines[index].PortGuidA = branchPort.viewDataKey;
                 Lines[index].PortGuidB = triggerPort.viewDataKey;
+                Lines[index].PortGuidC = checkPort.viewDataKey;
             } else {
                 branchPort.viewDataKey = Lines[index].PortGuidA;
                 triggerPort.viewDataKey = Lines[index].PortGuidB;
+                checkPort.viewDataKey = Lines[index].PortGuidC;
             }
 
             message.RegisterCallback<FocusOutEvent>(evt => {
@@ -104,6 +115,7 @@ namespace Dlog {
             conversationContainer.Add(message);
             conversationContainer.Add(branchPort);
             conversationContainer.Add(flexBreak);
+            conversationContainer.Add(checkPort);
             conversationContainer.Add(removeButton);
             conversationContainer.Add(triggerPort);
 
@@ -119,11 +131,14 @@ namespace Dlog {
             outputContainer.Add(conversationContainer);
             Ports.Add(branchPort);
             Ports.Add(triggerPort);
+            Ports.Add(checkPort);
             if (create) {
                 Owner.PortData.Add(branchPort.viewDataKey);
                 Owner.PortData.Add(triggerPort.viewDataKey);
+                Owner.PortData.Add(checkPort.viewDataKey);
                 Owner.GuidPortDictionary.Add(branchPort.viewDataKey, branchPort);
                 Owner.GuidPortDictionary.Add(triggerPort.viewDataKey, triggerPort);
+                Owner.GuidPortDictionary.Add(checkPort.viewDataKey, checkPort);
             }
 
             Refresh();
@@ -139,15 +154,20 @@ namespace Dlog {
             Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Removed Line");
             var edgesToRemove = Owner.EditorView.DlogObject.DlogGraph.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidA || edge.OutputPort == Lines[index].PortGuidA).ToList();
             edgesToRemove.AddRange(Owner.EditorView.DlogObject.DlogGraph.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidB || edge.OutputPort == Lines[index].PortGuidB));
+            edgesToRemove.AddRange(Owner.EditorView.DlogObject.DlogGraph.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidC || edge.OutputPort == Lines[index].PortGuidC));
             Owner.EditorView.DlogObject.DlogGraph.RemoveElements(new List<SerializedNode>(), edgesToRemove);
             Owner.PortData.Remove(Lines[index].PortGuidA);
             Owner.PortData.Remove(Lines[index].PortGuidB);
+            Owner.PortData.Remove(Lines[index].PortGuidC);
             var portA = Owner.GuidPortDictionary[Lines[index].PortGuidA];
             var portB = Owner.GuidPortDictionary[Lines[index].PortGuidB];
+            var portC = Owner.GuidPortDictionary[Lines[index].PortGuidC];
             Owner.GuidPortDictionary.Remove(Lines[index].PortGuidA);
             Owner.GuidPortDictionary.Remove(Lines[index].PortGuidB);
+            Owner.GuidPortDictionary.Remove(Lines[index].PortGuidC);
             Ports.Remove(portA);
             Ports.Remove(portB);
+            Ports.Remove(portC);
             Lines.RemoveAt(index);
             outputContainer.Remove(container);
             Refresh();
