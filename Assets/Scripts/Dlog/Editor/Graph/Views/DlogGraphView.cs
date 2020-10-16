@@ -8,24 +8,30 @@ using UnityEngine.UIElements;
 namespace Dlog {
     public class DlogGraphView : GraphView {
         private EditorView editorView;
+        public EditorView EditorView => editorView;
+        public DlogGraphData DlogGraph => editorView.DlogObject.DlogGraph;
 
         public DlogGraphView(EditorView editorView) {
             this.editorView = editorView;
             RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
             RegisterCallback<DragPerformEvent>(OnDragPerformed);
-            serializeGraphElements += SerializeGraphElements;
-            unserializeAndPaste += UnserializeAndPaste;
+            serializeGraphElements = SerializeGraphElementsImpl;
+            unserializeAndPaste = UnserializeAndPasteImpl;
+            deleteSelection = DeleteSelectionImpl;
         }
 
-        private void UnserializeAndPaste(string operation, string data) {
+        protected override bool canCopySelection => selection.OfType<AbstractNode>().Any() || selection.OfType<Group>().Any() || selection.OfType<BlackboardField>().Any();
+
+        private void UnserializeAndPasteImpl(string operation, string data) {
             editorView.DlogObject.RegisterCompleteObjectUndo(operation);
             var copyPasteData = CopyPasteData.FromJson(data);
             this.InsertCopyPasteData(copyPasteData);
         }
 
-        private string SerializeGraphElements(IEnumerable<GraphElement> elements) {
-            var nodes = elements.OfType<AbstractNode>().Select(x => x.Owner);
-            var edges = elements.OfType<Edge>().Select(x => x.userData).OfType<SerializedEdge>();
+        private string SerializeGraphElementsImpl(IEnumerable<GraphElement> elements) {
+            var elementsList = elements.ToList();
+            var nodes = elementsList.OfType<AbstractNode>().Select(x => x.Owner);
+            var edges = elementsList.OfType<Edge>().Select(x => x.userData).OfType<SerializedEdge>();
             var properties = selection.OfType<BlackboardField>().Select(x => x.userData as AbstractProperty);
 
             // Collect the property nodes and get the corresponding properties
@@ -37,7 +43,6 @@ namespace Dlog {
         }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt) {
-            // var mousePosition = evt.mousePosition;
             base.BuildContextualMenu(evt);
             evt.menu.AppendSeparator();
             if (evt.target is Node || evt.target is StickyNote) {
@@ -49,7 +54,7 @@ namespace Dlog {
             }
 
             if (evt.target is BlackboardField) {
-                evt.menu.AppendAction("Delete", _ => { DeleteSelectionImpl("Delete"); }, actionStatusCallback => canDeleteSelection ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
+                evt.menu.AppendAction("Delete", _ => { DeleteSelectionImpl("Delete", AskUser.DontAskUser); }, actionStatusCallback => canDeleteSelection ? DropdownMenuAction.Status.Normal : DropdownMenuAction.Status.Disabled);
             }
         }
 
@@ -63,7 +68,7 @@ namespace Dlog {
             return compatiblePorts;
         }
 
-        private void DeleteSelectionImpl(string operation) {
+        private void DeleteSelectionImpl(string operation, AskUser askUser) {
             var nodesToDelete = selection.OfType<AbstractNode>().Select(node => node.Owner);
             editorView.DlogObject.RegisterCompleteObjectUndo(operation);
             editorView.DlogObject.DlogGraph.RemoveElements(nodesToDelete.ToList(),

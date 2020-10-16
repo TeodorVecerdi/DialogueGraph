@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -15,9 +17,11 @@ namespace Dlog {
         [SerializeField] private List<SerializedNode> nodes = new List<SerializedNode>();
         [NonSerialized] private List<SerializedNode> addedNodes = new List<SerializedNode>();
         [NonSerialized] private List<SerializedNode> removedNodes = new List<SerializedNode>();
+        [NonSerialized] private List<SerializedNode> pastedNodes = new List<SerializedNode>();
         public List<SerializedNode> Nodes => nodes;
         public List<SerializedNode> AddedNodes => addedNodes;
         public List<SerializedNode> RemovedNodes => removedNodes;
+        public List<SerializedNode> PastedNodes => pastedNodes;
 
         [SerializeField] private List<SerializedEdge> edges = new List<SerializedEdge>();
         [NonSerialized] private List<SerializedEdge> addedEdges = new List<SerializedEdge>();
@@ -35,6 +39,11 @@ namespace Dlog {
         public List<AbstractProperty> AddedProperties => addedProperties;
         public List<AbstractProperty> RemovedProperties => removedProperties;
         public List<AbstractProperty> MovedProperties => movedProperties;
+
+        [NonSerialized] private List<SerializedNode> nodeSelectionQueue = new List<SerializedNode>();
+        [NonSerialized] private List<SerializedEdge> edgeSelectionQueue = new List<SerializedEdge>();
+        public List<SerializedNode> NodeSelectionQueue => nodeSelectionQueue;
+        public List<SerializedEdge> EdgeSelectionQueue => edgeSelectionQueue;
 
         public void OnBeforeSerialize() {
             if (Owner != null)
@@ -59,6 +68,8 @@ namespace Dlog {
             addedProperties.Clear();
             removedProperties.Clear();
             movedProperties.Clear();
+            nodeSelectionQueue.Clear();
+            edgeSelectionQueue.Clear();
         }
 
         public void ReplaceWith(DlogGraphData otherGraphData) {
@@ -81,7 +92,7 @@ namespace Dlog {
             foreach (var edge in otherGraphData.edges) {
                 AddEdge(edge);
             }
-            
+
             foreach (var property in otherGraphData.properties) {
                 AddProperty(property);
             }
@@ -173,39 +184,9 @@ namespace Dlog {
             }
         }
 
-        public string DebugString() {
-            var str = "Graph Data:\n";
-            str += "\tNodes:\n";
-            foreach (var node in nodes) {
-                str += $"\t\t{node.GUID}\n";
-            }
-
-            str += "\tAdded Nodes:\n";
-            foreach (var node in addedNodes) {
-                str += $"\t\t{node.GUID}\n";
-            }
-
-            str += "\tRemoved Nodes:\n";
-            foreach (var node in removedNodes) {
-                str += $"\t\t{node.GUID}\n";
-            }
-
-            str += "\tEdges:\n";
-            foreach (var edge in edges) {
-                str += $"\t\t{edge.Input}->{edge.Output}\n";
-            }
-
-            str += "\tAdded Edges:\n";
-            foreach (var edge in addedEdges) {
-                str += $"\t\t{edge.Input}->{edge.Output}\n";
-            }
-
-            str += "\tRemoved Edges:\n";
-            foreach (var edge in removedEdges) {
-                str += $"\t\t{edge.Input}->{edge.Output}\n";
-            }
-
-            return str;
+        public void QueueSelection(List<SerializedNode> nodes, List<SerializedEdge> edges) {
+            nodeSelectionQueue.AddRange(nodes);
+            edgeSelectionQueue.AddRange(edges);
         }
 
         public void SanitizePropertyName(AbstractProperty property) {
@@ -222,6 +203,77 @@ namespace Dlog {
                 return;
 
             property.OverrideReferenceName = DlogUtility.SanitizeName(properties.Where(prop => prop.GUID != property.GUID).Select(prop => prop.ReferenceName), "{0} ({1})", name);
+        }
+
+        public void Paste(CopyPasteData copyPasteData, List<SerializedNode> remappedNodes, List<SerializedEdge> remappedEdges) {
+            var nodeGuidMap = new Dictionary<string, string>();
+            var portGuidMap = new Dictionary<string, string>();
+            foreach (var node in copyPasteData.Nodes) {
+                var oldGuid = node.GUID;
+                var newGuid = Guid.NewGuid().ToString();
+                node.GUID = newGuid;
+                nodeGuidMap[oldGuid] = newGuid;
+                for (var i = 0; i < node.PortData.Count; i++) {
+                    var newPortGuid = Guid.NewGuid().ToString();
+                    var oldPortGuid = node.PortData[i];
+                    portGuidMap[oldPortGuid] = newPortGuid;
+
+                    node.PortData[i] = newPortGuid;
+                }
+
+                // Ugly magic to change dynamic port guid data
+                if (node.Type == typeof(SelfNode).FullName) {
+                    var data = JObject.Parse(node.NodeData);
+                    var lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(data.Value<string>("lines"));
+
+                    foreach (var currLine in lines) {
+                        currLine.PortGuidA = portGuidMap[currLine.PortGuidA];
+                        currLine.PortGuidB = portGuidMap[currLine.PortGuidB];
+                    }
+
+                    data["lines"] = new JValue(JsonConvert.SerializeObject(lines));
+                    node.NodeData = data.ToString(Formatting.None);
+                } else if (node.Type == typeof(NpcNode).FullName) {
+                    var data = JObject.Parse(node.NodeData);
+                    var lines = JsonConvert.DeserializeObject<List<LineDataNpc>>(data.Value<string>("lines"));
+
+                    foreach (var currLine in lines) {
+                        currLine.PortGuidA = portGuidMap[currLine.PortGuidA];
+                        currLine.PortGuidB = portGuidMap[currLine.PortGuidB];
+                        currLine.PortGuidC = portGuidMap[currLine.PortGuidC];
+                    }
+
+                    data["lines"] = new JValue(JsonConvert.SerializeObject(lines));
+                    node.NodeData = data.ToString(Formatting.None);
+                }
+
+                // offset the pasted node slightly so it's not on top of the original one
+                var drawState = node.DrawState;
+                var position = drawState.Position;
+                position.x += 30;
+                position.y += 30;
+                drawState.Position = position;
+                node.DrawState = drawState;
+                remappedNodes.Add(node);
+                AddNode(node);
+
+                // add the node to the pasted node list
+                pastedNodes.Add(node);
+            }
+
+            foreach (var edge in copyPasteData.Edges) {
+                if (nodeGuidMap.TryGetValue(edge.Output, out var remappedOutputGuid) && nodeGuidMap.TryGetValue(edge.Input, out var remappedInputGuid) &&
+                    portGuidMap.TryGetValue(edge.OutputPort, out var remappedOutputPortGuid) && portGuidMap.TryGetValue(edge.InputPort, out var remappedInputPortGuid)) {
+                    var remappedEdge = new SerializedEdge {
+                        Input = remappedInputGuid,
+                        Output = remappedOutputGuid,
+                        InputPort = remappedInputPortGuid,
+                        OutputPort = remappedOutputPortGuid
+                    };
+                    remappedEdges.Add(remappedEdge);
+                    AddEdge(remappedEdge);
+                }
+            }
         }
     }
 }
