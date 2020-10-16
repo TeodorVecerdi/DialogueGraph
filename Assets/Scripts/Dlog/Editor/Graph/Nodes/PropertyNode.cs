@@ -7,6 +7,7 @@ using UnityEditor.Experimental.GraphView;
 namespace Dlog {
     public class PropertyNode : AbstractNode {
         private string propertyGuid;
+        private string currentType;
         private EdgeConnectorListener edgeConnectorListener;
 
         public string PropertyGuid {
@@ -16,6 +17,10 @@ namespace Dlog {
                 propertyGuid = value;
                 var property = Owner.EditorView.DlogObject.DlogGraph.Properties.FirstOrDefault(prop => prop.GUID == value);
                 if (property == null) return;
+                if(!string.IsNullOrEmpty(currentType)) 
+                    RemoveFromClassList(currentType);
+                currentType = property.Type.ToString();
+                AddToClassList(currentType);
                 CreatePorts(property);
             }
         }

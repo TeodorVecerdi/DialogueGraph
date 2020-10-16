@@ -27,16 +27,16 @@ namespace Dlog {
                     return new Color(0.5f, 0.98f, 1f);
                 case PortType.Trigger:
                     if(port.direction == Direction.Input)
-                        return new Color(0.84f, 0.16f, 0.24f);
-                    return new Color(0.84f, 0.33f, 0.22f);
+                        return new Color(1f, 0.15f, 0.26f);
+                    return new Color(0.84f, 0.26f, 0.16f); 
                 case PortType.Actor:
                     if(port.direction == Direction.Input)
                         return new Color(0.55f, 1f, 0.3f);
-                    return new Color(0.75f, 1f, 0.36f);
+                    return new Color(0.75f, 1f, 0.36f); 
                 case PortType.Branch:
                     if(port.direction == Direction.Input)
-                        return new Color(0.56f, 0.16f, 0.91f);
-                    return new Color(0.67f, 0.24f, 0.91f);
+                        return new Color(0.9f, 1f, 0.99f);
+                    return new Color(0.91f, 0.93f, 1f);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(port), port, "Undefined color for port type.");
             }

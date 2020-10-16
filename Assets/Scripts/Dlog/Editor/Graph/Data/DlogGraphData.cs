@@ -115,6 +115,16 @@ namespace Dlog {
             edges.Where(edge => edge.Input == node.GUID || edge.Output == node.GUID).ToList().ForEach(RemoveEdge);
         }
 
+        public bool HasEdge(Edge edge) {
+            var serializedEdge = new SerializedEdge {
+                Input = edge.input.node.viewDataKey,
+                Output = edge.output.node.viewDataKey,
+                InputPort = edge.input.viewDataKey,
+                OutputPort = edge.output.viewDataKey
+            };
+            return Edges.Any(edge1 => edge1.Input == serializedEdge.Input && edge1.Output == serializedEdge.Output && edge1.InputPort == serializedEdge.InputPort && edge1.OutputPort == serializedEdge.OutputPort);
+        }
+
         public void AddEdge(Edge edge) {
             var serializedEdge = new SerializedEdge {
                 Input = edge.input.node.viewDataKey,
@@ -262,8 +272,11 @@ namespace Dlog {
             }
 
             foreach (var edge in copyPasteData.Edges) {
-                if (nodeGuidMap.TryGetValue(edge.Output, out var remappedOutputGuid) && nodeGuidMap.TryGetValue(edge.Input, out var remappedInputGuid) &&
-                    portGuidMap.TryGetValue(edge.OutputPort, out var remappedOutputPortGuid) && portGuidMap.TryGetValue(edge.InputPort, out var remappedInputPortGuid)) {
+                if ((nodeGuidMap.ContainsKey(edge.Input) || nodeGuidMap.ContainsKey(edge.Output)) && (portGuidMap.ContainsKey(edge.InputPort) || portGuidMap.ContainsKey(edge.OutputPort))) {
+                    var remappedOutputGuid = nodeGuidMap.ContainsKey(edge.Output) ? nodeGuidMap[edge.Output] : edge.Output;
+                    var remappedInputGuid = nodeGuidMap.ContainsKey(edge.Input) ? nodeGuidMap[edge.Input] : edge.Input;
+                    var remappedOutputPortGuid = portGuidMap.ContainsKey(edge.OutputPort) ? portGuidMap[edge.OutputPort] : edge.OutputPort;
+                    var remappedInputPortGuid = portGuidMap.ContainsKey(edge.InputPort) ? portGuidMap[edge.InputPort] : edge.InputPort;
                     var remappedEdge = new SerializedEdge {
                         Input = remappedInputGuid,
                         Output = remappedOutputGuid,

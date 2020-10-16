@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+#pragma warning disable 618
 
 namespace Dlog {
     public class LineDataSelf {
@@ -19,11 +20,14 @@ namespace Dlog {
     public class SelfNode : AbstractNode {
         public List<LineDataSelf> Lines = new List<LineDataSelf>();
 
-        private bool first = true;
+        private VisualElement lineLabel;
 
         public override void InitializeNode(EdgeConnectorListener edgeConnectorListener) {
             base.InitializeNode(edgeConnectorListener);
             Initialize("Self", EditorView.DefaultNodePosition);
+
+            lineLabel = new Label {name = "lineTitle", text = "Lines"};
+            outputContainer.Add(lineLabel);
 
             var button = new Button(() => AddConversationPort(true)) {text = "Create Dialogue Line"};
             extensionContainer.Add(button);
@@ -33,10 +37,7 @@ namespace Dlog {
             titleLabel.RemoveFromHierarchy();
             titleC.Add(titleLabel);
             titleElement.Insert(0, titleC);
-            var lineLabel = new Label {name = "lineTitle", text = "Lines"};
-            outputContainer.Add(lineLabel);
-                
-            
+
             var branchPort = DlogPort.Create("Branch", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Branch, edgeConnectorListener);
             titleC.Insert(0, branchPort);
             AddPort(branchPort, false);
@@ -64,6 +65,7 @@ namespace Dlog {
 
         private void AddConversationPort(bool create, int index = -1) {
             var conversationContainer = new VisualElement {name = "conversation-container"};
+            lineLabel.AddToClassList("visible");
 
             if (create) {
                 Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Created Dialogue Line");
@@ -107,14 +109,10 @@ namespace Dlog {
             conversationContainer.Add(removeButton);
             conversationContainer.Add(triggerPort);
 
-            if (!first) {
-                var separator = new VisualElement {name = "divider"};
-                separator.AddToClassList("horizontal");
-                separator.AddToClassList("horizontal-divider");
-                outputContainer.Add(separator);
-            } else {
-                first = false;
-            }
+            var separator = new VisualElement {name = "divider"};
+            separator.AddToClassList("horizontal");
+            separator.AddToClassList("horizontal-divider");
+            outputContainer.Add(separator);
 
             outputContainer.Add(conversationContainer);
             Ports.Add(branchPort);
@@ -130,11 +128,11 @@ namespace Dlog {
         }
 
         private void RemoveLine(int index) {
+            if (Lines.Count == 1)
+                lineLabel.RemoveFromClassList("visible");
             var container = outputContainer.Children().Where(element => element.name == "conversation-container").ToList()[index];
-            if (index > 0) {
-                var separator = outputContainer.Children().Where(element => element.name == "divider" && element.ClassListContains("horizontal-divider")).ToList()[index - 1];
-                outputContainer.Remove(separator);
-            }
+            var separator = outputContainer.Children().Where(element => element.name == "divider" && element.ClassListContains("horizontal-divider")).ToList()[index];
+            outputContainer.Remove(separator);
 
             Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Removed Line");
             var edgesToRemove = Owner.EditorView.DlogObject.DlogGraph.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidA || edge.OutputPort == Lines[index].PortGuidA).ToList();

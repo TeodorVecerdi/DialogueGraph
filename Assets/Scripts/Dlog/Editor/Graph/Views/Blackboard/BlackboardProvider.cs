@@ -28,8 +28,8 @@ namespace Dlog {
 
             Blackboard = new Blackboard {
                 scrollable = true,
-                title = "Events and Properties",
-                subTitle = "Dialogue Properties",
+                title = "Properties",
+                subTitle = "Dialogue Graph",
                 editTextRequested = EditTextRequested,
                 addItemRequested = AddItemRequested,
                 moveItemRequested = MoveItemRequested

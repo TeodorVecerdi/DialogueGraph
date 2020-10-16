@@ -21,6 +21,8 @@ namespace Dlog {
         }
 
         public void OnDrop(GraphView graphView, Edge edge) {
+            if(editorView.DlogObject.DlogGraph.HasEdge(edge)) return;
+            
             editorView.DlogObject.RegisterCompleteObjectUndo("Connect edge");
             editorView.DlogObject.DlogGraph.AddEdge(edge);
         }

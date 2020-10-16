@@ -1,6 +1,6 @@
 {
     "AssetGuid": "731f62ae2953652459b6a1addda8c3de",
-    "IsBlackboardVisible": true,
+    "IsBlackboardVisible": false,
     "nodes": [
         {
             "GUID": "d9529b0b-2753-4285-b0fa-7c2f5b2e7c1f",
@@ -8,10 +8,10 @@
             "DrawState": {
                 "Position": {
                     "serializedVersion": "2",
-                    "x": 780.0,
-                    "y": 112.0,
-                    "width": 324.0,
-                    "height": 211.0
+                    "x": 771.0,
+                    "y": 104.0,
+                    "width": 374.0,
+                    "height": 230.0
                 },
                 "Expanded": true
             },

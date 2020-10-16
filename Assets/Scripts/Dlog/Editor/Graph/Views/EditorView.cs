@@ -176,24 +176,7 @@ namespace Dlog {
             foreach (var addedEdge in dlogObject.DlogGraph.AddedEdges) {
                 AddEdge(addedEdge);
             }
-
-            /*if (dlogObject.DlogGraph.NodeSelectionQueue.Any() || dlogObject.DlogGraph.EdgeSelectionQueue.Any()) {
-                Debug.Log($"Queued nodes: {dlogObject.DlogGraph.NodeSelectionQueue.Count}, Queued edges: {dlogObject.DlogGraph.EdgeSelectionQueue.Count}");
-                var selectedNodes = 0;
-                var selectedEdges = 0;
-                graphView.graphElements.ForEach(element => {
-                    if (element is Edge edge && dlogObject.DlogGraph.EdgeSelectionQueue.Contains(edge.userData as SerializedEdge)) {
-                        graphView.AddToSelection(edge);
-                        selectedEdges++;
-                    }
             
-                    if (element is AbstractNode node && dlogObject.DlogGraph.NodeSelectionQueue.Contains(node.Owner)) {
-                        graphView.AddToSelection(node);
-                        selectedNodes++;
-                    }
-                });
-                Debug.Log($"Selected nodes: {selectedNodes}, Selected edges: {selectedEdges}");
-            }*/
             foreach (var queuedNode in dlogObject.DlogGraph.NodeSelectionQueue) {
                 graphView.AddToSelection(queuedNode.Node);
             }
@@ -224,6 +207,8 @@ namespace Dlog {
 
         public void RemoveEdge(SerializedEdge edgeToRemove) {
             if (edgeToRemove.Edge != null) {
+                edgeToRemove.Edge.input?.Disconnect(edgeToRemove.Edge);
+                edgeToRemove.Edge.output?.Disconnect(edgeToRemove.Edge);
                 graphView.RemoveElement(edgeToRemove.Edge);
             }
         }

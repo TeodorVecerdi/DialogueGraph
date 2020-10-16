@@ -5,11 +5,9 @@ using UnityEngine.UIElements;
 
 namespace Dlog {
     public class SearchWindowAdapter : SearcherAdapter {
-        private readonly VisualTreeAsset m_DefaultItemTemplate;
         public override bool HasDetailsPanel => false;
 
         public SearchWindowAdapter(string title) : base(title) {
-            m_DefaultItemTemplate = Resources.Load<VisualTreeAsset>("SearcherItem");
         }
     }
 

@@ -73,7 +73,8 @@ namespace Dlog {
             editorView.DlogObject.RegisterCompleteObjectUndo(operation);
             editorView.DlogObject.DlogGraph.RemoveElements(nodesToDelete.ToList(),
                 selection.OfType<Edge>().Select(e => e.userData).OfType<SerializedEdge>().ToList());
-
+            
+            
             foreach (var selectable in selection) {
                 if (!(selectable is BlackboardField field) || field.userData == null)
                     continue;

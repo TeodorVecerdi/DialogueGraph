@@ -50,7 +50,7 @@ namespace Dlog {
                 var propertyNode = node.Node as PropertyNode;
                 propertyNode.PropertyGuid = property.GUID;
                 node.BuildPortData();
-                AddEntries(node, new[] {"Properties", "Property: " + property.DisplayName}, nodeEntries);
+                AddEntries(node, new[] {"Properties", $"{property.Type}: {property.DisplayName}"}, nodeEntries);
             }
 
             nodeEntries.Sort((entry1, entry2) => {
@@ -58,12 +58,18 @@ namespace Dlog {
                     if (i >= entry2.Title.Length)
                         return 1;
                     var value = string.Compare(entry1.Title[i], entry2.Title[i], StringComparison.Ordinal);
-                    if (value != 0) {
-                        // Make sure that leaves go before nodes
-                        if (entry1.Title.Length != entry2.Title.Length && (i == entry1.Title.Length - 1 || i == entry2.Title.Length - 1))
-                            return entry1.Title.Length < entry2.Title.Length ? -1 : 1;
-                        return value;
+                    if (value == 0)
+                        continue;
+
+                    // Make sure that leaves go before nodes
+                    if (entry1.Title.Length != entry2.Title.Length && (i == entry1.Title.Length - 1 || i == entry2.Title.Length - 1)) {
+                        //once nodes are sorted, sort slot entries by slot order instead of alphebetically 
+                        var alphaOrder = entry1.Title.Length < entry2.Title.Length ? -1 : 1;
+                        var slotOrder = entry1.CompatiblePortIndex.CompareTo(entry2.CompatiblePortIndex);
+                        return alphaOrder.CompareTo(slotOrder);
                     }
+
+                    return value;
                 }
 
                 return 0;
@@ -79,13 +85,20 @@ namespace Dlog {
             }
 
             var portIndices = new List<int>();
-            for (var i = 0; i < node.Node.Ports.Count; i++) portIndices.Add(i);
-            portIndices.RemoveAll(portIndex => ConnectedPort.portType != node.Node.Ports[portIndex].portType || ConnectedPort.direction == node.Node.Ports[portIndex].direction);
+            for (var i = 0; i < node.Node.Ports.Count; i++) {
+                if ((ConnectedPort as DlogPort).IsCompatibleWith(node.Node.Ports[i] as DlogPort) && ConnectedPort.direction != node.Node.Ports[i].direction) {
+                    portIndices.Add(i);
+                }
+            }
+
             foreach (var portIndex in portIndices) {
                 var newTitle = new string[title.Length];
                 for (int i = 0; i < title.Length - 1; i++)
                     newTitle[i] = title[i];
-                newTitle[title.Length - 1] = title[title.Length - 1] + $" ({node.Node.Ports[portIndex].portName})";
+
+                newTitle[title.Length - 1] = title[title.Length - 1];
+                if (!string.IsNullOrEmpty(node.Node.Ports[portIndex].portName))
+                    newTitle[title.Length - 1] += $" ({node.Node.Ports[portIndex].portName})";
 
                 nodeEntries.Add(new NodeEntry(node, newTitle, portIndex));
             }
@@ -100,8 +113,12 @@ namespace Dlog {
             var node = (AbstractNode) Activator.CreateInstance(nodeType);
             node.InitializeNode(null);
             var portIndices = new List<int>();
-            for (var i = 0; i < node.Ports.Count; i++) portIndices.Add(i);
-            portIndices.RemoveAll(portIndex => ConnectedPort.portType != node.Ports[portIndex].portType || ConnectedPort.direction == node.Ports[portIndex].direction);
+            for (var i = 0; i < node.Ports.Count; i++) {
+                if ((ConnectedPort as DlogPort).IsCompatibleWith(node.Ports[i] as DlogPort) && ConnectedPort.direction != node.Ports[i].direction) {
+                    portIndices.Add(i);
+                }
+            }
+
             foreach (var portIndex in portIndices) {
                 var newTitle = new string[title.Length];
                 for (int i = 0; i < title.Length - 1; i++)
@@ -165,7 +182,7 @@ namespace Dlog {
             var nodeEntry = (selectedEntry as SearchNodeItem).NodeEntry;
             var windowMousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, mousePosition);
             var graphMousePosition = editorView.GraphView.contentViewContainer.WorldToLocal(windowMousePosition);
-            
+
             SerializedNode node;
             if (nodeEntry.Node != null) {
                 node = nodeEntry.Node;
@@ -179,7 +196,8 @@ namespace Dlog {
             editorView.DlogObject.DlogGraph.AddNode(node);
 
             if (ConnectedPort != null) {
-                node.BuildNode(editorView, null);
+                if (nodeEntry.Node == null)
+                    node.BuildNode(editorView, null);
                 var edge = new SerializedEdge {
                     Output = ConnectedPort.node.viewDataKey,
                     Input = node.GUID,
