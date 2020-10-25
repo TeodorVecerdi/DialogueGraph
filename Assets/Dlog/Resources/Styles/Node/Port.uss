@@ -1,0 +1,40 @@
+.optional #connector {
+    border-radius: 2px;
+}
+
+.optional #connector #cap {
+    border-radius: 1px;
+}
+#connector #cap {
+    border-width: 1px;
+    margin: -1px;
+}
+DlogPort.input {
+    margin-left: -12px;
+}
+
+DlogPort.output {
+    margin-right: -12px;
+}
+
+/*
+.square-circle.input #connector {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.square-circle.input #connector #cap {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.square-circle.output #connector {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.square-circle.output #connector #cap {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+*/

@@ -1,0 +1,225 @@
+/**
+ * @section Conversation Line
+ */
+#conversation-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    padding-left: 8px;
+    align-content: center;
+}
+
+#conversation-container #conversation-item {
+    flex: 1 0;
+}
+
+#conversation-container #conversation-item.message {
+    flex-basis: auto;
+    white-space: normal;
+}
+
+#conversation-item.message Label {
+    min-width: auto;
+    align-self: center;
+}
+
+#conversation-item.message TextInput {
+    margin-left: 8px;
+    min-width: 150px;
+    max-width: 200px;
+}
+
+#conversation-container #conversation-item.branch-port {
+    flex-basis: auto;
+    align-self: center;
+}
+
+#conversation-container #conversation-item.trigger-port {
+    flex-basis: 90%;
+}
+
+NpcNode #conversation-container #conversation-item.trigger-port {
+    flex-basis: 75%;
+}
+#conversation-container #conversation-item.check-port {
+    flex-basis: auto;
+    padding-left: 0;
+}
+
+#conversation-container #conversation-item.remove-button {
+    flex-basis: 5%;
+    min-width: 0;
+}
+
+.node.collapsed #conversation-container #conversation-item.remove-button {
+    display: none;
+}
+
+#lineTitle {
+    display: none;
+    align-self: center;
+    padding-bottom: 8px;
+    -unity-font-style: bold;
+    -unity-text-align: upper-left;
+}
+#lineTitle.visible {
+    display: flex;
+}
+
+/*
+ * @section General Node
+ */
+
+#node-border {
+    overflow: visible;
+    border-width: 0;
+}
+#selection-border {
+    margin: 2px;
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: #191919;
+}
+
+#title {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+PropertyNode #title, #collapsible-area {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#title-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+#npc-title-port-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+#npc-title-port-container DlogPort {
+    height: 24px;
+}
+
+NpcNode #title {
+    height: auto;
+}
+
+#title-label {
+    -unity-font-style: bold;
+    color: #e2e2e2;
+    margin-left: 16px;
+}
+
+PropertyNode #title-label {
+    margin-left: 6px;
+    /*margin-right: -4px;*/
+}
+
+PropertyNode #collapse-button {
+    display: none;
+}
+
+PropertyNode #title {
+    align-items: center;
+}
+
+PropertyNode #title.property-port-input #title-label {
+    margin-left: 0px;
+    margin-right: 6px;
+}
+
+/*
+ * @section Misc
+ */
+.flex-break {
+    height: 0;
+    flex-basis: 100%;
+}
+
+#divider.horizontal-divider {
+    margin-bottom: 6px;
+    margin-top: 4px;
+}
+
+/*
+ * @section Specific node styling
+ */
+.node {
+    --self-selection: #10f52f;
+    --self-node: #229f31;
+    --self-collapse: #058311;
+    
+    --npc-selection: #3094f1;
+    --npc-node: #0d68b7;
+    --npc-collapse: rgba(10, 87, 155, 255);
+
+    --check-selection: #7ff8fd;
+    --check-node: #2a98a7;
+    --check-collapse: rgba(27, 107, 122, 255);
+    
+    --trigger-selection: #d5293d;
+    --trigger-node: #8d131a;
+    --trigger-collapse: rgba(107, 10, 16, 255);
+    
+    --actor-selection: #befd5c;
+    --actor-node: #71a713;
+    --actor-collapse: rgba(71, 102, 10, 255);
+    
+    --extension-padding: 4px 4px;
+}
+
+.node #collapsible-area {
+    background-color: #212121;
+}
+.node #extension {
+    padding: var(--extension-padding);
+}
+
+SelfNode #title {
+    background-color: var(--self-node);
+}
+SelfNode:checked #selection-border, SelfNode:hover #selection-border, SelfNode:checked:hover #selection-border  {
+    border-color: var(--self-selection);
+}
+SelfNode:hover #collapse-button:hover > #icon {
+    background-color: var(--self-collapse);
+}
+
+NpcNode #title, NpcNode #collapsible-area {
+    background-color: var(--npc-node);
+}
+
+NpcNode:checked #selection-border, NpcNode:hover #selection-border, NpcNode:checked:hover #selection-border  {
+    border-color: var(--npc-selection);
+}
+NpcNode:hover #collapse-button:hover > #icon {
+    background-color: var(--npc-collapse);
+}
+PropertyNode.Check #title {
+    background-color: var(--check-node);
+}
+PropertyNode.Check:checked #selection-border, PropertyNode.Check:hover #selection-border, PropertyNode.Check:checked:hover #selection-border  {
+    border-color: var(--check-selection);
+}
+
+PropertyNode.Trigger #title {
+    background-color: var(--trigger-node);
+}
+PropertyNode.Trigger:checked #selection-border, PropertyNode.Trigger:hover #selection-border, PropertyNode.Trigger:checked:hover #selection-border   {
+    border-color: var(--trigger-selection);
+}
+
+PropertyNode.Actor #title {
+    background-color: var(--actor-node);
+}
+PropertyNode.Actor:checked #selection-border, PropertyNode.Actor:hover #selection-border, PropertyNode.Actor:checked:hover #selection-border {
+    border-color: var(--actor-selection);
+}

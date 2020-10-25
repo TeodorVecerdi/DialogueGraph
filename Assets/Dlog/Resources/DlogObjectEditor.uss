@@ -1,0 +1,50 @@
+.container {
+    background-color: #222222;
+    margin: 5px 10px 5px 0;
+    padding: 5px;
+    border-width: 3px;
+    border-radius: 10px;
+    border-color: #181818;
+}
+
+#propertiesContainer {
+    margin-top: 8px;
+}
+
+.container-inner {
+    background-color: #393939;
+    margin: 5px 0;
+    padding: 5px;
+    padding-left: 20px;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: #282828;
+}
+.container-inner Toggle Label {
+    font-size: 20px;
+    flex-grow: 1;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+.container-inner Toggle VisualElement#unity-checkmark {
+    align-self: center;
+}
+.heading{
+    margin: 5px 0 10px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.error-text {
+    margin: 10px 0;
+    font-size: 14px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    color: #E71F00;
+}
+
+.hidden {
+    display: none;
+}
