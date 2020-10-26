@@ -13,6 +13,10 @@ DlogPort.input {
     margin-left: -12px;
 }
 
+DlogPort.check-port {
+    margin-left: -16px;
+}
+
 DlogPort.output {
     margin-right: -12px;
 }

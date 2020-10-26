@@ -80,24 +80,6 @@ namespace Dlog {
                 referenceNameField.AddToClassList("modified");
 
             AddRow("Reference Name", referenceNameField);
-
-            if (property.Type == PropertyType.Actor) {
-                var actorProperty = property as ActorProperty;
-                var actorName = actorProperty.Value.Name;
-                if (string.IsNullOrEmpty(actorName)) actorName = "New Actor";
-                
-                var nameField = new TextField(512, false, false, ' ') {value = actorName};
-                
-                nameField.RegisterValueChangedCallback(evt => {
-                    editorView.DlogObject.RegisterCompleteObjectUndo("Change actor name");
-                    var actorPropertyValue = actorProperty.Value;
-                    actorPropertyValue.Name = evt.newValue;
-                    actorProperty.Value = actorPropertyValue;
-                    MarkDirtyRepaint();
-                });
-                
-                AddRow("Actor Name", nameField);
-            }
         }
 
         private void UpdateReferenceNameResetMenu() {

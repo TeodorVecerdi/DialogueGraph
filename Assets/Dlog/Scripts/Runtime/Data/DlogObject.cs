@@ -9,19 +9,18 @@ namespace Dlog.Runtime {
         [SerializeField] public List<Node> Nodes;
         [SerializeField] public List<Edge> Edges;
         [SerializeField] public List<Property> Properties;
-        [SerializeField] public Guid StartNode;
-        public Guid CurrentNode;
+        [SerializeField] public string StartNode;
 
-        public Dictionary<Guid, Node> NodeDictionary;
-        public Dictionary<Guid, Property> PropertyDictionary;
+        public NodeDictionary NodeDictionary;
+        public PropertyDictionary PropertyDictionary;
 
         public void BuildGraph() {
-            PropertyDictionary = new Dictionary<Guid, Property>();
+            PropertyDictionary = new PropertyDictionary();
             foreach (var property in Properties) {
                 PropertyDictionary.Add(property.Guid, property);
             }
 
-            NodeDictionary = new Dictionary<Guid, Node>();
+            NodeDictionary = new NodeDictionary();
             foreach (var node in Nodes) {
                 NodeDictionary.Add(node.Guid, node);
             }
@@ -33,8 +32,9 @@ namespace Dlog.Runtime {
             foreach (var node in Nodes) {
                 if (node.Type == NodeType.PROP) continue;
                 foreach (var line in node.Lines) {
-                    line.Checks = new List<Guid>();
-                    line.Triggers = new List<Guid>();
+                    line.Checks = new List<string>();
+                    line.Triggers = new List<string>();
+                    string setNext =  null;
                     foreach (var edge in Edges) {
                         // Find triggers
                         if (line.TriggerPort == edge.FromPort) {
@@ -49,11 +49,16 @@ namespace Dlog.Runtime {
                         // Find previous node
                         if (edge.ToNode == node.Guid && NodeDictionary[edge.FromNode].Type != NodeType.PROP)
                             node.Previous = edge.FromNode;
-
+                        
+                        // Find next node
+                        if (edge.FromNode == node.Guid && line.Next == edge.FromPort)
+                            setNext = edge.ToNode;
                         // Find actor node
                         if (edge.ToNode == node.Guid && node.Type == NodeType.NPC && propertyNodes.ContainsKey(edge.FromNode) && PropertyDictionary[propertyNodes[edge.FromNode].Temp_PropertyNodeGuid].Type == PropertyType.Actor)
                             node.ActorGuid = propertyNodes[edge.FromNode].Temp_PropertyNodeGuid;
                     }
+
+                    line.Next = setNext;
                 }
             }
 
@@ -67,18 +72,16 @@ namespace Dlog.Runtime {
 
             // Find start node
             foreach (var node in Nodes) {
-                if (node.Previous != Guid.Empty)
+                if (!string.IsNullOrEmpty(node.Previous))
                     continue;
                 
-                if (StartNode != Guid.Empty) {
+                if (!string.IsNullOrEmpty(StartNode)) {
                     Debug.LogWarning("Multiple nodes without a previous node detected! Defaulting to the first one found to be the start node.");
                     continue;
                 }
 
-                StartNode = node.Previous;
+                StartNode = node.Guid;
             }
-
-            CurrentNode = StartNode;
         }
     }
 }

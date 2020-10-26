@@ -1,0 +1,16 @@
+.trigger-container {
+    background-color: #3b3b3b;
+    margin: 5px;
+    margin-left: -25px;
+    padding: 5px;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: #282828;
+}
+
+.trigger-title {
+    margin: 5px 0 10px;
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+}

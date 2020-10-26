@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<engine:UXML
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:engine="UnityEngine.UIElements"
+        xmlns:editor="UnityEditor.UIElements"
+        xsi:noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd"
+>
+    <engine:VisualElement class="actor-container">
+        <engine:Label name="actorIdentifier" class="actor-title"/>
+        <engine:TextField label="Name" name="actorName" class="actor-name"/>
+        <editor:ObjectField name="customActorData" label="Custom Data"/>
+    </engine:VisualElement>
+
+
+</engine:UXML>

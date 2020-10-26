@@ -13,7 +13,6 @@ using Object = UnityEngine.Object;
 
 namespace Dlog {
     public class DlogEditorWindow : EditorWindow {
-
         private string selectedAssetGuid;
         private DlogGraphObject dlogObject;
         private DlogWindowEvents windowEvents;
@@ -27,7 +26,7 @@ namespace Dlog {
         }
         public DlogGraphObject GraphObject => dlogObject;
         public DlogWindowEvents Events => windowEvents;
-        
+
         public bool IsDirty {
             get {
                 if (deleted) return false;
@@ -47,21 +46,24 @@ namespace Dlog {
                 IsBlackboardVisible = dlogObject.IsBlackboardVisible
             };
             rootVisualElement.Add(editorView);
-            
+
             Refresh();
         }
 
         private void Update() {
-
             if (focusedWindow == this && deleted) {
-                Debug.Log("Graph deleted");
-                // TODO: Ask user if they want to save
-                Close();
+                DisplayDeletedFromDiskDialog();
+            }
+
+            if (dlogObject == null && selectedAssetGuid != null) {
+                var assetGuid = selectedAssetGuid;
+                selectedAssetGuid = null;
+                var newObject = DlogUtility.LoadGraphAtGuid(assetGuid);
+                SetDlogObject(newObject);
+                Refresh();
             }
 
             if (dlogObject == null) {
-                Debug.Log("Graph Object is null");
-                // TODO: Attempt to recover
                 Close();
                 return;
             }
@@ -85,9 +87,23 @@ namespace Dlog {
                 UpdateTitle();
                 dlogObject.IsDirty = false;
             }
-            
+
             editorView.HandleChanges();
             dlogObject.DlogGraph.ClearChanges();
+        }
+
+        private void DisplayDeletedFromDiskDialog() {
+            bool shouldClose = true; // Close unless if the same file was replaced
+
+            if (EditorUtility.DisplayDialog("Dialogue Graph Missing", AssetDatabase.GUIDToAssetPath(selectedAssetGuid)
+                                                                      + " has been deleted or moved outside of Unity.\n\nWould you like to save your Graph Asset?", "Save As", "Close Window")) {
+                shouldClose = !SaveAs();
+            }
+
+            if (shouldClose)
+                Close();
+            else
+                deleted = false; // Was restored
         }
 
         public void SetDlogObject(DlogGraphObject dlogObject) {
@@ -112,9 +128,9 @@ namespace Dlog {
         private void OnEnable() {
             this.SetAntiAliasing(4);
         }
-        
+
         private void OnDestroy() {
-            if (IsDirty && EditorUtility.DisplayDialog("PLACEHOLDER TITLE [SAVE DIALOG]", "PLACEHOLDER MESSAGE [SAVE DIALOG]", "Save", "Don't Save")) {
+            if (IsDirty && EditorUtility.DisplayDialog("Dlog Graph has been modified", "Do you want to save the changes you made in the Dialogue Graph?\nYour changes will be lost if you don't save them.", "Save", "Don't Save")) {
                 SaveAsset();
             }
         }
@@ -125,26 +141,33 @@ namespace Dlog {
             UpdateTitle();
         }
 
-        private void SaveAs() {
+        private bool SaveAs() {
             if (!string.IsNullOrEmpty(selectedAssetGuid) && dlogObject != null) {
                 var assetPath = AssetDatabase.GUIDToAssetPath(selectedAssetGuid);
-                if(string.IsNullOrEmpty(assetPath) || dlogObject == null) 
-                    return;
+                if (string.IsNullOrEmpty(assetPath) || dlogObject == null)
+                    return false;
 
                 var directoryPath = Path.GetDirectoryName(assetPath);
                 var savePath = EditorUtility.SaveFilePanelInProject("Save As...", Path.GetFileNameWithoutExtension(assetPath), DlogGraphImporter.Extension, "", directoryPath);
                 savePath = savePath.Replace(Application.dataPath, "Assets");
-                if (savePath != directoryPath && !string.IsNullOrEmpty(savePath)) {
-                    if (DlogUtility.CreateFile(savePath, dlogObject)) {
-                        dlogObject.RecalculateAssetGuid(savePath);
-                        DlogGraphImporterEditor.OpenEditorWindow(savePath);
+                if (savePath != directoryPath) {
+                    if (!string.IsNullOrEmpty(savePath)) {
+                        if (DlogUtility.CreateFile(savePath, dlogObject)) {
+                            dlogObject.RecalculateAssetGuid(savePath);
+                            DlogGraphImporterEditor.OpenEditorWindow(savePath);
+                        }
                     }
+
+                    dlogObject.IsDirty = false;
+                    return false;
                 }
-                dlogObject.IsDirty = false;
-            } else {
+
                 SaveAsset();
                 dlogObject.IsDirty = false;
+                return true;
             }
+
+            return false;
         }
 
         private void ShowInProject() {

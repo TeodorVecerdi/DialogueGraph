@@ -33,7 +33,6 @@ namespace Dlog {
             var jsonString = JsonUtility.ToJson(dlogObject.DlogGraph, true);
             File.WriteAllText(assetPath, jsonString);
             if (refreshAsset) AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
-
             return true;
         }
 

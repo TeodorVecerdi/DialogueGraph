@@ -23,6 +23,7 @@
 .container-inner Toggle Label {
     font-size: 20px;
     flex-grow: 1;
+    margin-left: -10px;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
 }
@@ -47,4 +48,10 @@
 
 .hidden {
     display: none;
+}
+
+#clearData {
+    padding: 6px 0;
+    margin: 12px 0 4px 0;
+    color: #ffffff;
 }

@@ -5,9 +5,9 @@ namespace Dlog.Runtime {
     [Serializable]
     public class Node {
         public NodeType Type;
-        public Guid Guid;
+        public string Guid;
 
-        public Guid ActorGuid;
+        public string ActorGuid;
         
         /// <summary>
         /// Since multiple nodes can be a previous node to a certain node, we are only
@@ -15,9 +15,9 @@ namespace Dlog.Runtime {
         /// node has multiple previous nodes because you never need to backtrack in the
         /// graph. You will only walk forwards in the graph.
         /// </summary>
-        public Guid Previous;
+        public string Previous;
         public List<ConversationLine> Lines;
-        public Guid Temp_PropertyNodeGuid;
+        public string Temp_PropertyNodeGuid;
     }
 
     public enum NodeType {

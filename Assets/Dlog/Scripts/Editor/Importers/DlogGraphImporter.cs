@@ -14,7 +14,6 @@ namespace Dlog {
         public const string Extension = "dlog";
         
         public override void OnImportAsset(AssetImportContext ctx) {
-            Debug.Log($"Imported: {ctx.assetPath}");
             var dlogObject = DlogUtility.LoadGraphAtPath(ctx.assetPath);
             var icon = Resources.Load<Texture2D>(ResourcesUtility.IconBig);
             var runtimeIcon = Resources.Load<Texture2D>(ResourcesUtility.RuntimeIconBig);
@@ -32,14 +31,13 @@ namespace Dlog {
             var assetNameSubStartIndex = filePath.LastIndexOf('/') + 1;
             var assetNameSubEndIndex = filePath.LastIndexOf('.');
             var assetName = filePath.Substring(assetNameSubStartIndex, assetNameSubEndIndex-assetNameSubStartIndex);
-            Debug.Log($"Asset name: {assetName}");
             runtimeObject.name = assetName;
             // Add properties
             runtimeObject.Properties = new List<Runtime.Property>();
             runtimeObject.Properties.AddRange(dlogObject.DlogGraph.Properties.Select(
                 property =>
                     new Runtime.Property {
-                        Type = property.Type, DisplayName = property.DisplayName, ReferenceName = property.ReferenceName, Guid = Guid.Parse(property.GUID)
+                        Type = property.Type, DisplayName = property.DisplayName, ReferenceName = property.ReferenceName, Guid = property.GUID
                     }
             ));
 
@@ -49,7 +47,7 @@ namespace Dlog {
                 var nodeData = JObject.Parse(node.NodeData);
 
                 var runtimeNode = new Runtime.Node();
-                runtimeNode.Guid = Guid.Parse(node.GUID);
+                runtimeNode.Guid = node.GUID;
                 switch (node.Type) {
                     case "Dlog.SelfNode":
                         runtimeNode.Type = NodeType.SELF;
@@ -59,7 +57,7 @@ namespace Dlog {
                         break;
                     case "Dlog.PropertyNode":
                         runtimeNode.Type = NodeType.PROP;
-                        runtimeNode.Temp_PropertyNodeGuid = Guid.Parse(nodeData.Value<string>("propertyGuid"));
+                        runtimeNode.Temp_PropertyNodeGuid = nodeData.Value<string>("propertyGuid");
                         break;
                 }
 
@@ -69,13 +67,13 @@ namespace Dlog {
                     if (runtimeNode.Type == NodeType.SELF) {
                         var lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(nodeData.Value<string>("lines"));
                         foreach (var line in lines) {
-                            var runtimeLine = new ConversationLine {Message = line.Line, Next = Guid.Parse(line.PortGuidA), TriggerPort = Guid.Parse(line.PortGuidB), CheckPort = Guid.Empty};
+                            var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = Guid.Empty.ToString()};
                             runtimeNode.Lines.Add(runtimeLine);
                         }
                     } else {
                         var lines = JsonConvert.DeserializeObject<List<LineDataNpc>>(nodeData.Value<string>("lines"));
                         foreach (var line in lines) {
-                            var runtimeLine = new ConversationLine {Message = line.Line, Next = Guid.Parse(line.PortGuidA), TriggerPort = Guid.Parse(line.PortGuidB), CheckPort = Guid.Parse(line.PortGuidC)};
+                            var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = line.PortGuidC};
                             runtimeNode.Lines.Add(runtimeLine);
                         }
                     }
@@ -89,13 +87,15 @@ namespace Dlog {
             runtimeObject.Edges.AddRange(dlogObject.DlogGraph.Edges.Select(
                 edge =>
                     new Runtime.Edge {
-                        FromNode = Guid.Parse(edge.Output), FromPort = Guid.Parse(edge.OutputPort), ToNode = Guid.Parse(edge.Input), ToPort = Guid.Parse(edge.InputPort)
+                        FromNode = edge.Output, FromPort = edge.OutputPort, ToNode = edge.Input, ToPort = edge.InputPort
                     }
             ));
             runtimeObject.BuildGraph();
             
             ctx.AddObjectToAsset("RuntimeAsset", runtimeObject, runtimeIcon);
             AssetDatabase.Refresh();
+            
+            EditorUtility.SetDirty(runtimeObject);
         }
     }
 }
