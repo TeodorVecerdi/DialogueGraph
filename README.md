@@ -7,6 +7,14 @@
 
 This project is developed for a self-defined learning objective that is part of the Personal Portfolio 1 course at Saxion.
 
+# Installing Dialogue Graph
+To install Dialogue Graph in your project use the Unity Package Manager.  
+To open the Unity Package Manager, inside unity, go to `Window > Package Manager` and to install Dialogue Graph click the `+` icon in the upper left corner of the window, then click on `Add package from git URL...` and paste in `https://github.com/TeodorVecerdi/DialogueGraph.git`
+
+Steps:  
+![Steps 1 and 2](https://i.imgur.com/potNoAK.png)
+![Steps 3 and 4](https://i.imgur.com/QUM0rwS.png)
+
 # Contributing
 If you would like to contribute to this project feel free to submit a **pull request**, and take a look at the 
 [Contributing document](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/Github~/CONTRIBUTING.md "CONTRIBUTING.md") provided to get a better insight into what **contributing** means, and the [Code of Conduct](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/Github~/CODE_OF_CONDUCT.md).
