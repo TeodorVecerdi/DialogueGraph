@@ -1,0 +1,18 @@
+{
+    "name": "DialogueGraph.Runtime",
+    "references": [
+        "GUID:11a2306c728a4b843a652ec6c2f142bc",
+        "GUID:a49fd1d25e23fd14e85d1cbf342bb06f",
+        "GUID:5debd524d9fe37b44aa7aede833a8eb7",
+        "GUID:479678a6fc2d434439a70c037334ff05"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

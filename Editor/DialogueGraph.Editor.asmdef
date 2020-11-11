@@ -1,0 +1,20 @@
+{
+    "name": "DialogueGraph.Editor",
+    "references": [
+        "GUID:d6f4b79f0a67eb24690aba82c1078929",
+        "GUID:4988cf9794f41d64c884876ab6574b89",
+        "GUID:5debd524d9fe37b44aa7aede833a8eb7",
+        "GUID:479678a6fc2d434439a70c037334ff05"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
