@@ -12,15 +12,50 @@ To install Dialogue Graph in your project use the Unity Package Manager.
 To open the Unity Package Manager, inside unity, go to `Window > Package Manager` and to install Dialogue Graph click the `+` icon in the upper left corner of the window, then click on `Add package from git URL...` and paste in `https://github.com/TeodorVecerdi/DialogueGraph.git`
 
 Steps:  
-![Steps 1 and 2](https://i.imgur.com/potNoAK.png)
-![Steps 3 and 4](https://i.imgur.com/QUM0rwS.png)
+![Steps 1 and 2](Github~/resources/DialogueGraph_tutorial1.png)
+![Steps 3 and 4](Github~/resources/DialogueGraph_tutorial2.png)
+
+# Using Dialogue Graph (WIP)
+## Editor
+To start using Dialogue Graph create a Dlog Graph object in your assets folder by going to `Assets > Create > Dialogue > Dlog Graph`.  
+Dialogue Graph currently contains three different nodes: **NPC**, **Self**, and **Property**.
+### NPC and Self Nodes
+#### General
+#### Dialogue Lines
+The NPC and Self nodes represent the dialogue lines said by either an NPC or the player. After creating one of these two nodes you can add dialogue lines by clicking the `Create Dialogue Line` button on each respective node.  
+Each dialogue line entry comes with additional ports. **Branch** and **Trigger** ports are available to both node types and the **Check** port is available only to NPC nodes.  
+The **Branch** port connects to the next node in the conversation tree. This connection is used by the runtime engine to progress the conversation once an option (dialogue line) was chosen. Unless you want the conversation to end with that line you should connect the Branch port to another node.  
+The **Trigger** port connects to one or more Trigger property nodes and is optional (more on that in the [**Property Nodes** section](#property-nodes)).
+The **Branch** port connects to one or more Trigger property nodes and is optional (more on that in the [**Property Nodes** section](#property-nodes)).
+#### Actor Port
+NPC nodes also contain an **Actor** port to which you should connect your Actor Property node (more on that in the [**Property Nodes** section](#property-nodes)). Actor property nodes not only let you differentiate between which character performs the dialogue lines but also allows you to attach any custom data to the actor through scriptable objects.
+### Property Nodes
+### Images
+Note: The following images use the Sample Project included with the package. You can install the Sample Project by going to the package manager, selecting Dialogue Graph, and clicking the `Import` button under Samples.  
+Nodes:  
+![Nodes](Github~/resources/DialogueGraph_demo_graph.png)  
+
+Properties: (you can open the properties window by clicking the "Blackboard" button in the toolbar at the top of the Dialogue Graph window)  
+![Properties](Github~/resources/DialogueGraph_demo_properties.png)  
+
+## Runtime
+### Images
+Note: The following images use the Sample Project included with the package. You can install the Sample Project by going to the package manager, selecting Dialogue Graph, and clicking the `Import` button under Samples.  
+#### Attaching functions to properties
+Attaching functions to properties is almost identical to the way you would do it with the Unity UI system (Buttons, TextFields, etc). Attach a script to the object field and then choose the method you want to use.  
+
+![Attaching functions to properties](Github~/resources/DialogueGraph_demo_functions.gif)  
+#### Dialogue Graph in action
+Check the included samples for the API usage.  
+
+![Dialogue Graph in action](Github~/resources/DialogueGraph_demo_sample.gif)  
 
 # Contributing
 If you would like to contribute to this project feel free to submit a **pull request**, and take a look at the 
 [Contributing document](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/Github~/CONTRIBUTING.md "CONTRIBUTING.md") provided to get a better insight into what **contributing** means, and the [Code of Conduct](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/Github~/CODE_OF_CONDUCT.md).
 
 # Versioning
-We use [CalVer](https://calver.org/) for versioning with the format `YYYY.0M.MICRO`. For the versions available check the [tags on this repository](https://github.com/TeodorVecerdi/DialogueGraph/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available check the [tags on this repository](https://github.com/TeodorVecerdi/DialogueGraph/tags).
 
 # License
 This project is licensed under the MIT License. See [LICENSE](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/LICENSE) for more details.
