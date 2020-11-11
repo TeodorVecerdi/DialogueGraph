@@ -9,7 +9,7 @@ This project is developed for a self-defined learning objective that is part of 
 
 # Contributing
 If you would like to contribute to this project feel free to submit a **pull request**, and take a look at the 
-[Contributing document](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/CONTRIBUTING.md "CONTRIBUTING.md") provided to get a better insight into what **contributing** means, and the [Code of Conduct](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/CODE_OF_CONDUCT.md).
+[Contributing document](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/Github~/CONTRIBUTING.md "CONTRIBUTING.md") provided to get a better insight into what **contributing** means, and the [Code of Conduct](https://github.com/TeodorVecerdi/DialogueGraph/blob/master/Github~/CODE_OF_CONDUCT.md).
 
 # Versioning
 We use [CalVer](https://calver.org/) for versioning with the format `YYYY.0M.MICRO`. For the versions available check the [tags on this repository](https://github.com/TeodorVecerdi/DialogueGraph/tags).
