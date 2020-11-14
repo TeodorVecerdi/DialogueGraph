@@ -1,7 +1,7 @@
 using System;
 
 namespace Dlog {
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class TitleAttribute : Attribute {
         public readonly string[] Title;
         public TitleAttribute(params string[] title) {

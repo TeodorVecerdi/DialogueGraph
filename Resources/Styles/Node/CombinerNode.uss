@@ -1,0 +1,54 @@
+#combiner-main {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    -unity-background-image-tint-color: rgba(114, 64, 253, 0.4);
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+#combiner-main.AND {
+    background-image: resource("checkCombinerBackgroundAnd");
+}
+
+#combiner-main.OR {
+    background-image: resource("checkCombinerBackgroundOr");
+}
+
+#combiner-main .combiner-column {
+    flex: 1 0;
+    align-self: center;
+}
+
+#combiner-main #combiner-input.combiner-column {
+    
+}
+
+#combiner-main #combiner-output.combiner-column {
+
+}
+
+#combiner-main #combiner-operation.combiner-column {
+    flex: 1 0;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    font-size: 12px;
+    color: white;
+    width: 32px;
+    padding: 0 0px;
+}
+
+#title {
+    border-radius: 5px;
+}
+
+.node {
+    --combiner-selection: #7340ff;
+    --combiner-node: #452aa7;
+}
+
+CheckCombinerNode #title {
+    background-color: var(--combiner-node);
+}
+CheckCombinerNode:checked #selection-border, CheckCombinerNode:hover #selection-border, CheckCombinerNode:checked:hover #selection-border  {
+    border-color: var(--combiner-selection);
+}

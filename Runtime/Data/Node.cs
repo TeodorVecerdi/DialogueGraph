@@ -23,6 +23,7 @@ namespace Dlog.Runtime {
     public enum NodeType {
         NPC,
         SELF,
-        PROP
+        PROP,
+        COMBINER,
     }
 }

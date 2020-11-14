@@ -8,16 +8,6 @@ namespace Dlog {
             return (AbstractProperty) JsonConvert.DeserializeObject(property.Data, type, new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
         }
 
-        public static void InjectCustomStyle(this AbstractNode node) {
-            var border = node.Q("node-border");
-            var overflowStyle = border.style.overflow;
-            overflowStyle.value = Overflow.Visible;
-            border.style.overflow = overflowStyle;
-
-            var selectionBorder = node.Q("selection-border");
-            selectionBorder.SendToBack();
-        }
-
         public static void InjectCustomStyle(this DlogPort port) {
             var cap = port.Q("cap");
             var width = cap.style.width;

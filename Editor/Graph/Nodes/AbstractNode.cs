@@ -23,9 +23,6 @@ namespace Dlog {
             }
         }
 
-        // [Obsolete("Use TempPort.Create instead.", true)]
-        // public new void InstantiatePort(Orientation orientation, Direction direction, Port.Capacity capacity, Type type) { }
-
         // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
         [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
         protected new VisualElement inputContainer => base.inputContainer;
@@ -57,7 +54,17 @@ namespace Dlog {
             GUID = Guid.NewGuid().ToString();
             viewDataKey = GUID;
             this.AddStyleSheet("Styles/Node/Node");
-            this.InjectCustomStyle();
+            InjectCustomStyle();
+        }
+
+        protected virtual void InjectCustomStyle() {
+            var border = this.Q("node-border");
+            var overflowStyle = border.style.overflow;
+            overflowStyle.value = Overflow.Visible;
+            border.style.overflow = overflowStyle;
+
+            var selectionBorder = this.Q("selection-border");
+            selectionBorder.SendToBack();
         }
 
         public void Refresh() {

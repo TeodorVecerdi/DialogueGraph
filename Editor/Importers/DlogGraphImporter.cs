@@ -12,17 +12,17 @@ namespace Dlog {
     [ScriptedImporter(0, Extension, 3)]
     public class DlogGraphImporter : ScriptedImporter {
         public const string Extension = "dlog";
-        
+
         public override void OnImportAsset(AssetImportContext ctx) {
             var dlogObject = DlogUtility.LoadGraphAtPath(ctx.assetPath);
             var icon = Resources.Load<Texture2D>(ResourcesUtility.IconBig);
             var runtimeIcon = Resources.Load<Texture2D>(ResourcesUtility.RuntimeIconBig);
-            
+
             if (string.IsNullOrEmpty(dlogObject.AssetGuid) || dlogObject.AssetGuid != AssetDatabase.AssetPathToGUID(ctx.assetPath)) {
                 dlogObject.RecalculateAssetGuid(ctx.assetPath);
                 DlogUtility.SaveGraph(dlogObject, false);
             }
-            
+
             ctx.AddObjectToAsset("MainAsset", dlogObject, icon);
             ctx.SetMainObject(dlogObject);
 
@@ -30,8 +30,9 @@ namespace Dlog {
             var filePath = ctx.assetPath;
             var assetNameSubStartIndex = filePath.LastIndexOf('/') + 1;
             var assetNameSubEndIndex = filePath.LastIndexOf('.');
-            var assetName = filePath.Substring(assetNameSubStartIndex, assetNameSubEndIndex-assetNameSubStartIndex);
+            var assetName = filePath.Substring(assetNameSubStartIndex, assetNameSubEndIndex - assetNameSubStartIndex);
             runtimeObject.name = assetName + " (Runtime)";
+
             // Add properties
             runtimeObject.Properties = new List<Runtime.Property>();
             runtimeObject.Properties.AddRange(dlogObject.DlogGraph.Properties.Select(
@@ -59,25 +60,27 @@ namespace Dlog {
                         runtimeNode.Type = NodeType.PROP;
                         runtimeNode.Temp_PropertyNodeGuid = nodeData.Value<string>("propertyGuid");
                         break;
+                    case "Dlog.CheckCombinerNode":
+                        runtimeNode.Type = NodeType.COMBINER;
+                        break;
                     default:
                         throw new NotSupportedException($"Invalid node type {node.Type}.");
                 }
 
                 // Get lines
-                if (runtimeNode.Type != NodeType.PROP) {
+                if (runtimeNode.Type == NodeType.SELF) {
                     runtimeNode.Lines = new List<ConversationLine>();
-                    if (runtimeNode.Type == NodeType.SELF) {
-                        var lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(nodeData.Value<string>("lines"));
-                        foreach (var line in lines) {
-                            var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = Guid.Empty.ToString()};
-                            runtimeNode.Lines.Add(runtimeLine);
-                        }
-                    } else {
-                        var lines = JsonConvert.DeserializeObject<List<LineDataNpc>>(nodeData.Value<string>("lines"));
-                        foreach (var line in lines) {
-                            var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = line.PortGuidC};
-                            runtimeNode.Lines.Add(runtimeLine);
-                        }
+                    var lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(nodeData.Value<string>("lines"));
+                    foreach (var line in lines) {
+                        var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = Guid.Empty.ToString()};
+                        runtimeNode.Lines.Add(runtimeLine);
+                    }
+                } else if (runtimeNode.Type == NodeType.NPC) {
+                    runtimeNode.Lines = new List<ConversationLine>();
+                    var lines = JsonConvert.DeserializeObject<List<LineDataNpc>>(nodeData.Value<string>("lines"));
+                    foreach (var line in lines) {
+                        var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = line.PortGuidC};
+                        runtimeNode.Lines.Add(runtimeLine);
                     }
                 }
 
@@ -93,10 +96,10 @@ namespace Dlog {
                     }
             ));
             runtimeObject.BuildGraph();
-            
+
             ctx.AddObjectToAsset("RuntimeAsset", runtimeObject, runtimeIcon);
             AssetDatabase.Refresh();
-            
+
             EditorUtility.SetDirty(runtimeObject);
         }
     }

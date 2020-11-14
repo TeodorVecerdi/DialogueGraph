@@ -30,7 +30,7 @@ namespace Dlog.Runtime {
 
             // convert each conversation line reference from port to property lists using edge list
             foreach (var node in Nodes) {
-                if (node.Type == NodeType.PROP) continue;
+                if (node.Type != NodeType.SELF && node.Type != NodeType.NPC) continue;
                 foreach (var line in node.Lines) {
                     line.Checks = new List<string>();
                     line.Triggers = new List<string>();
@@ -43,7 +43,7 @@ namespace Dlog.Runtime {
                         }
 
                         // Find checks, only for NPC nodes
-                        if (node.Type == NodeType.NPC && line.CheckPort == edge.ToPort) {
+                        if (node.Type == NodeType.NPC && line.CheckPort == edge.ToPort && NodeDictionary[edge.FromNode].Type == NodeType.PROP) {
                             var nodeGuid = edge.FromNode;
                             line.Checks.Add(propertyNodes[nodeGuid].Temp_PropertyNodeGuid);
                         }
@@ -62,7 +62,7 @@ namespace Dlog.Runtime {
                         node.ActorGuid = propertyNodes[edge.FromNode].Temp_PropertyNodeGuid;
 
                     // Find previous node
-                    if (edge.ToNode == node.Guid && NodeDictionary[edge.FromNode].Type != NodeType.PROP)
+                    if (edge.ToNode == node.Guid && (NodeDictionary[edge.FromNode].Type == NodeType.NPC || NodeDictionary[edge.FromNode].Type == NodeType.SELF))
                         node.Previous = edge.FromNode;
                 }
             }
@@ -70,7 +70,7 @@ namespace Dlog.Runtime {
             // Remove property nodes from Nodes and NodeDictionary
             var copyOfNodes = Nodes.ToList();
             copyOfNodes.ForEach(node => {
-                if (node.Type != NodeType.PROP) return;
+                if (node.Type == NodeType.NPC || node.Type == NodeType.SELF) return;
                 NodeDictionary.Remove(node.Guid);
                 Nodes.Remove(node);
             });

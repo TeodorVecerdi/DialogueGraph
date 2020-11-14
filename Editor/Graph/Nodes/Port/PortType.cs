@@ -5,6 +5,8 @@ namespace Dlog {
         Check,
         Trigger,
         Actor,
-        Branch
+        Branch,
+        Combiner,
+        Fake
     }
 }

@@ -81,6 +81,11 @@ NpcNode #conversation-container #conversation-item.trigger-port {
     border-color: #191919;
 }
 
+.node:checked #selection-border, .node:hover:checked #selection-border {
+    border-width: 3px;
+    margin: 1px;
+}
+
 #title {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;

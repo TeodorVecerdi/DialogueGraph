@@ -40,7 +40,9 @@ namespace Dlog {
                     continue;
 
                 if (type.GetCustomAttributes(typeof(TitleAttribute), false) is TitleAttribute[] attrs && attrs.Length > 0) {
-                    AddEntries(type, attrs[0].Title, nodeEntries);
+                    foreach (var attr in attrs) {
+                        AddEntries(type, attr.Title, nodeEntries);
+                    }
                 }
             }
 
