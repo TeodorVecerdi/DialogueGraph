@@ -148,3 +148,4 @@ InitTestScene*.unity
 # Symlink to force 'Samples~' to show up in unity
 Samples/
 Samples.meta
+Samples

@@ -10,6 +10,9 @@ using Debug = UnityEngine.Debug;
 
 namespace Dlog {
     public static class DlogUtility {
+        private static Ref<SemVer> dialogueGraphVersion = (SemVer)"1.1.2";
+
+        #region IO Utilities
         public static bool CreateFile(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {
             if (dlogObject == null || string.IsNullOrEmpty(path)) return false;
 
@@ -60,6 +63,7 @@ namespace Dlog {
 
             return LoadGraphAtPath(assetPath);
         }
+        #endregion
 
         /**
          * Found this nifty method inside the codebase of ShaderGraph while reverse engineering some functionality.

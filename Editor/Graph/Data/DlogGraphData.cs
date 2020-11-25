@@ -12,7 +12,9 @@ namespace Dlog {
         public DlogGraphObject Owner { get; set; }
         [SerializeField] public string AssetGuid;
         [SerializeField] public bool IsBlackboardVisible;
+        [SerializeField] public string DialogueGraphVersion;
 
+        
         [NonSerialized] private Dictionary<string, SerializedNode> nodeDictionary = new Dictionary<string, SerializedNode>();
         [SerializeField] private List<SerializedNode> nodes = new List<SerializedNode>();
         [NonSerialized] private List<SerializedNode> addedNodes = new List<SerializedNode>();
@@ -44,7 +46,7 @@ namespace Dlog {
         [NonSerialized] private List<SerializedEdge> edgeSelectionQueue = new List<SerializedEdge>();
         public List<SerializedNode> NodeSelectionQueue => nodeSelectionQueue;
         public List<SerializedEdge> EdgeSelectionQueue => edgeSelectionQueue;
-
+        
         public void OnBeforeSerialize() {
             if (Owner != null)
                 IsBlackboardVisible = Owner.IsBlackboardVisible;
@@ -53,6 +55,8 @@ namespace Dlog {
             foreach (var property in properties) {
                 serializedProperties.Add(new SerializedProperty(property));
             }
+
+            DialogueGraphVersion = DlogVersion.CommittedVersion;
         }
 
         public void OnAfterDeserialize() {
