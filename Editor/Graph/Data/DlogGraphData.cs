@@ -56,7 +56,7 @@ namespace Dlog {
                 serializedProperties.Add(new SerializedProperty(property));
             }
 
-            DialogueGraphVersion = DlogVersion.CommittedVersion;
+            DialogueGraphVersion = DlogVersion.Version.GetValue();
         }
 
         public void OnAfterDeserialize() {

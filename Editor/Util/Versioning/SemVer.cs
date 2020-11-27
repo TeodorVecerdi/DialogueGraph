@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Dlog {
     [Serializable]
-    public struct SemVer {
+    public struct SemVer : IEquatable<SemVer> {
         public static SemVer Invalid = new SemVer {MAJOR = -1, MINOR = -1, PATCH = -1};
         
         // ReSharper disable once InconsistentNaming
@@ -76,5 +76,30 @@ namespace Dlog {
         }
 
         public static bool IsValid(string versionString) => IsValid(versionString, out _, out _, out _);
+
+        public bool Equals(SemVer other) {
+            return MAJOR == other.MAJOR && MINOR == other.MINOR && PATCH == other.PATCH;
+        }
+
+        public override bool Equals(object obj) {
+            return obj is SemVer other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = MAJOR;
+                hashCode = (hashCode * 397) ^ MINOR;
+                hashCode = (hashCode * 397) ^ PATCH;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(SemVer left, SemVer right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SemVer left, SemVer right) {
+            return !left.Equals(right);
+        }
     }
 }

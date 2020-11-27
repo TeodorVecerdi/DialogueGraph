@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2df2ff4df2ec47b985377b23d6f9d259, type: 3}
   m_Name: DialogueGraphVersion
   m_EditorClassIdentifier: 
-  Version:
+  version:
     MAJOR: 1
     MINOR: 1
     PATCH: 1

@@ -10,8 +10,9 @@ using Debug = UnityEngine.Debug;
 
 namespace Dlog {
     public static class DlogUtility {
-        private static Ref<SemVer> dialogueGraphVersion = (SemVer)"1.1.2";
-
+        private static string DevelopmentFolder => Environment.GetEnvironmentVariable("dev", EnvironmentVariableTarget.User);
+        public static string DialogueGraphPath => Path.Combine(DevelopmentFolder, @"saxion\unity\dialogue_graph_dev\Assets\DialogueGraph");
+        
         #region IO Utilities
         public static bool CreateFile(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {
             if (dlogObject == null || string.IsNullOrEmpty(path)) return false;

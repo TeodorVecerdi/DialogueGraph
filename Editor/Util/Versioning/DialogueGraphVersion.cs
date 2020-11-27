@@ -5,7 +5,16 @@ using UnityEngine;
 namespace Dlog {
     [CreateAssetMenu(fileName = "Versioning", menuName = "Dialogue Graph/Versioning", order = 0)]
     public class DialogueGraphVersion : ScriptableObject {
-        public SemVer Version;
+        [SerializeField] private SemVer version;
+        public SemVer Version {
+            get => version;
+            set => version = value;
+        }
+
+        public void Apply() {
+            EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssets();
+        }
     }
 
     [CustomEditor(typeof(DialogueGraphVersion))]
@@ -45,6 +54,7 @@ namespace Dlog {
             GUI.enabled = isValid && changed;
             if (GUILayout.Button("Apply", button)) {
                 version.Version = (SemVer) versionString;
+                version.Apply();
                 changed = false;
             }
 

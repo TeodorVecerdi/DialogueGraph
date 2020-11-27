@@ -1,51 +1,37 @@
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 
 namespace Dlog {
     public static class DlogVersion {
         private static readonly SemVer FallbackVersion = (SemVer) "1.1.1";
-        private static SemVer lastCommittedVersion = SemVer.Invalid;
+        
         private static Ref<SemVer> version;
         private static DialogueGraphVersion versionFile;
-
-        public static SemVer CommittedVersion {
-            get {
-                if (lastCommittedVersion == SemVer.Invalid) {
-                    LoadVersionFile();
-                }
-
-                lastCommittedVersion = versionFile.Version;
-                return lastCommittedVersion;
-            }
-            private set {
-                lastCommittedVersion = value;
-                Save();
-            }
-        }
 
         public static Ref<SemVer> Version {
             get {
                 if (version == null) {
                     LoadVersionFile();
-                    version = versionFile.Version;
-                    lastCommittedVersion = version.GetValue();
+                    version = Ref<SemVer>.MakeRef(versionFile.Version, () => versionFile.Version, () => versionFile.Version = version.GetValueUnbound());
                 }
 
                 return version;
             }
-            set => version = value;
         }
 
-        private static void Save() {
-            versionFile.Version = version.GetValue();
-        }
-
-        public static void ResetToCommittedVersion() {
-            Version = CommittedVersion;
-        }
-
-        public static void CommitVersion() {
-            CommittedVersion = Version.Get();
+        public static void SaveVersion(SemVer newVersion) {
+            Version.Set(newVersion);
+            versionFile.Apply();
+            
+            // Load package.json file and update version
+            var packagePath = $"{DlogUtility.DialogueGraphPath}\\package.json";
+            var packageText = File.ReadAllText(packagePath);
+            var package = JObject.Parse(packageText);
+            package["version"] = versionFile.Version.ToString();
+            File.WriteAllText(packagePath, package.ToString(Formatting.Indented));
         }
 
         private static void LoadVersionFile() {
