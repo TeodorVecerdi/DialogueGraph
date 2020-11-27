@@ -19,6 +19,7 @@ namespace Dlog {
         private EditorView editorView;
 
         private bool deleted;
+        private bool skipOnDestroyCheck;
 
         public string SelectedAssetGuid {
             get => selectedAssetGuid;
@@ -46,8 +47,9 @@ namespace Dlog {
                 IsBlackboardVisible = dlogObject.IsBlackboardVisible
             };
             rootVisualElement.Add(editorView);
-
-            Refresh();
+            if (VersionCheck()) {
+                Refresh();
+            }
         }
 
         private void Update() {
@@ -95,8 +97,7 @@ namespace Dlog {
         private void DisplayDeletedFromDiskDialog() {
             bool shouldClose = true; // Close unless if the same file was replaced
 
-            if (EditorUtility.DisplayDialog("Dialogue Graph Missing", AssetDatabase.GUIDToAssetPath(selectedAssetGuid)
-                                                                      + " has been deleted or moved outside of Unity.\n\nWould you like to save your Graph Asset?", "Save As", "Close Window")) {
+            if (EditorUtility.DisplayDialog("Dialogue Graph Missing", $"{AssetDatabase.GUIDToAssetPath(selectedAssetGuid)} has been deleted or moved outside of Unity.\n\nWould you like to save your Graph Asset?", "Save As", "Close Window")) {
                 shouldClose = !SaveAs();
             }
 
@@ -129,14 +130,50 @@ namespace Dlog {
             this.SetAntiAliasing(4);
         }
 
+        private bool VersionCheck() {
+            var fileVersion = (SemVer)dlogObject.DlogGraph.DialogueGraphVersion;
+            var comparison = fileVersion.CompareTo(DlogVersion.Version.GetValue());
+            if (comparison < 0) {
+                if (EditorUtility.DisplayDialog("Version mismatch", $"The graph you are trying to load was saved with an older version of Dialogue Graph.\nIf you proceed with loading it will be converted to the current version. (A backup will be created)\n\nDo you wish to continue?", "Yes", "No")) {
+                    var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.AssetGuid);
+                    var assetNameSubEndIndex = assetPath.LastIndexOf('.');
+                    var backupAssetPath = assetPath.Substring(0, assetNameSubEndIndex);
+                    DlogUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
+                    DlogUtility.VersionConvert(fileVersion, dlogObject);
+                    Refresh();
+                } else {
+                    skipOnDestroyCheck = true;
+                    Close();
+                }
+                return false;
+            }
+
+            if (comparison > 0) {
+                if (EditorUtility.DisplayDialog("Version mismatch", $"The graph you are trying to load was saved with a newer version of Dialogue Graph.\nLoading the file might cause unexpected behaviour or errors. (A backup will be created)\n\nDo you wish to continue?", "Yes", "No")) {
+                    var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.AssetGuid);
+                    var assetNameSubEndIndex = assetPath.LastIndexOf('.');
+                    var backupAssetPath = assetPath.Substring(0, assetNameSubEndIndex);
+                    DlogUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
+                    Refresh();
+                } else {
+                    skipOnDestroyCheck = true;
+                    Close();
+                }
+
+                return false;
+            }
+            return true;
+        }
+
         private void OnDestroy() {
-            if (IsDirty && EditorUtility.DisplayDialog("Dlog Graph has been modified", "Do you want to save the changes you made in the Dialogue Graph?\nYour changes will be lost if you don't save them.", "Save", "Don't Save")) {
+            if (!skipOnDestroyCheck && IsDirty && EditorUtility.DisplayDialog("Dlog Graph has been modified", "Do you want to save the changes you made in the Dialogue Graph?\nYour changes will be lost if you don't save them.", "Save", "Don't Save")) {
                 SaveAsset();
             }
         }
 
         #region Window Events
         private void SaveAsset() {
+            dlogObject.DlogGraph.DialogueGraphVersion = DlogVersion.Version.GetValue();
             DlogUtility.SaveGraph(dlogObject);
             UpdateTitle();
         }

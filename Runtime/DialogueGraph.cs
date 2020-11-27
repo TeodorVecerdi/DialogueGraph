@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Dlog.Runtime;
-using Dlog.Scripts.Runtime;
 using UnityEngine;
 
 namespace Dlog.Runtime {

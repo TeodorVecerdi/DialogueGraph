@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Dlog.Runtime;
 
-namespace Dlog.Scripts.Runtime {
+namespace Dlog.Runtime {
     [Serializable]
     public class DlogObjectData {
         public StringIntSerializableDictionary ActorDataIndices;

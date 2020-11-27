@@ -1,28 +1,34 @@
 {
-    "name": "com.github.teodorvecerdi.dialoguegraph",
-    "version": "1.1.1",
-    "displayName": "Dialogue Graph",
-    "description": "Interactive node-based tool similar to Shader Graph for developing branching conversation trees.\nExample uses could be conversations with NPCs, but because this tool is mostly general purpose you can use it for any scenario that requires branching logic.",
-    "unity": "2020.1",
-    "keywords": ["node-based", "editor-tool", "dialogue", "visual-scripting", "conversation"],
-    "author": {
-        "name": "Teodor Vecerdi",
-        "email": "teodor.vecerdi@gmail.com",
-        "url": "https://github.com/TeodorVecerdi"
-    },
-    "dependencies": {
-        "com.unity.textmeshpro": "3.0.1",
-        "com.unity.shadergraph": "8.2.0"
-    },
-    "samples": [
-        {
-            "displayName": "Demo Project",
-            "description": "Small project showcasing the base usage of Dialogue Graph, including the Runtime API",
-            "path": "Samples~/DemoProject"
-        }
-    ],
-    "repository": {
-        "url": "https://github.com/TeodorVecerdi/CodeGraph.git",
-        "type": "git"
+  "name": "com.github.teodorvecerdi.dialoguegraph",
+  "version": "1.1.2",
+  "displayName": "Dialogue Graph",
+  "description": "Interactive node-based tool similar to Shader Graph for developing branching conversation trees.\nExample uses could be conversations with NPCs, but because this tool is mostly general purpose you can use it for any scenario that requires branching logic.",
+  "unity": "2020.1",
+  "keywords": [
+    "node-based",
+    "editor-tool",
+    "dialogue",
+    "visual-scripting",
+    "conversation"
+  ],
+  "author": {
+    "name": "Teodor Vecerdi",
+    "email": "teodor.vecerdi@gmail.com",
+    "url": "https://github.com/TeodorVecerdi"
+  },
+  "dependencies": {
+    "com.unity.textmeshpro": "3.0.1",
+    "com.unity.shadergraph": "8.2.0"
+  },
+  "samples": [
+    {
+      "displayName": "Demo Project",
+      "description": "Small project showcasing the base usage of Dialogue Graph, including the Runtime API",
+      "path": "Samples~/DemoProject"
     }
+  ],
+  "repository": {
+    "url": "https://github.com/TeodorVecerdi/CodeGraph.git",
+    "type": "git"
+  }
 }

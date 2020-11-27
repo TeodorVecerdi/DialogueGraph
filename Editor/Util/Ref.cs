@@ -3,21 +3,54 @@ using System;
 namespace Dlog {
     public class Ref<T> : IEquatable<T>, IEquatable<Ref<T>> where T : struct {
         private T value;
+        private Func<T> getValue = null;
+        private Action setValue = null;
 
-        public Ref(T value) {
+        private Ref(T value) {
             this.value = value;
         }
 
-        public Ref() {
+        private Ref() {
             value = new T();
         }
 
-        public ref T Get() {
+        public ref T GetReference() {
+            if (getValue != null) {
+                var val = getValue();
+                if (!val.Equals(value)) value = val;
+            }
             return ref value;
         }
 
-        public T GetVal() {
+        public T GetValue() {
+            if (getValue != null) {
+                var val = getValue();
+                if (!val.Equals(value)) value = val;
+            }
             return value;
+        }
+
+        public void Set(T newValue) {
+            value = newValue;
+            setValue?.Invoke();
+        }
+
+        public void SetValueUnbound(T newValue) {
+            value = newValue;
+        }
+
+        public T GetValueUnbound() {
+            return value;
+        }
+
+        public void Bind(Func<T> getValue, Action setValue) {
+            this.getValue = getValue;
+            this.setValue = setValue;
+        }
+
+        public void Unbind() {
+            getValue = null;
+            setValue = null;
         }
 
         #region Equality Members
@@ -72,9 +105,23 @@ namespace Dlog {
         public override string ToString() {
             return $"Ref<{typeof(T).Name}>[{value}]";
         }
+        
+        public static Ref<T> MakeRef(T initialValue, Func<T> getValue, Action setValue) {
+            var reference = new Ref<T>(initialValue);
+            reference.Bind(getValue, setValue);
+            return reference;
+        }
+
+        public static Ref<T> MakeRef(T initialValue) {
+            return new Ref<T>(initialValue);
+        }
+        
+        public static Ref<T> MakeRef() {
+            return new Ref<T>();
+        }
 
         #region Operators
-        public static implicit operator Ref<T>(T value) {
+        public static explicit operator Ref<T>(T value) {
             return new Ref<T>(value);
         }
         #endregion

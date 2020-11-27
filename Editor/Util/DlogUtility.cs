@@ -10,8 +10,9 @@ using Debug = UnityEngine.Debug;
 
 namespace Dlog {
     public static class DlogUtility {
-        private static Ref<SemVer> dialogueGraphVersion = (SemVer)"1.1.2";
-
+        private static string DevelopmentFolder => Environment.GetEnvironmentVariable("dev", EnvironmentVariableTarget.User);
+        public static string DialogueGraphPath => Path.Combine(DevelopmentFolder, @"saxion\unity\dialogue_graph_dev\Assets\DialogueGraph");
+        
         #region IO Utilities
         public static bool CreateFile(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {
             if (dlogObject == null || string.IsNullOrEmpty(path)) return false;
@@ -19,11 +20,14 @@ namespace Dlog {
             var assetGuid = AssetDatabase.AssetPathToGUID(path);
             dlogObject.DlogGraph.AssetGuid = assetGuid;
 
+            CreateFileNoUpdate(path, dlogObject, refreshAsset);
+            return true;
+        }
+
+        public static void CreateFileNoUpdate(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {
             var jsonString = JsonUtility.ToJson(dlogObject.DlogGraph, true);
             File.WriteAllText(path, jsonString);
             if (refreshAsset) AssetDatabase.ImportAsset(path);
-
-            return true;
         }
 
         public static bool SaveGraph(DlogGraphObject dlogObject, bool refreshAsset = true) {
@@ -65,6 +69,15 @@ namespace Dlog {
         }
         #endregion
 
+        /// <summary>
+        /// Converts (back-ports or forward-ports) dlogObject from <paramref name="fromVersion"/> to the current version.
+        /// </summary>
+        /// <param name="fromVersion">Dlog object version</param>
+        /// <param name="dlogObject">Dlog object to be converted</param>
+        public static void VersionConvert(SemVer fromVersion, DlogGraphObject dlogObject) {
+            VersionConverter.ConvertVersion(fromVersion, DlogVersion.Version.GetValue(), dlogObject);
+        }
+        
         /**
          * Found this nifty method inside the codebase of ShaderGraph while reverse engineering some functionality.
          * I needed something like this so it didn't make sense to reinvent the wheel, so I took this and slightly modified it.

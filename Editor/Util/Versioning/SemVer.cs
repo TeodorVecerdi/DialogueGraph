@@ -2,7 +2,10 @@ using System;
 using UnityEngine;
 
 namespace Dlog {
-    public struct SemVer {
+    [Serializable]
+    public struct SemVer : IEquatable<SemVer>, IComparable<SemVer> {
+        public static readonly SemVer Invalid = new SemVer {MAJOR = -1, MINOR = -1, PATCH = -1};
+
         // ReSharper disable once InconsistentNaming
         public int MAJOR;
 
@@ -12,17 +15,17 @@ namespace Dlog {
         // ReSharper disable once InconsistentNaming
         public int PATCH;
 
+
         public SemVer(string versionString) {
-            if (!IsValid(versionString)) {
+            if (!IsValid(versionString, out var major, out var minor, out var patch)) {
                 Debug.LogError($"Could not parse SemVer string {versionString} into format MAJOR.MINOR.PATCH.");
                 this = Invalid;
                 return;
             }
             
-            var split = versionString.Split('.');
-            MAJOR = int.Parse(split[0]);
-            MINOR = int.Parse(split[1]);
-            PATCH = int.Parse(split[2]);
+            MAJOR = major;
+            MINOR = minor;
+            PATCH = patch;
         }
 
         public void BumpMajor() {
@@ -50,22 +53,63 @@ namespace Dlog {
             return FromVersionString(versionString);
         }
 
-        public static SemVer Invalid = new SemVer {MAJOR = -1, MINOR = -1, PATCH = -1};
-
         public static SemVer FromVersionString(string versionString) {
             return new SemVer(versionString);
         }
 
-        public static bool IsValid(string versionString) {
+        public static bool IsValid(string versionString, out int major, out int minor, out int patch) {
             var split = versionString.Split('.');
             if (split.Length != 3) {
+                major = -1;
+                minor = -1;
+                patch = -1;
                 return false;
             }
 
-            var majorWorks = int.TryParse(split[0], out var _1);
-            var minorWorks = int.TryParse(split[1], out var _2);
-            var patchWorks = int.TryParse(split[2], out var _3);
+            var majorWorks = int.TryParse(split[0], out var majorParsed) && majorParsed >= 0;
+            var minorWorks = int.TryParse(split[1], out var minorParsed) && minorParsed >= 0;
+            var patchWorks = int.TryParse(split[2], out var patchParsed) && patchParsed >= 0;
+            major = majorParsed;
+            minor = minorParsed;
+            patch = patchParsed;
             return majorWorks && minorWorks && patchWorks;
+        }
+
+        public static bool IsValid(string versionString) => IsValid(versionString, out _, out _, out _);
+
+        public bool Equals(SemVer other) {
+            return MAJOR == other.MAJOR && MINOR == other.MINOR && PATCH == other.PATCH;
+        }
+
+        public override bool Equals(object obj) {
+            return obj is SemVer other && Equals(other);
+        }
+
+        public override int GetHashCode() {
+            unchecked {
+                var hashCode = MAJOR;
+                hashCode = (hashCode * 397) ^ MINOR;
+                hashCode = (hashCode * 397) ^ PATCH;
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(SemVer left, SemVer right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SemVer left, SemVer right) {
+            return !left.Equals(right);
+        }
+
+        public int CompareTo(SemVer other) {
+            var majorComparison = MAJOR.CompareTo(other.MAJOR);
+            if (majorComparison != 0)
+                return majorComparison;
+            var minorComparison = MINOR.CompareTo(other.MINOR);
+            if (minorComparison != 0)
+                return minorComparison;
+            return PATCH.CompareTo(other.PATCH);
         }
     }
 }
