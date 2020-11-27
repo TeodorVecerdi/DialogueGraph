@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Dlog {
     [Serializable]
-    public struct SemVer : IEquatable<SemVer> {
-        public static SemVer Invalid = new SemVer {MAJOR = -1, MINOR = -1, PATCH = -1};
-        
+    public struct SemVer : IEquatable<SemVer>, IComparable<SemVer> {
+        public static readonly SemVer Invalid = new SemVer {MAJOR = -1, MINOR = -1, PATCH = -1};
+
         // ReSharper disable once InconsistentNaming
         public int MAJOR;
 
@@ -14,6 +14,7 @@ namespace Dlog {
 
         // ReSharper disable once InconsistentNaming
         public int PATCH;
+
 
         public SemVer(string versionString) {
             if (!IsValid(versionString, out var major, out var minor, out var patch)) {
@@ -51,7 +52,6 @@ namespace Dlog {
         public static explicit operator SemVer(string versionString) {
             return FromVersionString(versionString);
         }
-
 
         public static SemVer FromVersionString(string versionString) {
             return new SemVer(versionString);
@@ -100,6 +100,16 @@ namespace Dlog {
 
         public static bool operator !=(SemVer left, SemVer right) {
             return !left.Equals(right);
+        }
+
+        public int CompareTo(SemVer other) {
+            var majorComparison = MAJOR.CompareTo(other.MAJOR);
+            if (majorComparison != 0)
+                return majorComparison;
+            var minorComparison = MINOR.CompareTo(other.MINOR);
+            if (minorComparison != 0)
+                return minorComparison;
+            return PATCH.CompareTo(other.PATCH);
         }
     }
 }

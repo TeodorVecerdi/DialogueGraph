@@ -46,7 +46,7 @@ namespace Dlog {
         [NonSerialized] private List<SerializedEdge> edgeSelectionQueue = new List<SerializedEdge>();
         public List<SerializedNode> NodeSelectionQueue => nodeSelectionQueue;
         public List<SerializedEdge> EdgeSelectionQueue => edgeSelectionQueue;
-        
+
         public void OnBeforeSerialize() {
             if (Owner != null)
                 IsBlackboardVisible = Owner.IsBlackboardVisible;
@@ -55,8 +55,6 @@ namespace Dlog {
             foreach (var property in properties) {
                 serializedProperties.Add(new SerializedProperty(property));
             }
-
-            DialogueGraphVersion = DlogVersion.Version.GetValue();
         }
 
         public void OnAfterDeserialize() {
