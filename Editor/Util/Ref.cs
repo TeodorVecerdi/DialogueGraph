@@ -16,7 +16,7 @@ namespace Dlog {
             return ref value;
         }
 
-        public T GetVal() {
+        public T GetValue() {
             return value;
         }
 

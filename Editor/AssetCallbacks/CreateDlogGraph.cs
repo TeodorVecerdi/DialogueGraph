@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Dlog {
     internal class CreateDlogGraph : EndNameEditAction {
-        [MenuItem("Assets/Create/Dialogue/Dlog Graph", false, 1)]
+        [MenuItem("Assets/Create/Dialogue Graph/Empty Dialogue Graph", false, 1)]
         public static void CreateDialogueGraph()
         {
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateDlogGraph>(),

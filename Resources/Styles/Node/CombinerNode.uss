@@ -7,11 +7,11 @@
 }
 
 #combiner-main.AND {
-    background-image: resource("checkCombinerBackgroundAnd");
+    background-image: resource("Textures/checkCombinerBackgroundAnd");
 }
 
 #combiner-main.OR {
-    background-image: resource("checkCombinerBackgroundOr");
+    background-image: resource("Textures/checkCombinerBackgroundOr");
 }
 
 #combiner-main .combiner-column {
