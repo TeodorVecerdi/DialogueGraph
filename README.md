@@ -1,6 +1,10 @@
 # Dialogue Graph
 <p align="center">
-<a href="https://github.com/TeodorVecerdi/DialogueGraph/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/TeodorVecerdi/DialogueGraph?color=e62c0b&label=issues"></a> <a href="https://www.codacy.com/gh/TeodorVecerdi/DialogueGraph/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TeodorVecerdi/DialogueGraph&amp;utm_campaign=Badge_Grade"><img alt="Codacy grade" src="https://app.codacy.com/project/badge/Grade/3306f4b963fa4cad9e904bb85265f0ef"></a> <a href="https://openupm.com/packages/com.github.teodorvecerdi.dialoguegraph/"><img src="https://img.shields.io/npm/v/com.github.teodorvecerdi.dialoguegraph?label=openupm&amp;registry_uri=https://package.openupm.com" /></a> <a href="https://github.com/TeodorVecerdi/DialogueGraph/releases/latest"><img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/TeodorVecerdi/DialogueGraph?include_prereleases&label=release"></a> <a href="https://github.com/TeodorVecerdi/DialogueGraph/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/TeodorVecerdi/DialogueGraph?color=FFD700"></a> <a href="https://github.com/TeodorVecerdi/DialogueGraph/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/TeodorVecerdi/DialogueGraph?color=009a00"></a> <a href="https://github.com/TeodorVecerdi/DialogueGraph/blob/master/LICENSE"><img alt="GitHub License" src="https://img.shields.io/github/license/TeodorVecerdi/DialogueGraph"></a>
+<!--Issues--><a href="https://github.com/TeodorVecerdi/DialogueGraph/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/TeodorVecerdi/DialogueGraph?color=e62c0b&label=issues"></a>
+<!--Code Quality--><a href="https://www.codacy.com/gh/TeodorVecerdi/DialogueGraph/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TeodorVecerdi/DialogueGraph&amp;utm_campaign=Badge_Grade"><img alt="Codacy grade" src="https://app.codacy.com/project/badge/Grade/3306f4b963fa4cad9e904bb85265f0ef"></a>
+<!--OpenUPM--><a href="https://openupm.com/packages/com.github.teodorvecerdi.dialoguegraph/"><img src="https://img.shields.io/npm/v/com.github.teodorvecerdi.dialoguegraph?label=openupm&amp;registry_uri=https://package.openupm.com" /></a>
+<!--Stars--><a href="https://github.com/TeodorVecerdi/DialogueGraph/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/TeodorVecerdi/DialogueGraph?color=FFD700"></a>
+<!--Contributors--><a href="https://github.com/TeodorVecerdi/DialogueGraph/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/TeodorVecerdi/DialogueGraph?color=009a00"></a>
 </p>
 
 <b>DialogueGraph</b> is an open-source editor tool for the [Unity](https://unity.com/) game engine used to create branching conversation trees in an easy and straighforward way by connecting nodes, and setting up conditions and triggers for the different conversation branches. An obvious use case for this tool is to create conversations with NPCs, although the versatility of this tool allows for any kind of project that requires branching behaviour based on checks and triggers.
@@ -9,7 +13,7 @@ This project is developed for a self-defined learning objective that is part of 
 
 # Installing Dialogue Graph
 ## 1. using OpenUPM
-**Requires [![OpenUPM icon](https://i.imgur.com/3rkt7gL.png) OpenUPM-CLI][openupm-cli]**  
+**Requires [<img src="Github~/resources/openupm-icon-64.png" height="24px" align="center"/> OpenUPM-CLI][openupm-cli]**  
 Run the following on the command line in your unity project's folder:
 
 ```sh
@@ -20,9 +24,16 @@ openupm add com.github.teodorvecerdi.dialoguegraph
 To install Dialogue Graph in your project use the Unity Package Manager.  
 To open the Unity Package Manager, inside unity, go to `Window > Package Manager` and to install Dialogue Graph click the `+` icon in the upper left corner of the window, then click on `Add package from git URL...` and paste in `https://github.com/TeodorVecerdi/DialogueGraph.git`
 
-Steps:  
-![Steps 1 and 2](Github~/resources/DialogueGraph_tutorial1.png)
-![Steps 3 and 4](Github~/resources/DialogueGraph_tutorial2.png)
+## 3. using a .unitypackage installer **(experimental)**
+This is provided by [<img src="Github~/resources/openupm-icon-64.png" height="24px" align="center"/> OpenUPM](https://openupm.com) and [🌵 Needle](https://package-installer.glitch.me/) and is **experimental**. You should use the other two methods if possible.  
+1. Download the .unitypackage  
+
+    [![](Github~/resources/openupm_get_unitypackage.svg)](https://package-installer.glitch.me/v1/installer/OpenUPM/com.github.teodorvecerdi.dialoguegraph?registry=https%3A%2F%2Fpackage.openupm.com) 
+
+2. Open the downloaded file with your Unity editor or drag it into the Unity editor window.
+3. The installer will remove itself after installation.
+See more at the [<img src="Github~/resources/openupm-icon-64.png" height="24px" align="center"/> OpenUPM page](https://openupm.com/packages/com.github.teodorvecerdi.dialoguegraph/) for Dialogue Graph.
+
 
 # Using Dialogue Graph (WIP)
 ## Editor
