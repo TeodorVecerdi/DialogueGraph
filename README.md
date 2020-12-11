@@ -11,8 +11,6 @@
 
 This project is developed for a self-defined learning objective that is part of the Personal Portfolio 1 course at Saxion.
 
-## If you wish to support Dialogue Graph development (and me), consider making a donation on Dialogue Graph's [<img src="Github~/resources/itch.io-app-icon.svg" height="24px" align="center" style="margin-bottom:4px"/> **itch.io**](https://teodorvecerdi.itch.io/dialogue-graph) page .
-
 # Installing Dialogue Graph
 ## 1. using OpenUPM
 **Requires [<img src="Github~/resources/openupm-icon-64.png" height="24px" align="center"/> OpenUPM-CLI][openupm-cli]**  
