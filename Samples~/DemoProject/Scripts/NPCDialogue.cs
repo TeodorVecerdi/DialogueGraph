@@ -1,4 +1,3 @@
-using System;
 using Dlog.Runtime;
 using TMPro;
 using UnityEngine;
@@ -63,8 +62,16 @@ public class NPCDialogue : MonoBehaviour {
             }
         } else {
             if (DialogueSystem.IsConversationDone()) {
+                // Reset state
                 isInConversation = false;
-                (showPlayer ? PlayerContainer : NpcContainer).SetActive(false);
+                showingSecondaryScreen = false;
+                showPlayer = false;
+                isPlayerChoosing = false;
+                shouldShowText = false;
+                showingText = false;
+                
+                PlayerContainer.SetActive(false);
+                NpcContainer.SetActive(false);
                 return;
             }
 
@@ -120,7 +127,8 @@ public class NPCDialogue : MonoBehaviour {
         NpcContainer.SetActive(false);
         PlayerContainer.gameObject.SetActive(false);
         showingText = false;
-        (showPlayer ? PlayerText : NpcText).gameObject.SetActive(false);
+        PlayerText.gameObject.SetActive(false);
+        NpcText.gameObject.SetActive(false);
     }
 
     public void OpenShop(string node, int lineIndex) {
@@ -130,6 +138,7 @@ public class NPCDialogue : MonoBehaviour {
         NpcContainer.SetActive(false);
         PlayerContainer.gameObject.SetActive(false);
         showingText = false;
-        (showPlayer ? PlayerText : NpcText).gameObject.SetActive(false);
+        PlayerText.gameObject.SetActive(false);
+        NpcText.gameObject.SetActive(false);
     }
 }
