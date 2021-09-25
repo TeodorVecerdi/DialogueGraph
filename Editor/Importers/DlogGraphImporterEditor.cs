@@ -1,19 +1,13 @@
 using System.IO;
 using UnityEditor;
+using UnityEditor.AssetImporters;
 using UnityEditor.Callbacks;
 using UnityEngine;
-
-#if UNITY_2021_1_OR_NEWER
-using UnityEditor.AssetImporters;
-#else
-using UnityEditor.Experimental.AssetImporters;
-#endif
 
 namespace Dlog {
     [CustomEditor(typeof(DlogGraphImporter))]
     public class DlogGraphImporterEditor : ScriptedImporterEditor {
         protected override bool needsApplyRevert => false;
-        
 
         public override void OnInspectorGUI() {
             var importer = target as DlogGraphImporter;
