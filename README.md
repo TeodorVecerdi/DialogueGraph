@@ -24,16 +24,6 @@ openupm add com.github.teodorvecerdi.dialoguegraph
 To install Dialogue Graph in your project use the Unity Package Manager.  
 To open the Unity Package Manager, inside unity, go to `Window > Package Manager` and to install Dialogue Graph click the `+` icon in the upper left corner of the window, then click on `Add package from git URL...` and paste in `https://github.com/TeodorVecerdi/DialogueGraph.git`
 
-## 3. using a .unitypackage installer **(experimental)**
-This is provided by [<img src="Github~/resources/openupm-icon-64.png" height="24px" align="center"/> OpenUPM](https://openupm.com) and [🌵 Needle](https://package-installer.glitch.me/) and is **experimental**. You should use the other two methods if possible.  
-1. Download the .unitypackage  
-
-    [![](Github~/resources/openupm_get_unitypackage.svg)](https://package-installer.glitch.me/v1/installer/OpenUPM/com.github.teodorvecerdi.dialoguegraph?registry=https%3A%2F%2Fpackage.openupm.com) 
-
-2. Open the downloaded file with your Unity editor or drag it into the Unity editor window.
-3. The installer will remove itself after installation.
-See more at the [<img src="Github~/resources/openupm-icon-64.png" height="24px" align="center"/> OpenUPM page](https://openupm.com/packages/com.github.teodorvecerdi.dialoguegraph/) for Dialogue Graph.
-
 
 # Using Dialogue Graph (WIP)
 ## Editor
