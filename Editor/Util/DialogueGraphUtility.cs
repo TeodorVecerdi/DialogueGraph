@@ -9,10 +9,9 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace Dlog {
-    public static class DlogUtility {
-        private static string DevelopmentFolder => Environment.GetEnvironmentVariable("dev", EnvironmentVariableTarget.User);
-        public static string DialogueGraphPath => Path.Combine(DevelopmentFolder, @"saxion\unity\dialogue_graph_dev\Assets\DialogueGraph");
-        
+    public static class DialogueGraphUtility {
+        internal static readonly SemVer LatestVersion = new SemVer(1, 1, 5);
+
         #region IO Utilities
         public static bool CreateFile(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {
             if (dlogObject == null || string.IsNullOrEmpty(path)) return false;
@@ -75,9 +74,9 @@ namespace Dlog {
         /// <param name="fromVersion">Dlog object version</param>
         /// <param name="dlogObject">Dlog object to be converted</param>
         public static void VersionConvert(SemVer fromVersion, DlogGraphObject dlogObject) {
-            VersionConverter.ConvertVersion(fromVersion, DlogVersion.Version.GetValue(), dlogObject);
+            VersionConverter.ConvertVersion(fromVersion, LatestVersion, dlogObject);
         }
-        
+
         /**
          * Found this nifty method inside the codebase of ShaderGraph while reverse engineering some functionality.
          * I needed something like this so it didn't make sense to reinvent the wheel, so I took this and slightly modified it.

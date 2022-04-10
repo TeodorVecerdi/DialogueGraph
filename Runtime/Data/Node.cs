@@ -8,7 +8,7 @@ namespace Dlog.Runtime {
         public string Guid;
 
         public string ActorGuid;
-        
+
         /// <summary>
         /// Since multiple nodes can be a previous node to a certain node, we are only
         /// using this property to find out where the graph begins. We don't care if a

@@ -32,13 +32,13 @@ namespace Dlog {
                 Debug.Log($"Could not find upgrading method [{from} -> {to}]");
                 return;
             }
-            
+
             UpgradeTo(next, dlogObject);
             ConvertVersion(next, to, dlogObject);
         }
 
 
-        [ConvertMethod("1.1.2")] 
+        [ConvertMethod("1.1.2")]
         private static void U_112(DlogGraphObject dlogObject) {
             dlogObject.DlogGraph.DialogueGraphVersion = v112;
         }
@@ -51,7 +51,7 @@ namespace Dlog {
                 upgradeMethodCache[version](dlogGraphObject);
             else Debug.LogWarning($"Upgrade conversion with [target={version}] is not supported.");
         }
-        
+
 
         private static void BuildMethodCache() {
             Debug.Log("Building cache");
@@ -63,7 +63,7 @@ namespace Dlog {
                 var attributes = method.GetCustomAttributes<ConvertMethodAttribute>(false).ToList();
                 if (attributes.Count <= 0) continue;
                 var attribute = attributes[0];
-                
+
                 var methodCall = method.CreateDelegate(typeof(Action<DlogGraphObject>)) as Action<DlogGraphObject>;
                 upgradeMethodCache.Add(attribute.TargetVersion, methodCall);
             }

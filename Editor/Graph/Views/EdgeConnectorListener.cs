@@ -18,7 +18,7 @@ namespace Dlog {
             edgesToDelete = new List<GraphElement>();
             graphViewChange.edgesToCreate = edgesToCreate;
         }
-        
+
         public void OnDropOutsidePort(Edge edge, Vector2 position) {
             var port = edge.output?.edgeConnector.edgeDragHelper.draggedPort ?? edge.input?.edgeConnector.edgeDragHelper.draggedPort;
             searchWindowProvider.ConnectedPort = port;

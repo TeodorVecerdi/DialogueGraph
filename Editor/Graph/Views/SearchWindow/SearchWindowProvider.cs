@@ -65,7 +65,7 @@ namespace Dlog {
 
                     // Make sure that leaves go before nodes
                     if (entry1.Title.Length != entry2.Title.Length && (i == entry1.Title.Length - 1 || i == entry2.Title.Length - 1)) {
-                        //once nodes are sorted, sort slot entries by slot order instead of alphebetically 
+                        //once nodes are sorted, sort slot entries by slot order instead of alphebetically
                         var alphaOrder = entry1.Title.Length < entry2.Title.Length ? -1 : 1;
                         var slotOrder = entry1.CompatiblePortIndex.CompareTo(entry2.CompatiblePortIndex);
                         return alphaOrder.CompareTo(slotOrder);
@@ -137,7 +137,7 @@ namespace Dlog {
                 RegenerateEntries = false;
             }
 
-            //create empty root for searcher tree 
+            //create empty root for searcher tree
             var root = new List<SearcherItem>();
             var dummyEntry = new NodeEntry();
 

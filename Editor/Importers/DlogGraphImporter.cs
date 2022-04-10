@@ -14,13 +14,13 @@ namespace Dlog {
         public const string Extension = "dlog";
 
         public override void OnImportAsset(AssetImportContext ctx) {
-            var dlogObject = DlogUtility.LoadGraphAtPath(ctx.assetPath);
+            var dlogObject = DialogueGraphUtility.LoadGraphAtPath(ctx.assetPath);
             var icon = Resources.Load<Texture2D>(ResourcesUtility.IconBig);
             var runtimeIcon = Resources.Load<Texture2D>(ResourcesUtility.RuntimeIconBig);
 
             if (string.IsNullOrEmpty(dlogObject.AssetGuid) || dlogObject.AssetGuid != AssetDatabase.AssetPathToGUID(ctx.assetPath)) {
                 dlogObject.RecalculateAssetGuid(ctx.assetPath);
-                DlogUtility.SaveGraph(dlogObject, false);
+                DialogueGraphUtility.SaveGraph(dlogObject, false);
             }
 
             ctx.AddObjectToAsset("MainAsset", dlogObject, icon);

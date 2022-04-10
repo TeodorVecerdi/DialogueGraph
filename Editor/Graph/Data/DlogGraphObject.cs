@@ -6,7 +6,7 @@ namespace Dlog {
     public class DlogGraphObject : ScriptableObject, ISerializationCallbackReceiver {
         [NonSerialized] private DlogGraphData dlogGraph;
         [NonSerialized] private int objectVersion;
-        
+
         [SerializeField] public string AssetGuid;
         [SerializeField] public bool IsBlackboardVisible;
         [SerializeField] private string serializedGraph;

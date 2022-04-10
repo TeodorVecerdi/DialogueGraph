@@ -22,7 +22,7 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
 			this[kvp.Key] = kvp.Value;
 		}
 	}
-	
+
 	protected SerializableDictionaryBase(SerializationInfo info, StreamingContext context) : base(info,context){}
 
 	protected abstract void SetValue(TValueStorage[] storage, int i, TValue value);

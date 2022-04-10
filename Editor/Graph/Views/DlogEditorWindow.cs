@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
 namespace Dlog {
@@ -60,7 +55,7 @@ namespace Dlog {
             if (dlogObject == null && selectedAssetGuid != null) {
                 var assetGuid = selectedAssetGuid;
                 selectedAssetGuid = null;
-                var newObject = DlogUtility.LoadGraphAtGuid(assetGuid);
+                var newObject = DialogueGraphUtility.LoadGraphAtGuid(assetGuid);
                 SetDlogObject(newObject);
                 Refresh();
             }
@@ -132,14 +127,14 @@ namespace Dlog {
 
         private bool VersionCheck() {
             var fileVersion = (SemVer)dlogObject.DlogGraph.DialogueGraphVersion;
-            var comparison = fileVersion.CompareTo(DlogVersion.Version.GetValue());
+            var comparison = fileVersion.CompareTo(DialogueGraphUtility.LatestVersion);
             if (comparison < 0) {
                 if (EditorUtility.DisplayDialog("Version mismatch", $"The graph you are trying to load was saved with an older version of Dialogue Graph.\nIf you proceed with loading it will be converted to the current version. (A backup will be created)\n\nDo you wish to continue?", "Yes", "No")) {
                     var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.AssetGuid);
                     var assetNameSubEndIndex = assetPath.LastIndexOf('.');
                     var backupAssetPath = assetPath.Substring(0, assetNameSubEndIndex);
-                    DlogUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
-                    DlogUtility.VersionConvert(fileVersion, dlogObject);
+                    DialogueGraphUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
+                    DialogueGraphUtility.VersionConvert(fileVersion, dlogObject);
                     Refresh();
                 } else {
                     skipOnDestroyCheck = true;
@@ -153,7 +148,7 @@ namespace Dlog {
                     var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.AssetGuid);
                     var assetNameSubEndIndex = assetPath.LastIndexOf('.');
                     var backupAssetPath = assetPath.Substring(0, assetNameSubEndIndex);
-                    DlogUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
+                    DialogueGraphUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
                     Refresh();
                 } else {
                     skipOnDestroyCheck = true;
@@ -173,8 +168,8 @@ namespace Dlog {
 
         #region Window Events
         private void SaveAsset() {
-            dlogObject.DlogGraph.DialogueGraphVersion = DlogVersion.Version.GetValue();
-            DlogUtility.SaveGraph(dlogObject);
+            dlogObject.DlogGraph.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
+            DialogueGraphUtility.SaveGraph(dlogObject);
             UpdateTitle();
         }
 
@@ -189,7 +184,7 @@ namespace Dlog {
                 savePath = savePath.Replace(Application.dataPath, "Assets");
                 if (savePath != directoryPath) {
                     if (!string.IsNullOrEmpty(savePath)) {
-                        if (DlogUtility.CreateFile(savePath, dlogObject)) {
+                        if (DialogueGraphUtility.CreateFile(savePath, dlogObject)) {
                             dlogObject.RecalculateAssetGuid(savePath);
                             DlogGraphImporterEditor.OpenEditorWindow(savePath);
                         }

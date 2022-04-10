@@ -11,7 +11,7 @@ namespace Dlog {
         [NonSerialized] private HashSet<AbstractProperty> properties = new HashSet<AbstractProperty>();
         // these are the properties that don't get copied but are required by property nodes that get copied
         [NonSerialized] private HashSet<AbstractProperty> metaProperties = new HashSet<AbstractProperty>();
-        
+
         [SerializeField] private List<SerializedNode> serializedNodes = new List<SerializedNode>();
         [SerializeField] private List<SerializedEdge> serializedEdges = new List<SerializedEdge>();
         [SerializeField] private List<SerializedProperty> serializedProperties = new List<SerializedProperty>();
@@ -25,7 +25,7 @@ namespace Dlog {
         public IEnumerable<SerializedProperty> SerializedMetaProperties => serializedMetaProperties;
         public IEnumerable<AbstractProperty> Properties => properties;
         public IEnumerable<AbstractProperty> MetaProperties => metaProperties;
-        
+
         private EditorView editorView;
 
         public CopyPasteData(EditorView editorView, IEnumerable<SerializedNode> nodes, IEnumerable<SerializedEdge> edges, IEnumerable<AbstractProperty> properties, IEnumerable<AbstractProperty> metaProperties) {
@@ -54,7 +54,7 @@ namespace Dlog {
         private void AddNode(SerializedNode node) {
             nodes.Add(node);
         }
-        
+
         private void AddEdge(SerializedEdge edge) {
             edges.Add(edge);
         }
@@ -105,7 +105,7 @@ namespace Dlog {
                 metaProperties.Add(prop.Deserialize());
             }
         }
-        
+
         private IEnumerable<SerializedEdge> GetAllEdgesForNode(SerializedNode node) {
             var edges = new List<SerializedEdge>();
             foreach (var portConnections in node.GuidPortDictionary.Values.Select(port => port.connections)) {

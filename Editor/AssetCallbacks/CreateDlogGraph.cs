@@ -1,4 +1,3 @@
-using System.IO;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
@@ -16,9 +15,9 @@ namespace Dlog {
             var dlogObject = CreateInstance<DlogGraphObject>();
             dlogObject.Initialize(dlogGraph);
             dlogObject.DlogGraph.AssetGuid = AssetDatabase.GetAssetPath(instanceId);
-            dlogObject.DlogGraph.DialogueGraphVersion = DlogVersion.Version.GetValue();
+            dlogObject.DlogGraph.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
             dlogObject.AssetGuid = dlogObject.DlogGraph.AssetGuid;
-            DlogUtility.CreateFile(pathName, dlogObject, false);
+            DialogueGraphUtility.CreateFile(pathName, dlogObject, false);
             AssetDatabase.ImportAsset(pathName);
         }
     }

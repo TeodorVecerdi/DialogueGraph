@@ -18,7 +18,7 @@ namespace Dlog {
                 propertyGuid = value;
                 var property = Owner.EditorView.DlogObject.DlogGraph.Properties.FirstOrDefault(prop => prop.GUID == value);
                 if (property == null) return;
-                if(!string.IsNullOrEmpty(currentType)) 
+                if(!string.IsNullOrEmpty(currentType))
                     RemoveFromClassList(currentType);
                 currentType = property.Type.ToString();
                 AddToClassList(currentType);
@@ -32,7 +32,7 @@ namespace Dlog {
             Refresh();
         }
 
-        
+
         public override string GetNodeData() {
             var root = new JObject();
             root["propertyGuid"] = propertyGuid;
@@ -51,7 +51,7 @@ namespace Dlog {
             Port createdPort;
             switch (property.Type) {
                 case PropertyType.Trigger:
-                    createdPort = DlogPort.Create("", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Trigger, false,edgeConnectorListener); 
+                    createdPort = DlogPort.Create("", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Trigger, false,edgeConnectorListener);
                     break;
                 case PropertyType.Check:
                     createdPort = DlogPort.Create("", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Check, false, edgeConnectorListener);

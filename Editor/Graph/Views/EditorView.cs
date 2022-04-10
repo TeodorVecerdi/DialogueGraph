@@ -49,7 +49,7 @@ namespace Dlog {
                 if (GUILayout.Button("Show In Project", EditorStyles.toolbarButton)) {
                     EditorWindow.Events.ShowInProjectRequested?.Invoke();
                 }
-                
+
                 GUILayout.FlexibleSpace();
                 IsBlackboardVisible = GUILayout.Toggle(IsBlackboardVisible, "Blackboard", EditorStyles.toolbarButton);
                 dlogObject.IsBlackboardVisible = IsBlackboardVisible;
@@ -68,14 +68,14 @@ namespace Dlog {
                 graphView.AddManipulator(new ClickSelector());
                 graphView.RegisterCallback<KeyDownEvent>(OnKeyDown);
                 content.Add(graphView);
-               
+
                 var grid = new GridBackground();
                 graphView.Insert(0, grid);
                 grid.StretchToParentSize();
-                
+
                 blackboardProvider = new BlackboardProvider(this);
                 graphView.Add(blackboardProvider.Blackboard);
-                
+
                 graphView.graphViewChanged += OnGraphViewChanged;
             }
             
@@ -92,7 +92,7 @@ namespace Dlog {
             
             Add(content);
         }
-        
+
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange) {
             if (graphViewChange.movedElements != null) {
@@ -151,7 +151,7 @@ namespace Dlog {
             graphView.graphElements.ToList().OfType<StickyNote>().ToList().ForEach(graphView.RemoveElement);
             graphView.graphElements.ToList().OfType<BlackboardRow>().ToList().ForEach(graphView.RemoveElement);
 
-            // Create & add graph elements 
+            // Create & add graph elements
             dlogObject.DlogGraph.Nodes.ForEach(node => AddNode(node));
             dlogObject.DlogGraph.Edges.ForEach(AddEdge);
             dlogObject.DlogGraph.Properties.ForEach(AddProperty);

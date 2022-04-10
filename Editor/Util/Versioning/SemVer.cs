@@ -15,31 +15,23 @@ namespace Dlog {
         // ReSharper disable once InconsistentNaming
         public int PATCH;
 
-
         public SemVer(string versionString) {
             if (!IsValid(versionString, out var major, out var minor, out var patch)) {
                 Debug.LogError($"Could not parse SemVer string {versionString} into format MAJOR.MINOR.PATCH.");
                 this = Invalid;
                 return;
             }
-            
+
             MAJOR = major;
             MINOR = minor;
             PATCH = patch;
         }
 
-        public void BumpMajor() {
-            MAJOR++;
-            MINOR = 0;
-            PATCH = 0;
+        public SemVer(int major, int minor, int patch) {
+            MAJOR = major;
+            MINOR = minor;
+            PATCH = patch;
         }
-
-        public void BumpMinor() {
-            MINOR++;
-            PATCH = 0;
-        }
-
-        public void BumpPatch() => PATCH++;
 
         public override string ToString() {
             return $"{MAJOR}.{MINOR}.{PATCH}";

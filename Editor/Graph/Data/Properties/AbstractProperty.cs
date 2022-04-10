@@ -11,7 +11,7 @@ namespace Dlog {
         [SerializeField] private string defaultReferenceName;
         [SerializeField] private string overrideReferenceName;
         [SerializeField] private bool hidden;
-        
+
         public string DisplayName {
             get {
                 if (string.IsNullOrEmpty(name))
@@ -29,7 +29,7 @@ namespace Dlog {
                     return defaultReferenceName;
                 }
                 return OverrideReferenceName;
-            }   
+            }
         }
 
         public string OverrideReferenceName {
@@ -45,7 +45,7 @@ namespace Dlog {
         public virtual string GetDefaultReferenceName() {
             return $"{Type}_{ShortGuid}";
         }
-        
+
         public string ShortGuid {
             get {
                 if (string.IsNullOrEmpty(GUID))

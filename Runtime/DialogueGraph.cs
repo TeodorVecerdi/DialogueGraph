@@ -78,7 +78,7 @@ namespace Dlog.Runtime {
             for (var i = 0; i < lines.Count - 1; i++) {
                 var line = lines[i];
                 var currentCheck = ExecuteChecks(line, i);
-                
+
 
                 if (currentCheck) {
                     Progress(line);

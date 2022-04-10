@@ -14,7 +14,7 @@ namespace Dlog {
         [SerializeField] public bool IsBlackboardVisible;
         [SerializeField] public string DialogueGraphVersion;
 
-        
+
         [NonSerialized] private Dictionary<string, SerializedNode> nodeDictionary = new Dictionary<string, SerializedNode>();
         [SerializeField] private List<SerializedNode> nodes = new List<SerializedNode>();
         [NonSerialized] private List<SerializedNode> addedNodes = new List<SerializedNode>();
@@ -75,7 +75,7 @@ namespace Dlog {
         }
 
         public void ReplaceWith(DlogGraphData otherGraphData) {
-            // Remove everything 
+            // Remove everything
             var removedNodesGuid = new List<string>();
             removedNodesGuid.AddRange(nodes.Select(node => node.GUID));
             foreach (var node in removedNodesGuid) {
@@ -153,7 +153,7 @@ namespace Dlog {
                 temp.AddRange(edges.Where(edge1 => edge1.OutputPort == edge.OutputPort));
                 temp.ForEach(RemoveEdge);
             }
-            
+
             edges.Add(edge);
             addedEdges.Add(edge);
         }
@@ -189,7 +189,7 @@ namespace Dlog {
             if (currentIndex == -1)
                 throw new ArgumentException("Property is not in graph.");
             if (newIndex == currentIndex) {
-                Debug.Log($"New index is the same as current index {newIndex} == {currentIndex}");   
+                Debug.Log($"New index is the same as current index {newIndex} == {currentIndex}");
                 return;
             }
             properties.RemoveAt(currentIndex);
@@ -224,7 +224,7 @@ namespace Dlog {
 
         public void SanitizePropertyName(AbstractProperty property) {
             property.DisplayName = property.DisplayName.Trim();
-            property.DisplayName = DlogUtility.SanitizeName(properties.Where(prop => prop.GUID != property.GUID).Select(prop => prop.DisplayName), "{0} ({1})", property.DisplayName);
+            property.DisplayName = DialogueGraphUtility.SanitizeName(properties.Where(prop => prop.GUID != property.GUID).Select(prop => prop.DisplayName), "{0} ({1})", property.DisplayName);
         }
 
         public void SanitizePropertyReference(AbstractProperty property, string newReferenceName) {
@@ -235,7 +235,7 @@ namespace Dlog {
             if (string.IsNullOrEmpty(name))
                 return;
 
-            property.OverrideReferenceName = DlogUtility.SanitizeName(properties.Where(prop => prop.GUID != property.GUID).Select(prop => prop.ReferenceName), "{0} ({1})", name);
+            property.OverrideReferenceName = DialogueGraphUtility.SanitizeName(properties.Where(prop => prop.GUID != property.GUID).Select(prop => prop.ReferenceName), "{0} ({1})", name);
         }
 
         public void Paste(CopyPasteData copyPasteData, List<SerializedNode> remappedNodes, List<SerializedEdge> remappedEdges) {

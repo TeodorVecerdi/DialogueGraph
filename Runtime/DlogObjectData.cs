@@ -24,13 +24,13 @@ namespace Dlog.Runtime {
             ActorDataIndices[guid] = ActorData.Count;
             ActorData.Add(data);
         }
-        
+
         public void AddCheckEvent(string guid, CheckEvent evt) {
             CheckDataIndices[guid] = CheckData.Count;
             CheckData.Add(evt);
             evt.dynamic = true;
         }
-        
+
         public void AddTriggerEvent(string guid, TriggerEvent evt) {
             TriggerDataIndices[guid] = TriggerData.Count;
             TriggerData.Add(evt);

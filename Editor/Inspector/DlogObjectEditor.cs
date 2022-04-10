@@ -108,7 +108,7 @@ namespace Dlog {
                     currentData.ActorData[currentData.ActorDataIndices[actorProperty.Guid]].CustomData = (ScriptableObject)evt.newValue;
                     serializedObject.ApplyModifiedProperties();
                 });
-            
+
                 actorContainer.Add(actorRoot);
             }
 
@@ -148,14 +148,14 @@ namespace Dlog {
 
                 var triggerTitle = triggerRoot.Q<Label>("triggerIdentifier");
                 triggerTitle.text = triggerProperty.DisplayName;
-            
+
                 var index = currentData.TriggerDataIndices[triggerProperty.Guid];
                 var property = CurrentDataProperty?.FindPropertyRelative($"TriggerData.Array.data[{index}]");
                 if (property != null) {
                     var triggerField = new IMGUIContainer(() => { EditorGUILayout.PropertyField(property); });
                     triggerRoot.Q("triggerContainer").Add(triggerField);
                 }
-            
+
                 triggerContainer.Add(triggerRoot);
             }
         }
