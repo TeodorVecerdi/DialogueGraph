@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using UnityEngine;
 
 public class LineController : MonoBehaviour {
@@ -15,7 +15,7 @@ public class LineController : MonoBehaviour {
         entries.ForEach(entry => Destroy(entry.gameObject));
         entries.Clear();
     }
-    
+
     public void Initialize(List<ConversationLine> lines) {
         isActive = true;
         entries = new List<LineEntry>();
@@ -51,7 +51,7 @@ public class LineController : MonoBehaviour {
             selectedIndex = nextIndex;
         }
 
-        if (Input.GetKeyDown(KeyCode.Return)) {
+        if (Input.GetKeyDown(KeyCode.Space)) {
             SelectLine(selectedIndex);
         }
     }

@@ -1,9 +1,9 @@
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using TMPro;
 using UnityEngine;
 
 public class NPCDialogue : MonoBehaviour {
-    public DialogueGraph DialogueSystem;
+    public RuntimeDialogueGraph DialogueSystem;
     public LineController LineController;
 
     [Header("UI References")]
@@ -36,7 +36,7 @@ public class NPCDialogue : MonoBehaviour {
             isInConversation = true;
             (showPlayer ? PlayerContainer : NpcContainer).SetActive(true);
         }
-        
+
         if (showingSecondaryScreen) {
             if (Input.GetKeyDown(KeyCode.Escape)) {
                 showingSecondaryScreen = false;
@@ -69,7 +69,7 @@ public class NPCDialogue : MonoBehaviour {
                 isPlayerChoosing = false;
                 shouldShowText = false;
                 showingText = false;
-                
+
                 PlayerContainer.SetActive(false);
                 NpcContainer.SetActive(false);
                 return;
@@ -123,7 +123,7 @@ public class NPCDialogue : MonoBehaviour {
     public void PlayGame(string node, int lineIndex) {
         showingSecondaryScreen = true;
         SecondaryScreen.SetActive(true);
-        
+
         NpcContainer.SetActive(false);
         PlayerContainer.gameObject.SetActive(false);
         showingText = false;
@@ -134,7 +134,7 @@ public class NPCDialogue : MonoBehaviour {
     public void OpenShop(string node, int lineIndex) {
         showingSecondaryScreen = true;
         SecondaryScreen.SetActive(true);
-    
+
         NpcContainer.SetActive(false);
         PlayerContainer.gameObject.SetActive(false);
         showingText = false;
