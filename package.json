@@ -1,9 +1,9 @@
 {
   "name": "com.github.teodorvecerdi.dialoguegraph",
-  "version": "1.1.5",
+  "version": "2.0.0",
   "displayName": "Dialogue Graph",
   "description": "Interactive node-based tool similar to Shader Graph for developing branching conversation trees.\nExample uses could be conversations with NPCs, but because this tool is mostly general purpose you can use it for any scenario that requires branching logic.",
-  "unity": "2020.1",
+  "unity": "2020.3",
   "keywords": [
     "node-based",
     "editor-tool",
