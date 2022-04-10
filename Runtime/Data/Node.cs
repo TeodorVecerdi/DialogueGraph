@@ -24,7 +24,6 @@ namespace DialogueGraph.Runtime {
         NPC,
         SELF,
         PROP,
-        COMBINER,
 
         BOOLEAN_NOT,
         BOOLEAN_AND,
