@@ -106,7 +106,7 @@ namespace DialogueGraph.Runtime {
                 return CheckTree.Property(propertyGuid);
             }
 
-            BooleanOperation operation = Enum.Parse<BooleanOperation>(node.Type.ToString().Replace("BOOLEAN_", ""));
+            BooleanOperation operation = (BooleanOperation)Enum.Parse(typeof(BooleanOperation), node.Type.ToString().Replace("BOOLEAN_", ""));
             if (node.Type == NodeType.BOOLEAN_NOT) {
                 Edge notEdge = Edges.FirstOrDefault(e => e.ToNode == node.Guid);
                 return CheckTree.Unary(operation, ParseCheckTree(notEdge, propertyNodes));
