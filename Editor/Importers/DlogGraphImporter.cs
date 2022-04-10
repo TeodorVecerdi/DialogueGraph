@@ -24,7 +24,8 @@ namespace DialogueGraph {
                     DialogueGraphUtility.SaveGraph(dlogObject, false);
                 }
 
-                ctx.AddObjectToAsset("MainAsset", dlogObject, icon);
+                ctx.AddObjectToAsset("EditorGraph", dlogObject, icon);
+                dlogObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable;
 
                 var runtimeObject = ScriptableObject.CreateInstance<DlogObject>();
                 var filePath = ctx.assetPath;
@@ -59,9 +60,6 @@ namespace DialogueGraph {
                         case "DialogueGraph.PropertyNode":
                             runtimeNode.Type = NodeType.PROP;
                             runtimeNode.Temp_PropertyNodeGuid = nodeData.Value<string>("propertyGuid");
-                            break;
-                        case "DialogueGraph.CheckCombinerNode":
-                            runtimeNode.Type = NodeType.COMBINER;
                             break;
                         case "DialogueGraph.NotBooleanNode":
                             runtimeNode.Type = NodeType.BOOLEAN_NOT;
@@ -118,13 +116,12 @@ namespace DialogueGraph {
                                              ));
                 runtimeObject.BuildGraph();
 
-                ctx.AddObjectToAsset("RuntimeAsset", runtimeObject, runtimeIcon);
+                ctx.AddObjectToAsset("MainAsset", runtimeObject, runtimeIcon);
                 ctx.SetMainObject(runtimeObject);
                 AssetDatabase.Refresh();
                 EditorUtility.SetDirty(runtimeObject);
-            } catch (Exception e) {
+            } catch (Exception) {
                 if (DialogueGraphUtility.VersionMismatch(ctx.assetPath)) {
-                    Debug.LogException(e);
                     ImportInvalidVersion(ctx);
                     return;
                 }
@@ -136,7 +133,7 @@ namespace DialogueGraph {
         private void ImportInvalidVersion(AssetImportContext ctx) {
             var icon = Resources.Load<Texture2D>(ResourcesUtility.IconError);
             VersionMismatchObject versionMismatchObject = ScriptableObject.CreateInstance<VersionMismatchObject>();
-            ctx.AddObjectToAsset("VersionMismatch", versionMismatchObject, icon);
+            ctx.AddObjectToAsset("MainAsset", versionMismatchObject, icon);
             ctx.SetMainObject(versionMismatchObject);
         }
     }

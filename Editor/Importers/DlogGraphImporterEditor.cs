@@ -51,8 +51,7 @@ namespace DialogueGraph {
                 return;
             }
 
-            Debug.Assert(importer != null, "importer != null");
-            if (GUILayout.Button("Open DialogueGraph Editor")) {
+            if (GUILayout.Button("Open Dialogue Graph Editor")) {
                 OpenEditorWindow(importer.assetPath);
             }
 
@@ -121,7 +120,8 @@ namespace DialogueGraph {
         [OnOpenAsset(0)]
         public static bool OnOpenAsset(int instanceID, int line) {
             var path = AssetDatabase.GetAssetPath(instanceID);
-            return OpenEditorWindow(path);
+            OpenEditorWindow(path);
+            return true;
         }
     }
 }
