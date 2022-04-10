@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace DialogueGraph {
@@ -107,6 +108,19 @@ namespace DialogueGraph {
 
         public void Refresh() {
             UpdateTitle();
+
+            if (editorView == null) {
+                editorView = rootVisualElement.Q<EditorView>();
+            }
+
+            if (editorView == null) {
+                editorView = new EditorView(this, dlogObject) {
+                    name = "Dlog Graph",
+                    IsBlackboardVisible = dlogObject.IsBlackboardVisible
+                };
+                rootVisualElement.Add(editorView);
+            }
+
             editorView.BuildGraph();
         }
 

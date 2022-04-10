@@ -52,10 +52,27 @@ namespace DialogueGraph {
         private static readonly Regex u200TypeRegex = new Regex(@"(?<quote>\\""|"")Dlog\.(.*?)(\k<quote>)", RegexOptions.Compiled);
         [ConvertMethod("2.0.0")]
         private static JObject U_200(JObject dlogObject) {
+            // Change namespaces
             string json = dlogObject.ToString(Formatting.None);
             json = u200TypeRegex.Replace(json, "${quote}DialogueGraph.$1${quote}");
 
             dlogObject = JObject.Parse(json);
+
+            // Replace all CheckCombinerNode with either AndBooleanNode or OrBooleanNode
+            JArray nodes = dlogObject["nodes"] as JArray;
+            foreach (JToken nodeToken in nodes) {
+                // "Type": "DialogueGraph.CheckCombinerNode"
+                if (nodeToken.Value<string>("Type") != "DialogueGraph.CheckCombinerNode") continue;
+
+                JObject nodeData = JObject.Parse(nodeToken.Value<string>("NodeData"));
+                if (nodeData.Value<string>("operation") == "true") {
+                    nodeToken["Type"] = "DialogueGraph.OrBooleanNode";
+                } else {
+                    nodeToken["Type"] = "DialogueGraph.AndBooleanNode";
+                }
+                nodeToken["NodeData"] = "{}";
+            }
+
             dlogObject["DialogueGraphVersion"] = v200.ToString();
             return dlogObject;
         }
