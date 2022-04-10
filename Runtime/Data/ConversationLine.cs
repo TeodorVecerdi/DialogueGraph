@@ -10,5 +10,6 @@ namespace DialogueGraph.Runtime {
         public string CheckPort;
         public List<string> Triggers;
         public List<string> Checks;
+        public List<CheckTree> CheckTrees;
     }
 }

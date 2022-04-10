@@ -25,7 +25,7 @@ namespace DialogueGraph.Runtime {
         SELF,
         PROP,
         COMBINER,
-        
+
         BOOLEAN_NOT,
         BOOLEAN_AND,
         BOOLEAN_OR,
@@ -33,5 +33,8 @@ namespace DialogueGraph.Runtime {
         BOOLEAN_NAND,
         BOOLEAN_NOR,
         BOOLEAN_XNOR,
+
+        BOOLEAN_START = BOOLEAN_NOT,
+        BOOLEAN_END = BOOLEAN_XNOR,
     }
 }

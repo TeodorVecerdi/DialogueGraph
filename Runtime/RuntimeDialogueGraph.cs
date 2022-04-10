@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -101,9 +102,9 @@ namespace DialogueGraph.Runtime {
         }
 
         private bool ExecuteChecks(ConversationLine line, int lineIndex) {
-            var currentCheck = true;
-            foreach (var checkGuid in line.Checks) {
-                currentCheck &= CurrentData.CheckData[CurrentData.CheckDataIndices[checkGuid]].Invoke(currentNodeGuid, lineIndex);
+            bool currentCheck = true;
+            foreach (CheckTree tree in line.CheckTrees) {
+                currentCheck = EvaluateCheckTree(tree, lineIndex) && currentCheck;
             }
 
             return currentCheck;
@@ -123,6 +124,49 @@ namespace DialogueGraph.Runtime {
             }
 
             currentNodeGuid = line.Next;
+        }
+
+        private bool EvaluateCheckTree(CheckTree tree, int lineIndex) {
+            if (tree.NodeKind == CheckTree.Kind.Property) {
+                if (string.IsNullOrEmpty(tree.PropertyGuid)) return false;
+                if (!CurrentData.CheckDataIndices.ContainsKey(tree.PropertyGuid)) return false;
+                int index = CurrentData.CheckDataIndices[tree.PropertyGuid];
+                if (index < 0 || index >= CurrentData.CheckData.Count) return false;
+                return CurrentData.CheckData[index].Invoke(currentNodeGuid, lineIndex);
+            }
+
+            if (tree.NodeKind == CheckTree.Kind.Unary) {
+                bool check = EvaluateCheckTree(tree.SubtreeA, lineIndex);
+                return EvaluateUnaryOperation(tree.BooleanOperation, check);
+            }
+
+            if (tree.NodeKind == CheckTree.Kind.Binary) {
+                bool checkA = EvaluateCheckTree(tree.SubtreeA, lineIndex);
+                bool checkB = EvaluateCheckTree(tree.SubtreeB, lineIndex);
+                return EvaluateBinaryOperation(tree.BooleanOperation, checkA, checkB);
+            }
+
+            // Unreachable
+            throw new Exception("Unreachable");
+        }
+
+        private static bool EvaluateUnaryOperation(BooleanOperation operation, bool value) {
+            switch (operation) {
+                case BooleanOperation.NOT: return !value;
+                default: throw new Exception("Unreachable");
+            }
+        }
+
+        private static bool EvaluateBinaryOperation(BooleanOperation operation, bool valueA, bool valueB) {
+            switch (operation) {
+                case BooleanOperation.AND: return valueA && valueB;
+                case BooleanOperation.OR: return valueA || valueB;
+                case BooleanOperation.XOR: return valueA ^ valueB;
+                case BooleanOperation.NAND: return !(valueA && valueB);
+                case BooleanOperation.NOR: return !(valueA || valueB);
+                case BooleanOperation.XNOR: return !(valueA ^ valueB);
+                default: throw new Exception("Unreachable");
+            }
         }
     }
 }
