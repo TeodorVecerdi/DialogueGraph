@@ -102,23 +102,20 @@ namespace DialogueGraph.Runtime {
 
             Node node = NodeDictionary[edge.FromNode];
             if (node.Type < NodeType.BOOLEAN_START || node.Type > NodeType.BOOLEAN_END) {
-                Debug.Log($"ParseCheckTree: parsed CheckTree.Property");
                 string propertyGuid = propertyNodes.ContainsKey(edge.FromNode) ? propertyNodes[edge.FromNode].Temp_PropertyNodeGuid : null;
                 return CheckTree.Property(propertyGuid);
             }
 
             BooleanOperation operation = Enum.Parse<BooleanOperation>(node.Type.ToString().Replace("BOOLEAN_", ""));
             if (node.Type == NodeType.BOOLEAN_NOT) {
-                Debug.Log("ParseCheckTree: parsed CheckTree.Unary");
                 Edge notEdge = Edges.FirstOrDefault(e => e.ToNode == node.Guid);
                 return CheckTree.Unary(operation, ParseCheckTree(notEdge, propertyNodes));
-            } else {
-                Debug.Log("ParseCheckTree: parsed CheckTree.Binary");
-                List<Edge> edges = Edges.Where(e => e.ToNode == node.Guid).ToList();
-                Edge edgeA = edges[0];
-                Edge edgeB = edges[1];
-                return CheckTree.Binary(operation, ParseCheckTree(edgeA, propertyNodes), ParseCheckTree(edgeB, propertyNodes));
             }
+
+            List<Edge> edges = Edges.Where(e => e.ToNode == node.Guid).ToList();
+            Edge edgeA = edges[0];
+            Edge edgeB = edges[1];
+            return CheckTree.Binary(operation, ParseCheckTree(edgeA, propertyNodes), ParseCheckTree(edgeB, propertyNodes));
         }
     }
 }

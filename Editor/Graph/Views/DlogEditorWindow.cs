@@ -42,9 +42,7 @@ namespace DialogueGraph {
                 IsBlackboardVisible = dlogObject.IsBlackboardVisible
             };
             rootVisualElement.Add(editorView);
-            if (VersionCheck()) {
-                Refresh();
-            }
+            Refresh();
         }
 
         private void Update() {
@@ -123,41 +121,6 @@ namespace DialogueGraph {
 
         private void OnEnable() {
             this.SetAntiAliasing(4);
-        }
-
-        private bool VersionCheck() {
-            var fileVersion = (SemVer)dlogObject.DlogGraph.DialogueGraphVersion;
-            var comparison = fileVersion.CompareTo(DialogueGraphUtility.LatestVersion);
-            if (comparison < 0) {
-                if (EditorUtility.DisplayDialog("Version mismatch", $"The graph you are trying to load was saved with an older version of Dialogue Graph.\nIf you proceed with loading it will be converted to the current version. (A backup will be created)\n\nDo you wish to continue?", "Yes", "No")) {
-                    var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.AssetGuid);
-                    var assetNameSubEndIndex = assetPath.LastIndexOf('.');
-                    var backupAssetPath = assetPath.Substring(0, assetNameSubEndIndex);
-                    DialogueGraphUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
-                    DialogueGraphUtility.VersionConvert(fileVersion, dlogObject);
-                    Refresh();
-                } else {
-                    skipOnDestroyCheck = true;
-                    Close();
-                }
-                return false;
-            }
-
-            if (comparison > 0) {
-                if (EditorUtility.DisplayDialog("Version mismatch", $"The graph you are trying to load was saved with a newer version of Dialogue Graph.\nLoading the file might cause unexpected behaviour or errors. (A backup will be created)\n\nDo you wish to continue?", "Yes", "No")) {
-                    var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.AssetGuid);
-                    var assetNameSubEndIndex = assetPath.LastIndexOf('.');
-                    var backupAssetPath = assetPath.Substring(0, assetNameSubEndIndex);
-                    DialogueGraphUtility.CreateFileNoUpdate($"{backupAssetPath}.backup_{fileVersion}.dlog", dlogObject);
-                    Refresh();
-                } else {
-                    skipOnDestroyCheck = true;
-                    Close();
-                }
-
-                return false;
-            }
-            return true;
         }
 
         private void OnDestroy() {

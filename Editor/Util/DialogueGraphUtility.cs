@@ -4,13 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace DialogueGraph {
     public static class DialogueGraphUtility {
-        internal static readonly SemVer LatestVersion = new SemVer(1, 1, 5);
+        internal static readonly SemVer LatestVersion = new SemVer(2, 0, 0);
 
         #region IO Utilities
         public static bool CreateFile(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {
@@ -66,15 +67,49 @@ namespace DialogueGraph {
 
             return LoadGraphAtPath(assetPath);
         }
+
+        public static JObject LoadJObjectAtPath(string assetPath) {
+            if (string.IsNullOrEmpty(assetPath)) return null;
+
+            var jsonString = File.ReadAllText(assetPath);
+            try {
+                return JObject.Parse(jsonString);
+            } catch (ArgumentNullException exception) {
+                Debug.LogException(exception);
+                return null;
+            }
+        }
+
+        public static DlogGraphObject FromJObject(JObject converted) {
+            if (converted == null) return null;
+
+            var dlogData = JsonUtility.FromJson<DlogGraphData>(converted.ToString());
+            var dlogObject = ScriptableObject.CreateInstance<DlogGraphObject>();
+            dlogObject.Initialize(dlogData);
+            dlogObject.AssetGuid = dlogData.AssetGuid;
+            return dlogObject;
+        }
+
         #endregion
 
         /// <summary>
         /// Converts (back-ports or forward-ports) dlogObject from <paramref name="fromVersion"/> to the current version.
         /// </summary>
-        /// <param name="fromVersion">Dlog object version</param>
-        /// <param name="dlogObject">Dlog object to be converted</param>
-        public static void VersionConvert(SemVer fromVersion, DlogGraphObject dlogObject) {
-            VersionConverter.ConvertVersion(fromVersion, LatestVersion, dlogObject);
+        /// <param name="fromVersion">DialogueGraph object version</param>
+        /// <param name="jsonObject">JObject representation of DialogueGraph to be converted</param>
+        public static JObject VersionConvert(SemVer fromVersion, JObject jsonObject) {
+            return VersionConverter.ConvertVersion(fromVersion, LatestVersion, jsonObject);
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> if the asset at <paramref name="assetPath"/> has a mismatching version.
+        /// </summary>
+        public static bool VersionMismatch(string assetPath) {
+            JObject jsonObject = LoadJObjectAtPath(assetPath);
+            if (jsonObject == null) return true;
+
+            SemVer version = (SemVer)jsonObject.Value<string>("DialogueGraphVersion");
+            return version != LatestVersion;
         }
 
         /**

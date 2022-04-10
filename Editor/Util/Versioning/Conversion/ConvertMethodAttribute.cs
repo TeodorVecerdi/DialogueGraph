@@ -1,7 +1,8 @@
 using System;
+using JetBrains.Annotations;
 
 namespace DialogueGraph {
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false), ]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false), MeansImplicitUse]
     public class ConvertMethodAttribute : Attribute {
         public readonly SemVer TargetVersion;
 
