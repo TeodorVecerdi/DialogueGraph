@@ -117,9 +117,17 @@ namespace DialogueGraph {
             window.Focus();
         }
 
-        [OnOpenAsset(0)]
+        [OnOpenAsset]
         public static bool OnOpenAsset(int instanceID, int line) {
             var path = AssetDatabase.GetAssetPath(instanceID);
+            var extension = Path.GetExtension(path);
+            if (string.IsNullOrEmpty(extension))
+                return false;
+
+            extension = extension.Substring(1).ToLowerInvariant();
+            if (extension != DlogGraphImporter.Extension)
+                return false;
+
             OpenEditorWindow(path);
             return true;
         }
