@@ -24,7 +24,6 @@ namespace DialogueGraph {
             }
 
             ctx.AddObjectToAsset("MainAsset", dlogObject, icon);
-            ctx.SetMainObject(dlogObject);
 
             var runtimeObject = ScriptableObject.CreateInstance<DlogObject>();
             var filePath = ctx.assetPath;
@@ -63,6 +62,27 @@ namespace DialogueGraph {
                     case "DialogueGraph.CheckCombinerNode":
                         runtimeNode.Type = NodeType.COMBINER;
                         break;
+                    case "DialogueGraph.NotBooleanNode":
+                        runtimeNode.Type = NodeType.BOOLEAN_NOT;
+                        break;
+                    case "DialogueGraph.AndBooleanNode":
+                        runtimeNode.Type = NodeType.BOOLEAN_AND;
+                        break;
+                    case "DialogueGraph.OrBooleanNode":
+                        runtimeNode.Type = NodeType.BOOLEAN_OR;
+                        break;
+                    case "DialogueGraph.XorBooleanNode":
+                        runtimeNode.Type = NodeType.BOOLEAN_XOR;
+                        break;
+                    case "DialogueGraph.NandBooleanNode":
+                        runtimeNode.Type = NodeType.BOOLEAN_NAND;
+                        break;
+                    case "DialogueGraph.NorBooleanNode":
+                        runtimeNode.Type = NodeType.BOOLEAN_NOR;
+                        break;
+                    case "DialogueGraph.XnorBooleanNode":
+                        runtimeNode.Type = NodeType.BOOLEAN_XNOR;
+                        break;
                     default:
                         throw new NotSupportedException($"Invalid node type {node.Type}.");
                 }
@@ -98,6 +118,7 @@ namespace DialogueGraph {
             runtimeObject.BuildGraph();
 
             ctx.AddObjectToAsset("RuntimeAsset", runtimeObject, runtimeIcon);
+            ctx.SetMainObject(runtimeObject);
             AssetDatabase.Refresh();
 
             EditorUtility.SetDirty(runtimeObject);

@@ -1,0 +1,60 @@
+#boolean-main {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    -unity-background-image-tint-color: rgba(114, 64, 253, 0.7);
+    -unity-background-scale-mode: scale-to-fit;
+    min-width: 0;
+    width: 64px;
+}
+
+#contents {
+    display: none;
+}
+
+.node.NOT  #boolean-main { background-image: resource("Textures/boolean/NOT");  }
+.node.AND  #boolean-main { background-image: resource("Textures/boolean/AND");  }
+.node.OR   #boolean-main { background-image: resource("Textures/boolean/OR");   }
+.node.XOR  #boolean-main { background-image: resource("Textures/boolean/XOR");  }
+.node.NAND #boolean-main { background-image: resource("Textures/boolean/NAND"); }
+.node.NOR  #boolean-main { background-image: resource("Textures/boolean/NOR");  }
+.node.XNOR #boolean-main { background-image: resource("Textures/boolean/XNOR"); }
+
+#boolean-main .boolean-column {
+    flex: 1 0;
+    align-self: center;
+}
+
+#boolean-main #boolean-input.boolean-column {
+    margin-left: 3px;
+}
+
+#boolean-main #boolean-output.boolean-column {
+    margin-right: 3px;
+}
+
+#boolean-main #boolean-operation.boolean-column {
+    flex: 1 0;
+    -unity-text-align: middle-center;
+    -unity-font-style: bold;
+    font-size: 12px;
+    color: white;
+    width: 32px;
+    padding: 0 0px;
+}
+
+#title {
+    border-radius: 5px;
+}
+
+.node {
+    --boolean-selection: #7340ff;
+    --boolean-node: #452aa7;
+}
+
+.node #title {
+    background-color: var(--boolean-node);
+}
+.node:checked #selection-border, .node:hover #selection-border, .node:checked:hover #selection-border  {
+    border-color: var(--boolean-selection);
+}
