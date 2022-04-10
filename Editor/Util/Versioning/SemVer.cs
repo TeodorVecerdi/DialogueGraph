@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public struct SemVer : IEquatable<SemVer>, IComparable<SemVer> {
         public static readonly SemVer Invalid = new SemVer {MAJOR = -1, MINOR = -1, PATCH = -1};

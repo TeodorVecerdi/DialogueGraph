@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Dlog {
+namespace DialogueGraph {
     public static class DialogueGraphUtility {
         internal static readonly SemVer LatestVersion = new SemVer(1, 1, 5);
 

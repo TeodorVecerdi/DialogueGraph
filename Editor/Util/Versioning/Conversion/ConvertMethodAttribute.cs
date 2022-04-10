@@ -1,6 +1,6 @@
 using System;
 
-namespace Dlog {
+namespace DialogueGraph {
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false), ]
     public class ConvertMethodAttribute : Attribute {
         public readonly SemVer TargetVersion;

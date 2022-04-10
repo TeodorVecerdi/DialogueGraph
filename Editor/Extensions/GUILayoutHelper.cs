@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     public static class GUILayoutHelper {
         public static void BeginCenterVertically() {
             GUILayout.BeginHorizontal();

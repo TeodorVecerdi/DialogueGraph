@@ -6,7 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public abstract class AbstractNode : Node {
         public SerializedNode Owner { get; set; }
         public string GUID;

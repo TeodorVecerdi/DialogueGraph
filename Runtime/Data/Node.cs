@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Dlog.Runtime {
+namespace DialogueGraph.Runtime {
     [Serializable]
     public class Node {
         public NodeType Type;

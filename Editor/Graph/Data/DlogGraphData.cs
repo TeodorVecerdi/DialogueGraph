@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public class DlogGraphData : ISerializationCallbackReceiver {
         public DlogGraphObject Owner { get; set; }

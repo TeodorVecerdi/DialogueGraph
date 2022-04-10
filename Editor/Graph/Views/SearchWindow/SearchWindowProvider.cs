@@ -6,7 +6,7 @@ using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class SearchWindowProvider : ScriptableObject {
         private DlogEditorWindow editorWindow;
         private EditorView editorView;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public class CopyPasteData : ISerializationCallbackReceiver {
         [NonSerialized] private HashSet<SerializedNode> nodes = new HashSet<SerializedNode>();

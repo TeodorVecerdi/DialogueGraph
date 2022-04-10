@@ -5,7 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class DlogGraphView : GraphView {
         private EditorView editorView;
         public EditorView EditorView => editorView;

@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Dlog.Runtime {
-    public class DialogueGraph : MonoBehaviour {
+namespace DialogueGraph.Runtime {
+    [AddComponentMenu("Dialogue Graph/Dialogue Graph")]
+    public class RuntimeDialogueGraph : MonoBehaviour {
         public DlogObject DlogObject;
 
         #region Inspector Data

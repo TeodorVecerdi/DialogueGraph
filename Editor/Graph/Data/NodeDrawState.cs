@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public struct NodeDrawState {
         [SerializeField] public Rect Position;

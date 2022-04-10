@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 #pragma warning disable 618
 
-namespace Dlog {
+namespace DialogueGraph {
     public class LineDataSelf {
         public string Line;
         public string PortGuidA;

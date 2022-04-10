@@ -1,8 +1,8 @@
 using System;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public abstract class AbstractProperty {
         [SerializeField] public string GUID = Guid.NewGuid().ToString();

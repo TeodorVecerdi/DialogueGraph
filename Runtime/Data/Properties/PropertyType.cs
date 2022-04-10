@@ -1,4 +1,4 @@
-namespace Dlog.Runtime {
+namespace DialogueGraph.Runtime {
     public enum PropertyType {
         Trigger,
         Check,

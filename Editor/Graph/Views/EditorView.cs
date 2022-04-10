@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class EditorView : VisualElement, IDisposable {
         public static readonly Vector2 DefaultNodeSize = new Vector2(200, 150);
         public static readonly Rect DefaultNodePosition = new Rect(Vector2.zero, DefaultNodeSize);

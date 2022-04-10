@@ -4,7 +4,7 @@ using UnityEditor.AssetImporters;
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [CustomEditor(typeof(DlogGraphImporter))]
     public class DlogGraphImporterEditor : ScriptedImporterEditor {
         protected override bool needsApplyRevert => false;
@@ -12,7 +12,7 @@ namespace Dlog {
         public override void OnInspectorGUI() {
             var importer = target as DlogGraphImporter;
             Debug.Assert(importer != null, "importer != null");
-            if (GUILayout.Button("Open Dlog Editor")) {
+            if (GUILayout.Button("Open DialogueGraph Editor")) {
                 OpenEditorWindow(importer.assetPath);
             }
             ApplyRevertGUI();

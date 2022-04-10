@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class BlackboardPropertyView : VisualElement {
         private readonly BlackboardField field;
         private readonly EditorView editorView;

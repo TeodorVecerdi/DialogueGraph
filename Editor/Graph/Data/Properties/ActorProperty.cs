@@ -1,8 +1,8 @@
 using System;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public class ActorProperty : AbstractProperty {
         public ActorProperty() {

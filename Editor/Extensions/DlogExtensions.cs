@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public static class DlogExtensions {
         public static AbstractProperty Deserialize(this SerializedProperty property) {
             var type = System.Type.GetType(property.Type);

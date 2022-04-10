@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public class SerializedProperty {
         public string Type;

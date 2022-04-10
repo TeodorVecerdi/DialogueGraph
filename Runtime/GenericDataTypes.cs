@@ -1,6 +1,6 @@
 using System;
 
-namespace Dlog.Runtime {
+namespace DialogueGraph.Runtime {
     // Node currentNode, int conversationLineIndex, bool returnValue;
     [Serializable] public class CheckEvent : SerializableCallback<string, int, bool> {}
     // Guid currentNode

@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [ScriptedImporter(0, Extension, 3)]
     public class DlogGraphImporter : ScriptedImporter {
         public const string Extension = "dlog";
@@ -50,17 +50,17 @@ namespace Dlog {
                 var runtimeNode = new Runtime.Node();
                 runtimeNode.Guid = node.GUID;
                 switch (node.Type) {
-                    case "Dlog.SelfNode":
+                    case "DialogueGraph.SelfNode":
                         runtimeNode.Type = NodeType.SELF;
                         break;
-                    case "Dlog.NpcNode":
+                    case "DialogueGraph.NpcNode":
                         runtimeNode.Type = NodeType.NPC;
                         break;
-                    case "Dlog.PropertyNode":
+                    case "DialogueGraph.PropertyNode":
                         runtimeNode.Type = NodeType.PROP;
                         runtimeNode.Temp_PropertyNodeGuid = nodeData.Value<string>("propertyGuid");
                         break;
-                    case "Dlog.CheckCombinerNode":
+                    case "DialogueGraph.CheckCombinerNode":
                         runtimeNode.Type = NodeType.COMBINER;
                         break;
                     default:

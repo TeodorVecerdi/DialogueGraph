@@ -1,6 +1,6 @@
 using System;
 
-namespace Dlog.Runtime {
+namespace DialogueGraph.Runtime {
     [Serializable]
     public class Edge {
         public string FromNode;

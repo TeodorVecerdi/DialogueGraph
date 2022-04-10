@@ -6,7 +6,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public static class GraphViewExtensions {
         public static void InsertCopyPasteData(this DlogGraphView graphView, CopyPasteData copyPasteData) {
             if (copyPasteData == null) return;

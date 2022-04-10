@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Dlog.Runtime {
+namespace DialogueGraph.Runtime {
     [Serializable]
     public class ActorData {
         public string Name;

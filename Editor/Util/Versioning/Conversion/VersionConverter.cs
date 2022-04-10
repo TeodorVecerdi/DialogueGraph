@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     public static class VersionConverter {
         private static readonly SemVer v111 = (SemVer) "1.1.1";
         private static readonly SemVer v112 = (SemVer) "1.1.2";

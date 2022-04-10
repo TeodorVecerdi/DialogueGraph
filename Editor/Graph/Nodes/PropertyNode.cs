@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor.Experimental.GraphView;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class PropertyNode : AbstractNode {
         private string propertyGuid;
         private string currentType;

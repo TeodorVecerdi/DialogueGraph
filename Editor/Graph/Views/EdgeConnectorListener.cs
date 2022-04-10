@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.Searcher;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class EdgeConnectorListener : IEdgeConnectorListener {
         private EditorView editorView;
         private SearchWindowProvider searchWindowProvider;

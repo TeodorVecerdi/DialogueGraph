@@ -3,21 +3,21 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public static class PortHelper {
         public static bool IsCompatibleWith(this DlogPort port, DlogPort other) {
             if (other.Type == PortType.Fake || port.Type == PortType.Fake) return true;
             switch (port.Type) {
                 case PortType.Check:
-                    return other.Type == PortType.Check || other.Type == PortType.Combiner;
+                    return other.Type == PortType.Check || other.Type == PortType.Boolean;
                 case PortType.Trigger:
                     return other.Type == PortType.Trigger;
                 case PortType.Actor:
                     return other.Type == PortType.Actor;
                 case PortType.Branch:
                     return other.Type == PortType.Branch;
-                case PortType.Combiner:
-                    return other.Type == PortType.Check || other.Type == PortType.Combiner;
+                case PortType.Boolean:
+                    return other.Type == PortType.Check || other.Type == PortType.Boolean;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -41,7 +41,7 @@ namespace Dlog {
                     if (port.direction == Direction.Input)
                         return new Color(0.9f, 1f, 0.99f);
                     return new Color(0.91f, 0.93f, 1f);
-                case PortType.Combiner:
+                case PortType.Boolean:
                     if (port.direction == Direction.Input)
                         return new Color(0.45f, 0.25f, 1f);
                     return new Color(0.45f, 0.25f, 1f);

@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class DlogGraphAssetPostprocessor : AssetPostprocessor {
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths) {
             var anyRemovedAssets = deletedAssets.Any(path => path.EndsWith(DlogGraphImporter.Extension, StringComparison.InvariantCultureIgnoreCase));

@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dlog.Runtime {
+namespace DialogueGraph.Runtime {
     public class DlogObject : ScriptableObject {
         // Graph data
         [SerializeField] public List<Node> Nodes;

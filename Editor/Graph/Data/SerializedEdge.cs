@@ -3,7 +3,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Edge = UnityEditor.Experimental.GraphView.Edge;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public class SerializedEdge {
         [SerializeField] public string Input;

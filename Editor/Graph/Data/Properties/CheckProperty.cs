@@ -1,7 +1,7 @@
 using System;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public class CheckProperty : AbstractProperty {
         public CheckProperty() {

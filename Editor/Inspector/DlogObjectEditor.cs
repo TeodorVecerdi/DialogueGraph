@@ -1,15 +1,15 @@
 using System.Linq;
-using Dlog.Runtime;
+using DialogueGraph.Runtime;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using ActorData = Dlog.Runtime.ActorData;
+using ActorData = DialogueGraph.Runtime.ActorData;
 
-namespace Dlog {
-    [CustomEditor(typeof(DialogueGraph))]
+namespace DialogueGraph {
+    [CustomEditor(typeof(Runtime.RuntimeDialogueGraph))]
     public class DlogObjectEditor : UnityEditor.Editor {
-        private DialogueGraph dialogueGraph;
+        private Runtime.RuntimeDialogueGraph dialogueGraph;
         private UnityEditor.SerializedProperty dlogObjectProperty;
         private UnityEditor.SerializedProperty dlogObjectAssetGuidProperty;
         private VisualElement rootElement;
@@ -30,7 +30,7 @@ namespace Dlog {
         }
 
         public void OnEnable() {
-            dialogueGraph = (DialogueGraph) target;
+            dialogueGraph = (Runtime.RuntimeDialogueGraph) target;
             rootElement = new VisualElement();
             dlogObjectProperty = serializedObject.FindProperty("DlogObject");
             dlogObjectAssetGuidProperty = serializedObject.FindProperty("CurrentAssetGuid");
@@ -215,7 +215,7 @@ namespace Dlog {
             var actorProperties = DlogObject.Properties.Where(property => property.Type == PropertyType.Actor).ToList();
             foreach (var actorProperty in actorProperties) {
                 if (!currentData.ActorDataIndices.ContainsKey(actorProperty.Guid))
-                    currentData.AddActorData(actorProperty.Guid, new ActorData("Empty name", null, actorProperty));
+                    currentData.AddActorData(actorProperty.Guid, new Runtime.ActorData("Empty name", null, actorProperty));
             }
 
             /*keysToRemove.Clear();

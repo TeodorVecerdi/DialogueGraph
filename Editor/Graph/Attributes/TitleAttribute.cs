@@ -1,6 +1,6 @@
 using System;
 
-namespace Dlog {
+namespace DialogueGraph {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class TitleAttribute : Attribute {
         public readonly string[] Title;

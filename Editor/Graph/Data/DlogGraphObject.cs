@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class DlogGraphObject : ScriptableObject, ISerializationCallbackReceiver {
         [NonSerialized] private DlogGraphData dlogGraph;
         [NonSerialized] private int objectVersion;

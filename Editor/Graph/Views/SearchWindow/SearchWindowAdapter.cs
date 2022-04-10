@@ -3,7 +3,7 @@ using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class SearchWindowAdapter : SearcherAdapter {
         public override bool HasDetailsPanel => false;
 

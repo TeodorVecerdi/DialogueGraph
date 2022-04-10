@@ -1,4 +1,4 @@
-namespace Dlog {
+namespace DialogueGraph {
     public static class ResourcesUtility {
         public const string IconBig = "Textures/dloggraph_256";
         public const string IconSmall = "Textures/dloggraph_256";

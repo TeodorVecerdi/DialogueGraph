@@ -6,7 +6,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class DlogEditorWindow : EditorWindow {
         private string selectedAssetGuid;
         private DlogGraphObject dlogObject;
@@ -161,7 +161,7 @@ namespace Dlog {
         }
 
         private void OnDestroy() {
-            if (!skipOnDestroyCheck && IsDirty && EditorUtility.DisplayDialog("Dlog Graph has been modified", "Do you want to save the changes you made in the Dialogue Graph?\nYour changes will be lost if you don't save them.", "Save", "Don't Save")) {
+            if (!skipOnDestroyCheck && IsDirty && EditorUtility.DisplayDialog("Dialogue Graph has been modified", "Do you want to save the changes you made in the Dialogue Graph?\nYour changes will be lost if you don't save them.", "Save", "Don't Save")) {
                 SaveAsset();
             }
         }

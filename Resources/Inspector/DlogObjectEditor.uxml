@@ -8,7 +8,7 @@
     <VisualElement class="container">
         <Label text="Dialogue Graph" class="heading"/>
         <editor:ObjectField name="dlogObjectField" label="Dialogue Graph Object" allow-scene-objects="false"/>
-        <Button name="clearData" text="Clear data cache" tooltip="Warning! This will clear all assigned properties from every Dlog Object"/>
+        <Button name="clearData" text="Clear data cache" tooltip="Warning! This will clear all assigned properties from every DialogueGraph Object"/>
         <VisualElement name="propertiesContainer">
             <Foldout class="container-inner" text="Checks">
                 <VisualElement name="checkList"/>

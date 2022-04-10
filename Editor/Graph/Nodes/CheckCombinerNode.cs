@@ -5,7 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Title("Combine Checks (AND)"), Title("Combine Checks (OR)")]
     public class CheckCombinerNode : AbstractNode {
         private bool operation;
@@ -26,9 +26,9 @@ namespace Dlog {
             Initialize("Combiner", EditorView.DefaultNodePosition);
             this.AddStyleSheet("Styles/Node/CombinerNode");
 
-            var inA = DlogPort.Create("A", Orientation.Horizontal, Direction.Input, Port.Capacity.Single, PortType.Combiner, true, edgeConnectorListener, true);
-            var inB = DlogPort.Create("B", Orientation.Horizontal, Direction.Input, Port.Capacity.Single, PortType.Combiner, true, edgeConnectorListener, true);
-            var @out = DlogPort.Create("OUT", Orientation.Horizontal, Direction.Output, Port.Capacity.Single, PortType.Combiner, true, edgeConnectorListener, true);
+            var inA = DlogPort.Create("A", Orientation.Horizontal, Direction.Input, Port.Capacity.Single, PortType.Boolean, true, edgeConnectorListener, true);
+            var inB = DlogPort.Create("B", Orientation.Horizontal, Direction.Input, Port.Capacity.Single, PortType.Boolean, true, edgeConnectorListener, true);
+            var @out = DlogPort.Create("OUT", Orientation.Horizontal, Direction.Output, Port.Capacity.Single, PortType.Boolean, true, edgeConnectorListener, true);
 
             AddPort(inA, false);
             AddPort(inB, false);

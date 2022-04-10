@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     [Serializable]
     public class SerializedNode : ISerializationCallbackReceiver {
         [SerializeField] public string GUID;

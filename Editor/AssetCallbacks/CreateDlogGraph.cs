@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using UnityEngine;
 
-namespace Dlog {
+namespace DialogueGraph {
     internal class CreateDlogGraph : EndNameEditAction {
         [MenuItem("Assets/Create/Dialogue Graph/Empty Dialogue Graph", false, 1)]
         public static void CreateDialogueGraph()

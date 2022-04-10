@@ -1,12 +1,12 @@
 using System;
 
-namespace Dlog {
+namespace DialogueGraph {
     public enum PortType {
         Check,
         Trigger,
         Actor,
         Branch,
-        Combiner,
+        Boolean,
         Fake
     }
 }

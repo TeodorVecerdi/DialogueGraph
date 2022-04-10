@@ -1,6 +1,6 @@
 using System;
 
-namespace Dlog {
+namespace DialogueGraph {
     public class Ref<T> : IEquatable<T>, IEquatable<Ref<T>> where T : struct {
         private T value;
         private Func<T> getValue = null;

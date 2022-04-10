@@ -1,7 +1,7 @@
 using System;
 using UnityEngine.UIElements;
 
-namespace Dlog {
+namespace DialogueGraph {
     public static class UIElementsFactory {
         public static VisualElement FlexBreaker() {
             return VisualElement<VisualElement>("", new[] {"flex-break"});
