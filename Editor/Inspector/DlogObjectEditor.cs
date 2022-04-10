@@ -95,7 +95,7 @@ namespace Dlog {
                 actorTemplate.CloneTree(actorRoot);
 
                 var actorTitle = actorRoot.Q<Label>("actorIdentifier");
-                actorTitle.text = $"{actorProperty.DisplayName} ({actorProperty.Guid})";
+                actorTitle.text = $"{actorProperty.DisplayName}";
                 var actorName = actorRoot.Q<TextField>("actorName");
                 actorName.SetValueWithoutNotify(currentData.ActorData[currentData.ActorDataIndices[actorProperty.Guid]].Name);
                 actorName.RegisterValueChangedCallback(evt => { currentData.ActorData[currentData.ActorDataIndices[actorProperty.Guid]].Name = evt.newValue; });

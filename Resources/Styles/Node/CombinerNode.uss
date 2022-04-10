@@ -2,8 +2,14 @@
     display: flex;
     flex-direction: row;
     align-content: center;
-    -unity-background-image-tint-color: rgba(114, 64, 253, 0.4);
-    -unity-background-scale-mode: stretch-to-fill;
+    -unity-background-image-tint-color: rgba(114, 64, 253, 0.7);
+    -unity-background-scale-mode: scale-to-fit;
+    min-width: 0;
+    width: 64px;
+}
+
+#contents {
+    display: none;
 }
 
 #combiner-main.AND {
@@ -20,11 +26,11 @@
 }
 
 #combiner-main #combiner-input.combiner-column {
-    
+    margin-left: 3px;
 }
 
 #combiner-main #combiner-output.combiner-column {
-
+    margin-right: 3px;
 }
 
 #combiner-main #combiner-operation.combiner-column {

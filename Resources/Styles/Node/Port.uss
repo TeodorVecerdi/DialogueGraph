@@ -20,25 +20,3 @@ DlogPort.check-port {
 DlogPort.output {
     margin-right: -12px;
 }
-
-/*
-.square-circle.input #connector {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.square-circle.input #connector #cap {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.square-circle.output #connector {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.square-circle.output #connector #cap {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-*/
