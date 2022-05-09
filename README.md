@@ -1,11 +1,8 @@
 # Dialogue Graph
-<p align="center">
-<!--Issues--><a href="https://github.com/TeodorVecerdi/DialogueGraph/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/TeodorVecerdi/DialogueGraph?color=e62c0b&label=issues"></a>
-<!--Code Quality--><a href="https://www.codacy.com/gh/TeodorVecerdi/DialogueGraph/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=TeodorVecerdi/DialogueGraph&amp;utm_campaign=Badge_Grade"><img alt="Codacy grade" src="https://app.codacy.com/project/badge/Grade/3306f4b963fa4cad9e904bb85265f0ef"></a>
 <!--OpenUPM--><a href="https://openupm.com/packages/com.github.teodorvecerdi.dialoguegraph/"><img alt src="https://img.shields.io/npm/v/com.github.teodorvecerdi.dialoguegraph?label=openupm&amp;registry_uri=https://package.openupm.com" /></a>
 <!--Stars--><a href="https://github.com/TeodorVecerdi/DialogueGraph/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/TeodorVecerdi/DialogueGraph?color=FFD700"></a>
 <!--Contributors--><a href="https://github.com/TeodorVecerdi/DialogueGraph/graphs/contributors"><img alt="GitHub contributors" src="https://img.shields.io/github/contributors-anon/TeodorVecerdi/DialogueGraph?color=009a00"></a>
-</p>
+
 
 <b>Dialogue Graph</b> is an open-source editor tool for the [Unity](https://unity.com/) game engine used to create branching conversation trees in an easy and straightforward way by connecting nodes, and setting up conditions and triggers for the different conversation branches. An obvious use case for this tool is to create conversations with NPCs, although the versatility of this tool allows for any kind of project that requires branching behaviour based on checks and triggers.
 
@@ -14,6 +11,8 @@ Dialogue Graph is compatible with the following Unity versions:
 - 2021.2
 
 Other versions of Unity may work as well, but are not tested.
+
+![Nodes](Github~/resources/DialogueGraph_demo_graph.png)  
 
 # Installing Dialogue Graph
 ## 1. using OpenUPM
