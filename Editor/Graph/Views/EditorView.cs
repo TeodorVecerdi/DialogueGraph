@@ -23,14 +23,13 @@ namespace DialogueGraph {
 
         public DlogEditorWindow EditorWindow { get; }
 
-        public DlogGraphObject DlogObject { get; }
+        public DlogGraphObject DlogObject => EditorWindow.GraphObject;
 
         public DlogGraphView GraphView { get; }
 
         public EdgeConnectorListener EdgeConnectorListener { get; }
 
-        public EditorView(DlogEditorWindow editorWindow, DlogGraphObject dlogObject) {
-            DlogObject = dlogObject;
+        public EditorView(DlogEditorWindow editorWindow) {
             EditorWindow = editorWindow;
             this.AddStyleSheet("Styles/Graph");
             
@@ -51,7 +50,7 @@ namespace DialogueGraph {
 
                 GUILayout.FlexibleSpace();
                 IsBlackboardVisible = GUILayout.Toggle(IsBlackboardVisible, "Blackboard", EditorStyles.toolbarButton);
-                dlogObject.IsBlackboardVisible = IsBlackboardVisible;
+                editorWindow.GraphObject.IsBlackboardVisible = IsBlackboardVisible;
 
                 GUILayout.EndHorizontal();
             });

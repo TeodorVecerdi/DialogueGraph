@@ -34,7 +34,7 @@ namespace DialogueGraph {
             rootVisualElement.Clear();
             Events = new DlogWindowEvents {SaveRequested = SaveAsset, SaveAsRequested = SaveAs, ShowInProjectRequested = ShowInProject};
 
-            editorView = new EditorView(this, GraphObject) {
+            editorView = new EditorView(this) {
                 name = "Dlog Graph",
                 IsBlackboardVisible = GraphObject.IsBlackboardVisible
             };
@@ -99,7 +99,7 @@ namespace DialogueGraph {
 
         public void SetDlogObject(DlogGraphObject dlogObject) {
             SelectedAssetGuid = dlogObject.AssetGuid;
-            this.GraphObject = dlogObject;
+            GraphObject = dlogObject;
         }
 
         public void Refresh() {
