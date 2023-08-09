@@ -7,12 +7,12 @@ using UnityEngine.UIElements;
 
 namespace DialogueGraph {
     public class DlogGraphView : GraphView {
-        private EditorView editorView;
-        public EditorView EditorView => editorView;
-        public DlogGraphData DlogGraph => editorView.DlogObject.DlogGraph;
+        public EditorView EditorView { get; }
+
+        public DlogGraphData DlogGraph => EditorView.DlogObject.DlogGraph;
 
         public DlogGraphView(EditorView editorView) {
-            this.editorView = editorView;
+            this.EditorView = editorView;
             RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
             RegisterCallback<DragPerformEvent>(OnDragPerformed);
             serializeGraphElements = SerializeGraphElementsImpl;
@@ -23,7 +23,7 @@ namespace DialogueGraph {
         protected override bool canCopySelection => selection.OfType<AbstractNode>().Any() || selection.OfType<Group>().Any() || selection.OfType<BlackboardField>().Any();
 
         private void UnserializeAndPasteImpl(string operation, string data) {
-            editorView.DlogObject.RegisterCompleteObjectUndo(operation);
+            EditorView.DlogObject.RegisterCompleteObjectUndo(operation);
             var copyPasteData = CopyPasteData.FromJson(data);
             this.InsertCopyPasteData(copyPasteData);
         }
@@ -36,9 +36,9 @@ namespace DialogueGraph {
 
             // Collect the property nodes and get the corresponding properties
             var propertyNodeGuids = nodes.OfType<PropertyNode>().Select(x => x.PropertyGuid);
-            var metaProperties = editorView.DlogObject.DlogGraph.Properties.Where(x => propertyNodeGuids.Contains(x.GUID));
+            var metaProperties = EditorView.DlogObject.DlogGraph.Properties.Where(x => propertyNodeGuids.Contains(x.GUID));
 
-            var copyPasteData = new CopyPasteData(editorView, nodes, edges, properties, metaProperties);
+            var copyPasteData = new CopyPasteData(EditorView, nodes, edges, properties, metaProperties);
             return JsonUtility.ToJson(copyPasteData, true);
         }
 
@@ -70,8 +70,8 @@ namespace DialogueGraph {
 
         private void DeleteSelectionImpl(string operation, AskUser askUser) {
             var nodesToDelete = selection.OfType<AbstractNode>().Select(node => node.Owner);
-            editorView.DlogObject.RegisterCompleteObjectUndo(operation);
-            editorView.DlogObject.DlogGraph.RemoveElements(nodesToDelete.ToList(),
+            EditorView.DlogObject.RegisterCompleteObjectUndo(operation);
+            EditorView.DlogObject.DlogGraph.RemoveElements(nodesToDelete.ToList(),
                 selection.OfType<Edge>().Select(e => e.userData).OfType<SerializedEdge>().ToList());
             
             
@@ -79,7 +79,7 @@ namespace DialogueGraph {
                 if (!(selectable is BlackboardField field) || field.userData == null)
                     continue;
                 var property = (AbstractProperty) field.userData;
-                editorView.DlogObject.DlogGraph.RemoveProperty(property);
+                EditorView.DlogObject.DlogGraph.RemoveProperty(property);
             }
             
             selection.Clear();
@@ -115,11 +115,11 @@ namespace DialogueGraph {
 
         private void CreateNode(object obj, Vector2 nodePosition) {
             if (obj is BlackboardField blackboardField) {
-                editorView.DlogObject.RegisterCompleteObjectUndo("Drag Blackboard Field");
+                EditorView.DlogObject.RegisterCompleteObjectUndo("Drag Blackboard Field");
                 var property = blackboardField.userData as AbstractProperty;
                 var node = new SerializedNode(typeof(PropertyNode), new Rect(nodePosition, EditorView.DefaultNodeSize));
-                editorView.DlogObject.DlogGraph.AddNode(node);
-                node.BuildNode(editorView, editorView.EdgeConnectorListener, false);
+                EditorView.DlogObject.DlogGraph.AddNode(node);
+                node.BuildNode(EditorView, EditorView.EdgeConnectorListener, false);
                 var propertyNode = node.Node as PropertyNode;
                 propertyNode.PropertyGuid = property.GUID;
                 node.BuildPortData();

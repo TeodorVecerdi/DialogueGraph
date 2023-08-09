@@ -9,38 +9,34 @@ using Object = UnityEngine.Object;
 
 namespace DialogueGraph {
     public class DlogEditorWindow : EditorWindow {
-        private string selectedAssetGuid;
-        private DlogGraphObject dlogObject;
-        private DlogWindowEvents windowEvents;
         private EditorView editorView;
 
         private bool deleted;
         private bool skipOnDestroyCheck;
 
-        public string SelectedAssetGuid {
-            get => selectedAssetGuid;
-            set => selectedAssetGuid = value;
-        }
-        public DlogGraphObject GraphObject => dlogObject;
-        public DlogWindowEvents Events => windowEvents;
+        public string SelectedAssetGuid { get; set; }
+
+        public DlogGraphObject GraphObject { get; private set; }
+
+        public DlogWindowEvents Events { get; private set; }
 
         public bool IsDirty {
             get {
                 if (deleted) return false;
-                if (dlogObject == null) return false;
-                var current = JsonUtility.ToJson(dlogObject.DlogGraph, true);
-                var saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(selectedAssetGuid));
+                if (GraphObject == null) return false;
+                var current = JsonUtility.ToJson(GraphObject.DlogGraph, true);
+                var saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(SelectedAssetGuid));
                 return !string.Equals(current, saved, StringComparison.Ordinal);
             }
         }
 
         public void BuildWindow() {
             rootVisualElement.Clear();
-            windowEvents = new DlogWindowEvents {SaveRequested = SaveAsset, SaveAsRequested = SaveAs, ShowInProjectRequested = ShowInProject};
+            Events = new DlogWindowEvents {SaveRequested = SaveAsset, SaveAsRequested = SaveAs, ShowInProjectRequested = ShowInProject};
 
-            editorView = new EditorView(this, dlogObject) {
+            editorView = new EditorView(this, GraphObject) {
                 name = "Dlog Graph",
-                IsBlackboardVisible = dlogObject.IsBlackboardVisible
+                IsBlackboardVisible = GraphObject.IsBlackboardVisible
             };
             rootVisualElement.Add(editorView);
             Refresh();
@@ -51,20 +47,20 @@ namespace DialogueGraph {
                 DisplayDeletedFromDiskDialog();
             }
 
-            if (dlogObject == null && selectedAssetGuid != null) {
-                var assetGuid = selectedAssetGuid;
-                selectedAssetGuid = null;
+            if (GraphObject == null && SelectedAssetGuid != null) {
+                var assetGuid = SelectedAssetGuid;
+                SelectedAssetGuid = null;
                 var newObject = DialogueGraphUtility.LoadGraphAtGuid(assetGuid);
                 SetDlogObject(newObject);
                 Refresh();
             }
 
-            if (dlogObject == null) {
+            if (GraphObject == null) {
                 Close();
                 return;
             }
 
-            if (editorView == null && dlogObject != null) {
+            if (editorView == null && GraphObject != null) {
                 BuildWindow();
             }
 
@@ -72,26 +68,26 @@ namespace DialogueGraph {
                 Close();
             }
 
-            var wasUndoRedoPerformed = dlogObject.WasUndoRedoPerformed;
+            var wasUndoRedoPerformed = GraphObject.WasUndoRedoPerformed;
             if (wasUndoRedoPerformed) {
                 editorView.HandleChanges();
-                dlogObject.DlogGraph.ClearChanges();
-                dlogObject.HandleUndoRedo();
+                GraphObject.DlogGraph.ClearChanges();
+                GraphObject.HandleUndoRedo();
             }
 
-            if (dlogObject.IsDirty || wasUndoRedoPerformed) {
+            if (GraphObject.IsDirty || wasUndoRedoPerformed) {
                 UpdateTitle();
-                dlogObject.IsDirty = false;
+                GraphObject.IsDirty = false;
             }
 
             editorView.HandleChanges();
-            dlogObject.DlogGraph.ClearChanges();
+            GraphObject.DlogGraph.ClearChanges();
         }
 
         private void DisplayDeletedFromDiskDialog() {
             bool shouldClose = true; // Close unless if the same file was replaced
 
-            if (EditorUtility.DisplayDialog("Dialogue Graph Missing", $"{AssetDatabase.GUIDToAssetPath(selectedAssetGuid)} has been deleted or moved outside of Unity.\n\nWould you like to save your Graph Asset?", "Save As", "Close Window")) {
+            if (EditorUtility.DisplayDialog("Dialogue Graph Missing", $"{AssetDatabase.GUIDToAssetPath(SelectedAssetGuid)} has been deleted or moved outside of Unity.\n\nWould you like to save your Graph Asset?", "Save As", "Close Window")) {
                 shouldClose = !SaveAs();
             }
 
@@ -103,7 +99,7 @@ namespace DialogueGraph {
 
         public void SetDlogObject(DlogGraphObject dlogObject) {
             SelectedAssetGuid = dlogObject.AssetGuid;
-            this.dlogObject = dlogObject;
+            this.GraphObject = dlogObject;
         }
 
         public void Refresh() {
@@ -125,7 +121,7 @@ namespace DialogueGraph {
         }
 
         private void UpdateTitle() {
-            var asset = AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(selectedAssetGuid));
+            var asset = AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(SelectedAssetGuid));
             titleContent.text = asset.name.Split('/').Last() + (IsDirty ? "*" : "");
         }
 
@@ -141,15 +137,15 @@ namespace DialogueGraph {
 
         #region Window Events
         private void SaveAsset() {
-            dlogObject.DlogGraph.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
-            DialogueGraphUtility.SaveGraph(dlogObject);
+            GraphObject.DlogGraph.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
+            DialogueGraphUtility.SaveGraph(GraphObject);
             UpdateTitle();
         }
 
         private bool SaveAs() {
-            if (!string.IsNullOrEmpty(selectedAssetGuid) && dlogObject != null) {
-                var assetPath = AssetDatabase.GUIDToAssetPath(selectedAssetGuid);
-                if (string.IsNullOrEmpty(assetPath) || dlogObject == null)
+            if (!string.IsNullOrEmpty(SelectedAssetGuid) && GraphObject != null) {
+                var assetPath = AssetDatabase.GUIDToAssetPath(SelectedAssetGuid);
+                if (string.IsNullOrEmpty(assetPath) || GraphObject == null)
                     return false;
 
                 var directoryPath = Path.GetDirectoryName(assetPath);
@@ -157,18 +153,18 @@ namespace DialogueGraph {
                 savePath = savePath.Replace(Application.dataPath, "Assets");
                 if (savePath != directoryPath) {
                     if (!string.IsNullOrEmpty(savePath)) {
-                        if (DialogueGraphUtility.CreateFile(savePath, dlogObject)) {
-                            dlogObject.RecalculateAssetGuid(savePath);
+                        if (DialogueGraphUtility.CreateFile(savePath, GraphObject)) {
+                            GraphObject.RecalculateAssetGuid(savePath);
                             DlogGraphImporterEditor.OpenEditorWindow(savePath);
                         }
                     }
 
-                    dlogObject.IsDirty = false;
+                    GraphObject.IsDirty = false;
                     return false;
                 }
 
                 SaveAsset();
-                dlogObject.IsDirty = false;
+                GraphObject.IsDirty = false;
                 return true;
             }
 
@@ -176,9 +172,9 @@ namespace DialogueGraph {
         }
 
         private void ShowInProject() {
-            if (string.IsNullOrEmpty(selectedAssetGuid)) return;
+            if (string.IsNullOrEmpty(SelectedAssetGuid)) return;
 
-            var path = AssetDatabase.GUIDToAssetPath(selectedAssetGuid);
+            var path = AssetDatabase.GUIDToAssetPath(SelectedAssetGuid);
             var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
             EditorGUIUtility.PingObject(asset);
         }

@@ -15,47 +15,44 @@ namespace DialogueGraph {
         private AbstractProperty property;
 
         private TextField referenceNameField;
-        private List<VisualElement> rows;
-        public List<VisualElement> Rows => rows;
+        public List<VisualElement> Rows { get; }
 
-        private int undoGroup = -1;
-        public int UndoGroup => undoGroup;
+        public int UndoGroup { get; private set; } = -1;
 
         private static Type contextualMenuManipulator = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).FirstOrDefault(t => t.FullName == "UnityEngine.UIElements.ContextualMenuManipulator");
         private IManipulator resetReferenceMenu;
 
-        private EventCallback<KeyDownEvent> keyDownCallback;
-        public EventCallback<KeyDownEvent> KeyDownCallback => keyDownCallback;
-        private EventCallback<FocusOutEvent> focusOutCallback;
-        public EventCallback<FocusOutEvent> FocusOutCallback => focusOutCallback;
+        public EventCallback<KeyDownEvent> KeyDownCallback { get; }
+
+        public EventCallback<FocusOutEvent> FocusOutCallback { get; }
 
         public BlackboardPropertyView(BlackboardField field, EditorView editorView, AbstractProperty property) {
             this.AddStyleSheet("Styles/PropertyView/Blackboard");
             this.field = field;
             this.editorView = editorView;
             this.property = property;
-            rows = new List<VisualElement>();
+            Rows = new List<VisualElement>();
 
-            keyDownCallback = evt => {
+            KeyDownCallback = evt => {
                 // Record Undo for input field edit
-                if (undoGroup == -1) {
-                    undoGroup = Undo.GetCurrentGroup();
+                if (UndoGroup == -1) {
+                    UndoGroup = Undo.GetCurrentGroup();
                     editorView.DlogObject.RegisterCompleteObjectUndo("Change property value");
                 }
 
                 // Handle escaping input field edit
-                if (evt.keyCode == KeyCode.Escape && undoGroup > -1) {
-                    Undo.RevertAllDownToGroup(undoGroup);
-                    undoGroup = -1;
+                if (evt.keyCode == KeyCode.Escape && UndoGroup > -1) {
+                    Undo.RevertAllDownToGroup(UndoGroup);
+                    UndoGroup = -1;
                     evt.StopPropagation();
                 }
 
                 // Dont record Undo again until input field is unfocused
-                undoGroup++;
+                UndoGroup++;
                 MarkDirtyRepaint();
             };
 
-            focusOutCallback = evt => undoGroup = -1;
+            FocusOutCallback = evt => UndoGroup = -1;
 
             BuildFields(property);
             AddToClassList("blackboardPropertyView");
@@ -103,12 +100,12 @@ namespace DialogueGraph {
         public VisualElement AddRow(string labelText, VisualElement control, bool enabled = true) {
             var rowView = CreateRow(labelText, control, enabled);
             Add(rowView);
-            rows.Add(rowView);
+            Rows.Add(rowView);
             return rowView;
         }
 
         public void Rebuild() {
-            rows.Where(t => t.parent == this).ToList().ForEach(Remove);
+            Rows.Where(t => t.parent == this).ToList().ForEach(Remove);
             BuildFields(property);
         }
 

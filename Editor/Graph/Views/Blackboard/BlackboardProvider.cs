@@ -17,9 +17,9 @@ namespace DialogueGraph {
         private readonly BlackboardSection triggerSection;
         private readonly BlackboardSection actorSection;
         private List<Node> selectedNodes = new List<Node>();
-        private Dictionary<string, bool> expandedInputs = new Dictionary<string, bool>();
 
-        public Dictionary<string, bool> ExpandedInputs => expandedInputs;
+        public Dictionary<string, bool> ExpandedInputs { get; } = new Dictionary<string, bool>();
+
         public string AssetName {
             get => Blackboard.title;
             set => Blackboard.title = value;
@@ -108,14 +108,14 @@ namespace DialogueGraph {
                 return;
             
             row.expanded = true;
-            expandedInputs[property.GUID] = true;
+            ExpandedInputs[property.GUID] = true;
             editorView.DlogObject.RegisterCompleteObjectUndo("Create Property");
             editorView.DlogObject.DlogGraph.AddProperty(property);
             field.OpenTextEditor();
         }
 
         private void OnExpanded(MouseDownEvent evt, AbstractProperty input) {
-            expandedInputs[input.GUID] = !inputRows[input.GUID].expanded;
+            ExpandedInputs[input.GUID] = !inputRows[input.GUID].expanded;
         }
 
         private void OnMouseHover(EventBase evt, AbstractProperty input) {
@@ -165,7 +165,7 @@ namespace DialogueGraph {
                     (property.Type == PropertyType.Actor ? actorSection : property.Type == PropertyType.Check ? checkSection : triggerSection).Add(inputRows[property.GUID]);
             }
 
-            expandedInputs.Clear();
+            ExpandedInputs.Clear();
         }
     }
 }

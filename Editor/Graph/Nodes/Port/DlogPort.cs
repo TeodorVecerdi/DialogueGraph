@@ -5,8 +5,8 @@ using UnityEngine.UIElements;
 
 namespace DialogueGraph {
     public class DlogPort : Port {
-        private PortType type;
-        public PortType Type => type;
+        public PortType Type { get; private set; }
+
         private DlogPort(Orientation portOrientation, Direction portDirection, Capacity portCapacity) : base(portOrientation, portDirection, portCapacity, typeof(object)) { }
 
         public static DlogPort Create(string name, Orientation portOrientation, Direction portDirection, Capacity portCapacity, PortType type, bool required, EdgeConnectorListener edgeConnectorListener, bool hideLabel = false) {
@@ -21,7 +21,7 @@ namespace DialogueGraph {
                 port.AddToClassList("optional");
             }
             
-            port.type = type;
+            port.Type = type;
             port.portColor = PortHelper.PortColor(port);
             port.viewDataKey = Guid.NewGuid().ToString();
             port.portName = name;
