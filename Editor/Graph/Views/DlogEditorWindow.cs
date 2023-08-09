@@ -114,11 +114,7 @@ namespace DialogueGraph {
             }
 
             if (editorView == null) {
-                editorView = new EditorView(this, dlogObject) {
-                    name = "Dlog Graph",
-                    IsBlackboardVisible = dlogObject.IsBlackboardVisible
-                };
-                rootVisualElement.Add(editorView);
+                BuildWindow();
             }
 
             editorView.BuildGraph();
