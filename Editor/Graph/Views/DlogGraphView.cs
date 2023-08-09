@@ -12,7 +12,7 @@ namespace DialogueGraph {
         public DlogGraphData DlogGraph => EditorView.DlogObject.DlogGraph;
 
         public DlogGraphView(EditorView editorView) {
-            this.EditorView = editorView;
+            EditorView = editorView;
             RegisterCallback<DragUpdatedEvent>(OnDragUpdated);
             RegisterCallback<DragPerformEvent>(OnDragPerformed);
             serializeGraphElements = SerializeGraphElementsImpl;
