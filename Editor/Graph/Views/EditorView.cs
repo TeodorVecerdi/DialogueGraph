@@ -13,11 +13,7 @@ namespace DialogueGraph {
         public static readonly Vector2 DefaultNodeSize = new Vector2(200, 150);
         public static readonly Rect DefaultNodePosition = new Rect(Vector2.zero, DefaultNodeSize);
 
-        private readonly DlogGraphView graphView;
-        private readonly DlogEditorWindow editorWindow;
-        private readonly DlogGraphObject dlogObject;
         private readonly BlackboardProvider blackboardProvider;
-        private readonly EdgeConnectorListener edgeConnectorListener;
         private SearchWindowProvider searchWindowProvider;
 
         public bool IsBlackboardVisible {
@@ -25,14 +21,17 @@ namespace DialogueGraph {
             set => blackboardProvider.Blackboard.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        public DlogEditorWindow EditorWindow => editorWindow;
-        public DlogGraphObject DlogObject => dlogObject;
-        public DlogGraphView GraphView => graphView;
-        public EdgeConnectorListener EdgeConnectorListener => edgeConnectorListener;
+        public DlogEditorWindow EditorWindow { get; }
+
+        public DlogGraphObject DlogObject { get; }
+
+        public DlogGraphView GraphView { get; }
+
+        public EdgeConnectorListener EdgeConnectorListener { get; }
 
         public EditorView(DlogEditorWindow editorWindow, DlogGraphObject dlogObject) {
-            this.dlogObject = dlogObject;
-            this.editorWindow = editorWindow;
+            DlogObject = dlogObject;
+            EditorWindow = editorWindow;
             this.AddStyleSheet("Styles/Graph");
             
             
@@ -60,65 +59,64 @@ namespace DialogueGraph {
             Add(toolbar);
             var content = new VisualElement {name="content"};
             {
-                graphView = new DlogGraphView(this);
-                graphView.SetupZoom(0.05f, 8f);
-                graphView.AddManipulator(new ContentDragger());
-                graphView.AddManipulator(new SelectionDragger());
-                graphView.AddManipulator(new RectangleSelector());
-                graphView.AddManipulator(new ClickSelector());
-                graphView.RegisterCallback<KeyDownEvent>(OnKeyDown);
-                content.Add(graphView);
+                GraphView = new DlogGraphView(this);
+                GraphView.SetupZoom(0.05f, 8f);
+                GraphView.AddManipulator(new ContentDragger());
+                GraphView.AddManipulator(new SelectionDragger());
+                GraphView.AddManipulator(new RectangleSelector());
+                GraphView.AddManipulator(new ClickSelector());
+                GraphView.RegisterCallback<KeyDownEvent>(OnKeyDown);
+                content.Add(GraphView);
 
                 var grid = new GridBackground();
-                graphView.Insert(0, grid);
+                GraphView.Insert(0, grid);
                 grid.StretchToParentSize();
 
                 blackboardProvider = new BlackboardProvider(this);
-                graphView.Add(blackboardProvider.Blackboard);
+                GraphView.Add(blackboardProvider.Blackboard);
 
-                graphView.graphViewChanged += OnGraphViewChanged;
+                GraphView.graphViewChanged += OnGraphViewChanged;
             }
             
             searchWindowProvider = ScriptableObject.CreateInstance<SearchWindowProvider>();
-            searchWindowProvider.Initialize(this.editorWindow, this);
+            searchWindowProvider.Initialize(EditorWindow, this);
 
-            graphView.nodeCreationRequest = ctx => {
+            GraphView.nodeCreationRequest = ctx => {
                 searchWindowProvider.ConnectedPort = null;
                 SearcherWindow.Show(editorWindow, searchWindowProvider.LoadSearchWindow(),
                     item => searchWindowProvider.OnSelectEntry(item, ctx.screenMousePosition - editorWindow.position.position),
                     ctx.screenMousePosition - editorWindow.position.position, null);
             };
-            edgeConnectorListener = new EdgeConnectorListener(this, searchWindowProvider);
+            EdgeConnectorListener = new EdgeConnectorListener(this, searchWindowProvider);
             
             Add(content);
         }
 
-
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange) {
             if (graphViewChange.movedElements != null) {
-                editorWindow.GraphObject.RegisterCompleteObjectUndo("Moved elements");
+                EditorWindow.GraphObject.RegisterCompleteObjectUndo("Moved elements");
                 foreach (var node in graphViewChange.movedElements.OfType<AbstractNode>()) {
-                    var rect = node.parent.ChangeCoordinatesTo(graphView.contentViewContainer, node.GetPosition());
+                    var rect = node.parent.ChangeCoordinatesTo(GraphView.contentViewContainer, node.GetPosition());
                     node.Owner.DrawState.Position = rect;
                 }
             }
 
             if (graphViewChange.edgesToCreate != null) {
-                editorWindow.GraphObject.RegisterCompleteObjectUndo("Created edges");
+                EditorWindow.GraphObject.RegisterCompleteObjectUndo("Created edges");
                 foreach (var edge in graphViewChange.edgesToCreate) {
-                    dlogObject.DlogGraph.AddEdge(edge);
+                    DlogObject.DlogGraph.AddEdge(edge);
                 }
                 graphViewChange.edgesToCreate.Clear();
             }
 
             if (graphViewChange.elementsToRemove != null) {
-                editorWindow.GraphObject.RegisterCompleteObjectUndo("Removed elements");
+                EditorWindow.GraphObject.RegisterCompleteObjectUndo("Removed elements");
                 foreach (var node in graphViewChange.elementsToRemove.OfType<AbstractNode>()) {
-                    dlogObject.DlogGraph.RemoveNode(node.Owner);
+                    DlogObject.DlogGraph.RemoveNode(node.Owner);
                 }
 
                 foreach (var edge in graphViewChange.elementsToRemove.OfType<Edge>()) {
-                    dlogObject.DlogGraph.RemoveEdge((SerializedEdge)edge.userData);
+                    DlogObject.DlogGraph.RemoveEdge((SerializedEdge)edge.userData);
                 }
 
                 foreach (var property in graphViewChange.elementsToRemove.OfType<BlackboardField>()) {
@@ -131,13 +129,13 @@ namespace DialogueGraph {
 
         private void OnKeyDown(KeyDownEvent evt) {
             if (evt.actionKey && evt.keyCode == KeyCode.G) {
-                if (graphView.selection.OfType<GraphElement>().Any()) {
+                if (GraphView.selection.OfType<GraphElement>().Any()) {
                     // TODO: GROUP
                 }
             }
 
             if (evt.actionKey && evt.keyCode == KeyCode.U) {
-                if (graphView.selection.OfType<GraphElement>().Any()) {
+                if (GraphView.selection.OfType<GraphElement>().Any()) {
                     // TODO: UNGROUP
                 }
             }
@@ -145,71 +143,71 @@ namespace DialogueGraph {
 
         public void BuildGraph() {
             // Remove existing elements
-            graphView.graphElements.ToList().OfType<Node>().ToList().ForEach(graphView.RemoveElement);
-            graphView.graphElements.ToList().OfType<Edge>().ToList().ForEach(graphView.RemoveElement);
-            graphView.graphElements.ToList().OfType<Group>().ToList().ForEach(graphView.RemoveElement);
-            graphView.graphElements.ToList().OfType<StickyNote>().ToList().ForEach(graphView.RemoveElement);
-            graphView.graphElements.ToList().OfType<BlackboardRow>().ToList().ForEach(graphView.RemoveElement);
+            GraphView.graphElements.ToList().OfType<Node>().ToList().ForEach(GraphView.RemoveElement);
+            GraphView.graphElements.ToList().OfType<Edge>().ToList().ForEach(GraphView.RemoveElement);
+            GraphView.graphElements.ToList().OfType<Group>().ToList().ForEach(GraphView.RemoveElement);
+            GraphView.graphElements.ToList().OfType<StickyNote>().ToList().ForEach(GraphView.RemoveElement);
+            GraphView.graphElements.ToList().OfType<BlackboardRow>().ToList().ForEach(GraphView.RemoveElement);
 
             // Create & add graph elements
-            dlogObject.DlogGraph.Nodes.ForEach(node => AddNode(node));
-            dlogObject.DlogGraph.Edges.ForEach(AddEdge);
-            dlogObject.DlogGraph.Properties.ForEach(AddProperty);
+            DlogObject.DlogGraph.Nodes.ForEach(node => AddNode(node));
+            DlogObject.DlogGraph.Edges.ForEach(AddEdge);
+            DlogObject.DlogGraph.Properties.ForEach(AddProperty);
         }
 
         public void HandleChanges() {
 
-            if(dlogObject.DlogGraph.AddedProperties.Any() || dlogObject.DlogGraph.RemovedProperties.Any())
+            if(DlogObject.DlogGraph.AddedProperties.Any() || DlogObject.DlogGraph.RemovedProperties.Any())
                 searchWindowProvider.RegenerateEntries = true;
             blackboardProvider.HandleChanges();
             
-            foreach (var removedNode in dlogObject.DlogGraph.RemovedNodes) {
+            foreach (var removedNode in DlogObject.DlogGraph.RemovedNodes) {
                 RemoveNode(removedNode);
             }
-            foreach (var removedEdge in dlogObject.DlogGraph.RemovedEdges) {
+            foreach (var removedEdge in DlogObject.DlogGraph.RemovedEdges) {
                 RemoveEdge(removedEdge);
             }
 
-            foreach (var addedNode in dlogObject.DlogGraph.AddedNodes) {
+            foreach (var addedNode in DlogObject.DlogGraph.AddedNodes) {
                 AddNode(addedNode);
             }
-            foreach (var addedEdge in dlogObject.DlogGraph.AddedEdges) {
+            foreach (var addedEdge in DlogObject.DlogGraph.AddedEdges) {
                 AddEdge(addedEdge);
             }
             
-            foreach (var queuedNode in dlogObject.DlogGraph.NodeSelectionQueue) {
-                graphView.AddToSelection(queuedNode.Node);
+            foreach (var queuedNode in DlogObject.DlogGraph.NodeSelectionQueue) {
+                GraphView.AddToSelection(queuedNode.Node);
             }
-            foreach (var queuedEdge in dlogObject.DlogGraph.EdgeSelectionQueue) {
-                graphView.AddToSelection(queuedEdge.Edge);
+            foreach (var queuedEdge in DlogObject.DlogGraph.EdgeSelectionQueue) {
+                GraphView.AddToSelection(queuedEdge.Edge);
             }
         }
 
         public void AddNode(SerializedNode nodeToAdd) {
-            nodeToAdd.BuildNode(this, edgeConnectorListener);
-            graphView.AddElement(nodeToAdd.Node);
+            nodeToAdd.BuildNode(this, EdgeConnectorListener);
+            GraphView.AddElement(nodeToAdd.Node);
         }
 
         public void RemoveNode(SerializedNode nodeToRemove) {
             if(nodeToRemove.Node != null)
-                graphView.RemoveElement(nodeToRemove.Node);
+                GraphView.RemoveElement(nodeToRemove.Node);
             else {
-                var view = graphView.GetNodeByGuid(nodeToRemove.GUID);
+                var view = GraphView.GetNodeByGuid(nodeToRemove.GUID);
                 if(view != null)
-                    graphView.RemoveElement(view);
+                    GraphView.RemoveElement(view);
             }
         }
 
         public void AddEdge(SerializedEdge edgeToAdd) {
             edgeToAdd.BuildEdge(this);
-            graphView.AddElement(edgeToAdd.Edge);
+            GraphView.AddElement(edgeToAdd.Edge);
         }
 
         public void RemoveEdge(SerializedEdge edgeToRemove) {
             if (edgeToRemove.Edge != null) {
                 edgeToRemove.Edge.input?.Disconnect(edgeToRemove.Edge);
                 edgeToRemove.Edge.output?.Disconnect(edgeToRemove.Edge);
-                graphView.RemoveElement(edgeToRemove.Edge);
+                GraphView.RemoveElement(edgeToRemove.Edge);
             }
         }
 
