@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DialogueGraph {
     public class DlogGraphObject : ScriptableObject, ISerializationCallbackReceiver {
         [NonSerialized] private DlogGraphData m_GraphData;
-        [NonSerialized] private int objectVersion;
+        [NonSerialized] private int m_ObjectVersion;
 
         [SerializeField] public string AssetGuid;
         [SerializeField] public bool IsBlackboardVisible;
@@ -17,14 +17,15 @@ namespace DialogueGraph {
             get => this.m_GraphData;
             private set {
                 this.m_GraphData = value;
-                if (this.m_GraphData != null)
+                if (this.m_GraphData != null) {
                     this.m_GraphData.Owner = this;
+                }
             }
         }
 
         public void Initialize(DlogGraphData graphData) {
             this.GraphData = graphData;
-            IsBlackboardVisible = this.m_GraphData.IsBlackboardVisible;
+            this.IsBlackboardVisible = this.m_GraphData.IsBlackboardVisible;
         }
 
         public bool IsDirty {
@@ -32,20 +33,20 @@ namespace DialogueGraph {
             set => isDirty = value;
         }
 
-        public bool WasUndoRedoPerformed => objectVersion != fileVersion;
+        public bool WasUndoRedoPerformed => this.m_ObjectVersion != this.fileVersion;
 
-        public void RegisterCompleteObjectUndo(string name) {
-            Undo.RegisterCompleteObjectUndo(this, name);
-            fileVersion++;
-            objectVersion++;
-            isDirty = true;
+        public void RegisterCompleteObjectUndo(string operationName) {
+            Undo.RegisterCompleteObjectUndo(this, operationName);
+            this.fileVersion++;
+            this.m_ObjectVersion++;
+            this.isDirty = true;
         }
 
         public void OnBeforeSerialize() {
             if(this.m_GraphData == null) return;
 
-            serializedGraph = JsonUtility.ToJson(this.m_GraphData, true);
-            AssetGuid = this.m_GraphData.AssetGuid;
+            this.serializedGraph = JsonUtility.ToJson(this.m_GraphData, true);
+            this.AssetGuid = this.m_GraphData.AssetGuid;
         }
 
         public void OnAfterDeserialize() {
@@ -54,7 +55,7 @@ namespace DialogueGraph {
         }
 
         public void HandleUndoRedo() {
-            if (!WasUndoRedoPerformed) {
+            if (!this.WasUndoRedoPerformed) {
                 Debug.LogError("Trying to handle undo/redo when undo/redo was not performed", this);
                 return;
             }
@@ -64,16 +65,16 @@ namespace DialogueGraph {
         }
 
         private DlogGraphData Deserialize() {
-            DlogGraphData graphData = JsonUtility.FromJson<DlogGraphData>(serializedGraph);
-            graphData.AssetGuid = AssetGuid;
-            objectVersion = fileVersion;
-            serializedGraph = "";
+            DlogGraphData graphData = JsonUtility.FromJson<DlogGraphData>(this.serializedGraph);
+            graphData.AssetGuid = this.AssetGuid;
+            this.m_ObjectVersion = this.fileVersion;
+            this.serializedGraph = "";
             return graphData;
         }
 
         public void RecalculateAssetGuid(string assetPath) {
-            AssetGuid = AssetDatabase.AssetPathToGUID(assetPath);
-            this.m_GraphData.AssetGuid = AssetGuid;
+            this.AssetGuid = AssetDatabase.AssetPathToGUID(assetPath);
+            this.m_GraphData.AssetGuid = this.AssetGuid;
         }
     }
 }
