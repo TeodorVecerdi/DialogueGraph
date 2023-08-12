@@ -118,8 +118,6 @@ namespace DialogueGraph {
 
                 ctx.AddObjectToAsset("MainAsset", runtimeObject, runtimeIcon);
                 ctx.SetMainObject(runtimeObject);
-                AssetDatabase.Refresh();
-                EditorUtility.SetDirty(runtimeObject);
             } catch (Exception) {
                 if (DialogueGraphUtility.VersionMismatch(ctx.assetPath)) {
                     ImportInvalidVersion(ctx);
