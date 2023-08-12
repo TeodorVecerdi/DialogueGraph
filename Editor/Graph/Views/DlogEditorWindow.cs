@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -10,14 +10,11 @@ using Object = UnityEngine.Object;
 namespace DialogueGraph {
     public class DlogEditorWindow : EditorWindow {
         private EditorView editorView;
-
         private bool deleted;
         private bool skipOnDestroyCheck;
 
         public string SelectedAssetGuid { get; set; }
-
         public DlogGraphObject GraphObject { get; private set; }
-
         public DlogWindowEvents Events { get; private set; }
 
         public bool IsDirty {
@@ -32,11 +29,11 @@ namespace DialogueGraph {
 
         public void BuildWindow() {
             rootVisualElement.Clear();
-            Events = new DlogWindowEvents {SaveRequested = SaveAsset, SaveAsRequested = SaveAs, ShowInProjectRequested = ShowInProject};
+            Events = new DlogWindowEvents { SaveRequested = SaveAsset, SaveAsRequested = SaveAs, ShowInProjectRequested = ShowInProject };
 
             editorView = new EditorView(this) {
-                name = "Dlog Graph",
-                IsBlackboardVisible = GraphObject.IsBlackboardVisible
+                name = "Dialogue Graph",
+                IsBlackboardVisible = GraphObject.IsBlackboardVisible,
             };
             rootVisualElement.Add(editorView);
             Refresh();
@@ -51,7 +48,7 @@ namespace DialogueGraph {
                 var assetGuid = SelectedAssetGuid;
                 SelectedAssetGuid = null;
                 var newObject = DialogueGraphUtility.LoadGraphAtGuid(assetGuid);
-                SetDlogObject(newObject);
+                this.SetGraphObject(newObject);
                 Refresh();
             }
 
@@ -66,6 +63,7 @@ namespace DialogueGraph {
 
             if (editorView == null) {
                 Close();
+                return;
             }
 
             var wasUndoRedoPerformed = GraphObject.WasUndoRedoPerformed;
@@ -97,23 +95,21 @@ namespace DialogueGraph {
                 deleted = false; // Was restored
         }
 
-        public void SetDlogObject(DlogGraphObject dlogObject) {
-            SelectedAssetGuid = dlogObject.AssetGuid;
-            GraphObject = dlogObject;
+        public void SetGraphObject(DlogGraphObject graphObject) {
+            SelectedAssetGuid = graphObject.AssetGuid;
+            GraphObject = graphObject;
         }
 
         public void Refresh() {
             UpdateTitle();
 
-            if (editorView == null) {
-                editorView = rootVisualElement.Q<EditorView>();
-            }
+            this.editorView ??= this.rootVisualElement.Q<EditorView>();
 
-            if (editorView == null) {
+            if (this.editorView == null) {
                 BuildWindow();
             }
 
-            editorView.BuildGraph();
+            this.editorView!.BuildGraph();
         }
 
         public void GraphDeleted() {
