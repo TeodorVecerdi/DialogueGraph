@@ -17,14 +17,13 @@
     "url": "https://github.com/TeodorVecerdi"
   },
   "dependencies": {
-    "com.unity.textmeshpro": "3.0.1",
-    "com.unity.shadergraph": "10.5.1",
+    "com.unity.searcher": "4.9.0",
     "com.unity.nuget.newtonsoft-json": "2.0.0"
   },
   "samples": [
     {
       "displayName": "Demo Project",
-      "description": "Small project showcasing the base usage of Dialogue Graph, including the Runtime API",
+      "description": "Small project showcasing the base usage of Dialogue Graph, including the Runtime API.\n\nNote: The sample project requires the TextMeshPro package to be installed.",
       "path": "Samples~/DemoProject"
     }
   ],
