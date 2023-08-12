@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,10 +7,10 @@ using UnityEngine.UIElements;
 namespace DialogueGraph {
     public abstract class AbstractNode : Node {
         public SerializedNode Owner { get; set; }
-        public string GUID;
-        public readonly List<Port> Ports = new List<Port>();
+        public string GUID { get; set; }
+        public List<Port> Ports { get; } = new();
 
-        protected EdgeConnectorListener EdgeConnectorListener;
+        protected EdgeConnectorListener EdgeConnectorListener { get; private set; }
 
         public override bool expanded {
             get => base.expanded;
@@ -23,25 +21,15 @@ namespace DialogueGraph {
             }
         }
 
-        // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
-        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
-        protected new VisualElement inputContainer => base.inputContainer;
-
-        // ReSharper disable once InconsistentNaming, UnusedAutoPropertyAccessor.Local
-        [Obsolete("Use AddPort instead of manually adding ports to the container. Only use this if you're adding custom items to the container.", false)]
-        protected new VisualElement outputContainer => base.outputContainer;
-
         protected void AddPort(Port port, bool alsoAddToHierarchy = true) {
             Ports.Add(port);
-            
-            if(!alsoAddToHierarchy) return;
-            var isInput = port.direction == Direction.Input;
-            if (isInput) {
-                base.inputContainer.Add(port);
-            } else {
-                base.outputContainer.Add(port);
-            }
 
+            if(!alsoAddToHierarchy) return;
+            if (port.direction == Direction.Input) {
+                this.inputContainer.Add(port);
+            } else {
+                this.outputContainer.Add(port);
+            }
         }
 
         public virtual void InitializeNode(EdgeConnectorListener edgeConnectorListener) {
@@ -58,12 +46,12 @@ namespace DialogueGraph {
         }
 
         protected virtual void InjectCustomStyle() {
-            var border = this.Q("node-border");
-            var overflowStyle = border.style.overflow;
+            VisualElement border = this.Q("node-border");
+            StyleEnum<Overflow> overflowStyle = border.style.overflow;
             overflowStyle.value = Overflow.Visible;
             border.style.overflow = overflowStyle;
 
-            var selectionBorder = this.Q("selection-border");
+            VisualElement selectionBorder = this.Q("selection-border");
             selectionBorder.SendToBack();
         }
 
@@ -77,12 +65,7 @@ namespace DialogueGraph {
         }
 
         public virtual void SetNodeData(string jsonData) { }
-
-        public virtual string GetNodeData() {
-            var root = new JObject();
-            return root.ToString(Formatting.None);
-        }
-
+        public virtual string GetNodeData() => "{}";
         public virtual void OnNodeSerialized() { }
         public virtual void OnNodeDeserialized() { }
     }
