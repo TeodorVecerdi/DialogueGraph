@@ -1,36 +1,31 @@
-using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.Searcher;
 using UnityEngine;
 
 namespace DialogueGraph {
     public class EdgeConnectorListener : IEdgeConnectorListener {
-        private EditorView editorView;
-        private SearchWindowProvider searchWindowProvider;
-        private GraphViewChange graphViewChange;
-        private List<Edge> edgesToCreate;
-        private List<GraphElement> edgesToDelete;
+        private readonly EditorView m_EditorView;
+        private readonly SearchWindowProvider m_SearchWindowProvider;
 
         public EdgeConnectorListener(EditorView editorView, SearchWindowProvider searchWindowProvider) {
-            this.editorView = editorView;
-            this.searchWindowProvider = searchWindowProvider;
-            edgesToCreate = new List<Edge>();
-            edgesToDelete = new List<GraphElement>();
-            graphViewChange.edgesToCreate = edgesToCreate;
+            this.m_EditorView = editorView;
+            this.m_SearchWindowProvider = searchWindowProvider;
         }
 
         public void OnDropOutsidePort(Edge edge, Vector2 position) {
-            var port = edge.output?.edgeConnector.edgeDragHelper.draggedPort ?? edge.input?.edgeConnector.edgeDragHelper.draggedPort;
-            searchWindowProvider.ConnectedPort = port;
-            searchWindowProvider.RegenerateEntries = true;
-            SearcherWindow.Show(editorView.EditorWindow, searchWindowProvider.LoadSearchWindow(), item => searchWindowProvider.OnSelectEntry(item, position), position, null);
-            searchWindowProvider.RegenerateEntries = true;
+            Port port = edge.output?.edgeConnector.edgeDragHelper.draggedPort ?? edge.input?.edgeConnector.edgeDragHelper.draggedPort;
+            this.m_SearchWindowProvider.ConnectedPort = port;
+            this.m_SearchWindowProvider.RegenerateEntries = true;
+            SearcherWindow.Show(this.m_EditorView.EditorWindow, this.m_SearchWindowProvider.LoadSearchWindow(), item => this.m_SearchWindowProvider.OnSelectEntry(item, position), position, null);
+            this.m_SearchWindowProvider.RegenerateEntries = true;
         }
 
         public void OnDrop(GraphView graphView, Edge edge) {
-            if(editorView.DlogObject.GraphData.HasEdge(edge)) return;
-            editorView.DlogObject.RegisterCompleteObjectUndo("Connect edge");
-            editorView.DlogObject.GraphData.AddEdge(edge);
+            DlogGraphObject graphObject = this.m_EditorView.DlogObject;
+
+            if (graphObject.GraphData.HasEdge(edge)) return;
+            graphObject.RegisterCompleteObjectUndo("Connect edge");
+            graphObject.GraphData.AddEdge(edge);
         }
     }
 }
