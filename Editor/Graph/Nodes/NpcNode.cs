@@ -152,10 +152,10 @@ namespace DialogueGraph {
             outputContainer.Remove(separator);
 
             Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Removed Line");
-            var edgesToRemove = Owner.EditorView.DlogObject.DlogGraph.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidA || edge.OutputPort == Lines[index].PortGuidA).ToList();
-            edgesToRemove.AddRange(Owner.EditorView.DlogObject.DlogGraph.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidB || edge.OutputPort == Lines[index].PortGuidB));
-            edgesToRemove.AddRange(Owner.EditorView.DlogObject.DlogGraph.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidC || edge.OutputPort == Lines[index].PortGuidC));
-            Owner.EditorView.DlogObject.DlogGraph.RemoveElements(new List<SerializedNode>(), edgesToRemove);
+            var edgesToRemove = Owner.EditorView.DlogObject.GraphData.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidA || edge.OutputPort == Lines[index].PortGuidA).ToList();
+            edgesToRemove.AddRange(Owner.EditorView.DlogObject.GraphData.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidB || edge.OutputPort == Lines[index].PortGuidB));
+            edgesToRemove.AddRange(Owner.EditorView.DlogObject.GraphData.Edges.Where(edge => edge.InputPort == Lines[index].PortGuidC || edge.OutputPort == Lines[index].PortGuidC));
+            Owner.EditorView.DlogObject.GraphData.RemoveElements(new List<SerializedNode>(), edgesToRemove);
             Owner.PortData.Remove(Lines[index].PortGuidA);
             Owner.PortData.Remove(Lines[index].PortGuidB);
             Owner.PortData.Remove(Lines[index].PortGuidC);

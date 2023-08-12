@@ -28,9 +28,9 @@ namespace DialogueGraph {
         }
 
         public void OnDrop(GraphView graphView, Edge edge) {
-            if(editorView.DlogObject.DlogGraph.HasEdge(edge)) return;
+            if(editorView.DlogObject.GraphData.HasEdge(edge)) return;
             editorView.DlogObject.RegisterCompleteObjectUndo("Connect edge");
-            editorView.DlogObject.DlogGraph.AddEdge(edge);
+            editorView.DlogObject.GraphData.AddEdge(edge);
         }
     }
 }

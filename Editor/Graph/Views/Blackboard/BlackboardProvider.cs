@@ -51,9 +51,9 @@ namespace DialogueGraph {
             if (!string.IsNullOrEmpty(newText) && newText != property.DisplayName) {
                 editorView.DlogObject.RegisterCompleteObjectUndo("Edit Property Name");
                 property.DisplayName = newText;
-                editorView.DlogObject.DlogGraph.SanitizePropertyName(property);
+                editorView.DlogObject.GraphData.SanitizePropertyName(property);
                 field.text = property.DisplayName;
-                var modifiedNodes = editorView.DlogObject.DlogGraph.Nodes.Where(node => node.Node is PropertyNode propertyNode && propertyNode.PropertyGuid == property.GUID).Select(node => node.Node as PropertyNode);
+                var modifiedNodes = editorView.DlogObject.GraphData.Nodes.Where(node => node.Node is PropertyNode propertyNode && propertyNode.PropertyGuid == property.GUID).Select(node => node.Node as PropertyNode);
                 foreach (var modifiedNode in modifiedNodes) {
                     modifiedNode?.Update(property);
                 }
@@ -65,7 +65,7 @@ namespace DialogueGraph {
                 return;
 
             editorView.DlogObject.RegisterCompleteObjectUndo("Move Property");
-            editorView.DlogObject.DlogGraph.MoveProperty(property, newIndex);
+            editorView.DlogObject.GraphData.MoveProperty(property, newIndex);
         }
 
         private void AddItemRequested(Blackboard blackboard) {
@@ -83,7 +83,7 @@ namespace DialogueGraph {
             var section = property.Type == PropertyType.Actor ? actorSection : property.Type == PropertyType.Check ? checkSection : triggerSection;
 
             if (create) {
-                editorView.DlogObject.DlogGraph.SanitizePropertyName(property);
+                editorView.DlogObject.GraphData.SanitizePropertyName(property);
             }
 
             var field = new BlackboardField(exposedIcon, property.DisplayName, property.Type.ToString()) {userData = property};
@@ -110,7 +110,7 @@ namespace DialogueGraph {
             row.expanded = true;
             ExpandedInputs[property.GUID] = true;
             editorView.DlogObject.RegisterCompleteObjectUndo("Create Property");
-            editorView.DlogObject.DlogGraph.AddProperty(property);
+            editorView.DlogObject.GraphData.AddProperty(property);
             field.OpenTextEditor();
         }
 
@@ -146,7 +146,7 @@ namespace DialogueGraph {
         }
 
         public void HandleChanges() {
-            foreach (var inputGuid in editorView.DlogObject.DlogGraph.RemovedProperties) {
+            foreach (var inputGuid in editorView.DlogObject.GraphData.RemovedProperties) {
                 if (!inputRows.TryGetValue(inputGuid.GUID, out var row))
                     continue;
 
@@ -154,14 +154,14 @@ namespace DialogueGraph {
                 inputRows.Remove(inputGuid.GUID);
             }
 
-            foreach (var input in editorView.DlogObject.DlogGraph.AddedProperties)
-                AddInputRow(input, index: editorView.DlogObject.DlogGraph.Properties.IndexOf(input));
+            foreach (var input in editorView.DlogObject.GraphData.AddedProperties)
+                AddInputRow(input, index: editorView.DlogObject.GraphData.Properties.IndexOf(input));
 
-            if (editorView.DlogObject.DlogGraph.MovedProperties.Any()) {
+            if (editorView.DlogObject.GraphData.MovedProperties.Any()) {
                 foreach (var row in inputRows.Values)
                     row.RemoveFromHierarchy();
 
-                foreach (var property in editorView.DlogObject.DlogGraph.Properties)
+                foreach (var property in editorView.DlogObject.GraphData.Properties)
                     (property.Type == PropertyType.Actor ? actorSection : property.Type == PropertyType.Check ? checkSection : triggerSection).Add(inputRows[property.GUID]);
             }
 

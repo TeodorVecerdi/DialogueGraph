@@ -14,9 +14,9 @@ namespace DialogueGraph {
             var dlogGraph = new DlogGraphData();
             var dlogObject = CreateInstance<DlogGraphObject>();
             dlogObject.Initialize(dlogGraph);
-            dlogObject.DlogGraph.AssetGuid = AssetDatabase.GetAssetPath(instanceId);
-            dlogObject.DlogGraph.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
-            dlogObject.AssetGuid = dlogObject.DlogGraph.AssetGuid;
+            dlogObject.GraphData.AssetGuid = AssetDatabase.GetAssetPath(instanceId);
+            dlogObject.GraphData.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
+            dlogObject.AssetGuid = dlogObject.GraphData.AssetGuid;
             DialogueGraphUtility.CreateFile(pathName, dlogObject, false);
             AssetDatabase.ImportAsset(pathName);
         }

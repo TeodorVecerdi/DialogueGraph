@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace DialogueGraph {
     public class DlogGraphObject : ScriptableObject, ISerializationCallbackReceiver {
-        [NonSerialized] private DlogGraphData dlogGraph;
+        [NonSerialized] private DlogGraphData m_GraphData;
         [NonSerialized] private int objectVersion;
 
         [SerializeField] public string AssetGuid;
@@ -13,18 +13,18 @@ namespace DialogueGraph {
         [SerializeField] private int fileVersion;
         [SerializeField] private bool isDirty;
 
-        public DlogGraphData DlogGraph {
-            get => dlogGraph;
-            set {
-                dlogGraph = value;
-                if (dlogGraph != null)
-                    dlogGraph.Owner = this;
+        public DlogGraphData GraphData {
+            get => this.m_GraphData;
+            private set {
+                this.m_GraphData = value;
+                if (this.m_GraphData != null)
+                    this.m_GraphData.Owner = this;
             }
         }
 
-        public void Initialize(DlogGraphData dlogData) {
-            DlogGraph = dlogData;
-            IsBlackboardVisible = DlogGraph.IsBlackboardVisible;
+        public void Initialize(DlogGraphData graphData) {
+            this.GraphData = graphData;
+            IsBlackboardVisible = this.m_GraphData.IsBlackboardVisible;
         }
 
         public bool IsDirty {
@@ -42,15 +42,15 @@ namespace DialogueGraph {
         }
 
         public void OnBeforeSerialize() {
-            if(dlogGraph == null) return;
+            if(this.m_GraphData == null) return;
 
-            serializedGraph = JsonUtility.ToJson(dlogGraph, true);
-            AssetGuid = dlogGraph.AssetGuid;
+            serializedGraph = JsonUtility.ToJson(this.m_GraphData, true);
+            AssetGuid = this.m_GraphData.AssetGuid;
         }
 
         public void OnAfterDeserialize() {
-            if(DlogGraph != null) return;
-            DlogGraph = Deserialize();
+            if(this.m_GraphData != null) return;
+            this.GraphData = Deserialize();
         }
 
         public void HandleUndoRedo() {
@@ -58,22 +58,22 @@ namespace DialogueGraph {
                 Debug.LogError("Trying to handle undo/redo when undo/redo was not performed", this);
                 return;
             }
-            var deserialized = Deserialize();
-            dlogGraph.ReplaceWith(deserialized);
-            // Undo.PerformUndo();
+
+            DlogGraphData graphData = Deserialize();
+            this.m_GraphData.ReplaceWith(graphData);
         }
 
         private DlogGraphData Deserialize() {
-            var deserialized = JsonUtility.FromJson<DlogGraphData>(serializedGraph);
-            deserialized.AssetGuid = AssetGuid;
+            DlogGraphData graphData = JsonUtility.FromJson<DlogGraphData>(serializedGraph);
+            graphData.AssetGuid = AssetGuid;
             objectVersion = fileVersion;
             serializedGraph = "";
-            return deserialized;
+            return graphData;
         }
 
         public void RecalculateAssetGuid(string assetPath) {
             AssetGuid = AssetDatabase.AssetPathToGUID(assetPath);
-            dlogGraph.AssetGuid = AssetGuid;
+            this.m_GraphData.AssetGuid = AssetGuid;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace DialogueGraph {
                 }
             }
 
-            foreach (var property in editorView.DlogObject.DlogGraph.Properties) {
+            foreach (var property in editorView.DlogObject.GraphData.Properties) {
                 var node = new SerializedNode(typeof(PropertyNode), new Rect(Vector2.zero, EditorView.DefaultNodeSize));
                 node.BuildNode(editorView, editorView.EdgeConnectorListener, false);
                 var propertyNode = node.Node as PropertyNode;
@@ -195,7 +195,7 @@ namespace DialogueGraph {
             }
 
             editorView.DlogObject.RegisterCompleteObjectUndo("Add " + node.Type);
-            editorView.DlogObject.DlogGraph.AddNode(node);
+            editorView.DlogObject.GraphData.AddNode(node);
 
             if (ConnectedPort != null) {
                 if (nodeEntry.Node == null)
@@ -208,7 +208,7 @@ namespace DialogueGraph {
                     OutputCapacity =  ConnectedPort.capacity,
                     InputCapacity = nodeEntry.Capacity.Value
                 };
-                editorView.DlogObject.DlogGraph.AddEdge(edge);
+                editorView.DlogObject.GraphData.AddEdge(edge);
             }
 
             return true;

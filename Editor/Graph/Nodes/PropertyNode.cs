@@ -16,7 +16,7 @@ namespace DialogueGraph {
             set {
                 if (propertyGuid == value) return;
                 propertyGuid = value;
-                var property = Owner.EditorView.DlogObject.DlogGraph.Properties.FirstOrDefault(prop => prop.GUID == value);
+                var property = Owner.EditorView.DlogObject.GraphData.Properties.FirstOrDefault(prop => prop.GUID == value);
                 if (property == null) return;
                 if(!string.IsNullOrEmpty(currentType))
                     RemoveFromClassList(currentType);

@@ -63,7 +63,7 @@ namespace DialogueGraph {
             referenceNameField.AddStyleSheet("Styles/PropertyView/ReferenceNameField");
             referenceNameField.RegisterValueChangedCallback(evt => {
                 editorView.DlogObject.RegisterCompleteObjectUndo("Change Reference Name");
-                editorView.DlogObject.DlogGraph.SanitizePropertyReference(property, evt.newValue);
+                editorView.DlogObject.GraphData.SanitizePropertyReference(property, evt.newValue);
                 referenceNameField.value = property.ReferenceName;
                 if (string.IsNullOrEmpty(property.OverrideReferenceName))
                     referenceNameField.RemoveFromClassList("modified");
