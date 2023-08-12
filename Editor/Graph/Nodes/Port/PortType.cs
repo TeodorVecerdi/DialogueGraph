@@ -1,5 +1,3 @@
-using System;
-
 namespace DialogueGraph {
     public enum PortType {
         Check,
@@ -7,6 +5,5 @@ namespace DialogueGraph {
         Actor,
         Branch,
         Boolean,
-        Fake
     }
 }
