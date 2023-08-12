@@ -17,6 +17,10 @@ namespace DialogueGraph {
         public override void OnImportAsset(AssetImportContext ctx) {
             try {
                 string importedAssetPath = ctx.assetPath;
+                if (DialogueGraphUtility.VersionMismatch(importedAssetPath)) {
+                    this.ImportInvalidVersion(ctx);
+                    return;
+                }
 
                 DlogGraphObject graphObject = DialogueGraphUtility.LoadGraphAtPath(importedAssetPath);
                 graphObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable;

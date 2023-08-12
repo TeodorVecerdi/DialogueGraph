@@ -1,67 +1,65 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace DialogueGraph {
-    public static class VersionConverter {
-        private static readonly SemVer v111 = (SemVer) "1.1.1";
-        private static readonly SemVer v112 = (SemVer) "1.1.2";
-        private static readonly SemVer v200 = (SemVer) "2.0.0";
+    internal static class VersionConverter {
+        private static readonly SemVer s_V111 = (SemVer) "1.1.1";
+        private static readonly SemVer s_V112 = (SemVer) "1.1.2";
+        private static readonly SemVer s_V200 = (SemVer) "2.0.0";
 
-        private static readonly SemVer[] sortedVersions = {v111, v112, v200};
+        private static readonly SemVer[] s_SortedVersions = { s_V111, s_V112, s_V200 };
 
-        private static bool builtMethodCache;
-        private static Dictionary<SemVer, Func<JObject, JObject>> upgradeMethodCache;
+        private static bool s_BuiltMethodCache;
+        private static Dictionary<SemVer, Func<JObject, JObject>> s_UpgradeMethodCache;
 
         private static SemVer GetNextVersion(SemVer from) {
-            for (int i = 1; i < sortedVersions.Length; i++) {
-                int comparePrev = from.CompareTo(sortedVersions[i - 1]);
-                int compareNext = from.CompareTo(sortedVersions[i]);
-                if (comparePrev >= 0 && compareNext < 0) return sortedVersions[i];
+            for (int i = 1; i < s_SortedVersions.Length; i++) {
+                if (from >= s_SortedVersions[i - 1] && from < s_SortedVersions[i]) {
+                    return s_SortedVersions[i];
+                }
             }
 
             return SemVer.Invalid;
         }
 
-        public static JObject ConvertVersion(SemVer from, SemVer to, JObject jsonDlogObject) {
+        public static JObject Convert(SemVer from, SemVer to, JObject graphObject) {
             while (true) {
-                if (from == to) return jsonDlogObject;
+                if (from == to) return graphObject;
                 SemVer next = GetNextVersion(from);
                 if (next == SemVer.Invalid) {
                     Debug.Log($"Could not find upgrading method [{from} -> {to}]");
-                    return jsonDlogObject;
+                    return graphObject;
                 }
 
-                jsonDlogObject = UpgradeTo(next, jsonDlogObject);
+                graphObject = UpgradeTo(next, graphObject);
                 from = next;
             }
         }
 
         [ConvertMethod("1.1.2")]
-        private static JObject U_112(JObject dlogObject) {
-            dlogObject["DialogueGraphVersion"] = v112.ToString();
-            return dlogObject;
+        private static JObject U_112(JObject graphObject) {
+            graphObject["DialogueGraphVersion"] = s_V112.ToString();
+            return graphObject;
         }
 
-        private static readonly Regex u200TypeRegex = new Regex(@"(?<quote>\\""|"")Dlog\.(.*?)(\k<quote>)", RegexOptions.Compiled);
+        private static readonly Regex u200TypeRegex = new(@"(?<quote>\\""|"")Dlog\.(.*?)(\k<quote>)", RegexOptions.Compiled);
+
         [ConvertMethod("2.0.0")]
-        private static JObject U_200(JObject dlogObject) {
+        private static JObject U_200(JObject graphObject) {
             // Change namespaces
-            string json = dlogObject.ToString(Formatting.None);
+            string json = graphObject.ToString(Formatting.None);
             json = u200TypeRegex.Replace(json, "${quote}DialogueGraph.$1${quote}");
 
-            dlogObject = JObject.Parse(json);
+            graphObject = JObject.Parse(json);
 
             // Replace all CheckCombinerNode with either AndBooleanNode or OrBooleanNode
-            JArray nodes = dlogObject["nodes"] as JArray;
-            foreach (JToken nodeToken in nodes) {
-                // "Type": "DialogueGraph.CheckCombinerNode"
+            JArray nodes = graphObject["nodes"] as JArray;
+            foreach (JToken nodeToken in nodes!) {
                 if (nodeToken.Value<string>("Type") != "DialogueGraph.CheckCombinerNode") continue;
 
                 JObject nodeData = JObject.Parse(nodeToken.Value<string>("NodeData"));
@@ -73,26 +71,26 @@ namespace DialogueGraph {
                 nodeToken["NodeData"] = "{}";
             }
 
-            dlogObject["DialogueGraphVersion"] = v200.ToString();
-            return dlogObject;
+            graphObject["DialogueGraphVersion"] = s_V200.ToString();
+            return graphObject;
         }
 
-        private static JObject UpgradeTo(SemVer version, JObject dlogGraphObject) {
-            if (!builtMethodCache) {
+        private static JObject UpgradeTo(SemVer version, JObject graphObject) {
+            if (!s_BuiltMethodCache) {
                 BuildMethodCache();
             }
-            if(upgradeMethodCache.ContainsKey(version))
-                return upgradeMethodCache[version](dlogGraphObject);
+            if(s_UpgradeMethodCache.ContainsKey(version))
+                return s_UpgradeMethodCache[version](graphObject);
 
             Debug.LogWarning($"Upgrade conversion with [target={version}] is not supported.");
-            return dlogGraphObject;
+            return graphObject;
         }
 
 
         private static void BuildMethodCache() {
             Debug.Log("Building cache");
-            builtMethodCache = true;
-            upgradeMethodCache = new Dictionary<SemVer, Func<JObject, JObject>>();
+            s_BuiltMethodCache = true;
+            s_UpgradeMethodCache = new Dictionary<SemVer, Func<JObject, JObject>>();
 
             MethodInfo[] methods = typeof(VersionConverter).GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
             foreach (MethodInfo method in methods) {
@@ -100,7 +98,7 @@ namespace DialogueGraph {
                 if (attribute == null) continue;
 
                 Func<JObject, JObject> methodCall = method.CreateDelegate(typeof(Func<JObject, JObject>)) as Func<JObject, JObject>;
-                upgradeMethodCache.Add(attribute.TargetVersion, methodCall);
+                s_UpgradeMethodCache.Add(attribute.TargetVersion, methodCall);
             }
         }
     }

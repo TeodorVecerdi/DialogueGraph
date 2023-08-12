@@ -98,7 +98,7 @@ namespace DialogueGraph {
         /// <param name="fromVersion">DialogueGraph object version</param>
         /// <param name="jsonObject">JObject representation of DialogueGraph to be converted</param>
         public static JObject VersionConvert(SemVer fromVersion, JObject jsonObject) {
-            return VersionConverter.ConvertVersion(fromVersion, LatestVersion, jsonObject);
+            return VersionConverter.Convert(fromVersion, LatestVersion, jsonObject);
         }
 
         /// <summary>
