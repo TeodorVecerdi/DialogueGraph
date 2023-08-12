@@ -103,7 +103,7 @@ namespace DialogueGraph {
             if (graphViewChange.edgesToCreate != null) {
                 EditorWindow.GraphObject.RegisterCompleteObjectUndo("Created edges");
                 foreach (var edge in graphViewChange.edgesToCreate) {
-                    DlogObject.DlogGraph.AddEdge(edge);
+                    DlogObject.GraphData.AddEdge(edge);
                 }
                 graphViewChange.edgesToCreate.Clear();
             }
@@ -111,15 +111,15 @@ namespace DialogueGraph {
             if (graphViewChange.elementsToRemove != null) {
                 EditorWindow.GraphObject.RegisterCompleteObjectUndo("Removed elements");
                 foreach (var node in graphViewChange.elementsToRemove.OfType<AbstractNode>()) {
-                    DlogObject.DlogGraph.RemoveNode(node.Owner);
+                    DlogObject.GraphData.RemoveNode(node.Owner);
                 }
 
                 foreach (var edge in graphViewChange.elementsToRemove.OfType<Edge>()) {
-                    DlogObject.DlogGraph.RemoveEdge((SerializedEdge)edge.userData);
+                    DlogObject.GraphData.RemoveEdge((SerializedEdge)edge.userData);
                 }
 
                 foreach (var property in graphViewChange.elementsToRemove.OfType<BlackboardField>()) {
-                    DlogObject.DlogGraph.RemoveProperty(property.userData as AbstractProperty);
+                    DlogObject.GraphData.RemoveProperty(property.userData as AbstractProperty);
                 }
             }
 
@@ -149,35 +149,35 @@ namespace DialogueGraph {
             GraphView.graphElements.ToList().OfType<BlackboardRow>().ToList().ForEach(GraphView.RemoveElement);
 
             // Create & add graph elements
-            DlogObject.DlogGraph.Nodes.ForEach(node => AddNode(node));
-            DlogObject.DlogGraph.Edges.ForEach(AddEdge);
-            DlogObject.DlogGraph.Properties.ForEach(AddProperty);
+            DlogObject.GraphData.Nodes.ForEach(node => AddNode(node));
+            DlogObject.GraphData.Edges.ForEach(AddEdge);
+            DlogObject.GraphData.Properties.ForEach(AddProperty);
         }
 
         public void HandleChanges() {
 
-            if(DlogObject.DlogGraph.AddedProperties.Any() || DlogObject.DlogGraph.RemovedProperties.Any())
+            if(DlogObject.GraphData.AddedProperties.Any() || DlogObject.GraphData.RemovedProperties.Any())
                 searchWindowProvider.RegenerateEntries = true;
             blackboardProvider.HandleChanges();
             
-            foreach (var removedNode in DlogObject.DlogGraph.RemovedNodes) {
+            foreach (var removedNode in DlogObject.GraphData.RemovedNodes) {
                 RemoveNode(removedNode);
             }
-            foreach (var removedEdge in DlogObject.DlogGraph.RemovedEdges) {
+            foreach (var removedEdge in DlogObject.GraphData.RemovedEdges) {
                 RemoveEdge(removedEdge);
             }
 
-            foreach (var addedNode in DlogObject.DlogGraph.AddedNodes) {
+            foreach (var addedNode in DlogObject.GraphData.AddedNodes) {
                 AddNode(addedNode);
             }
-            foreach (var addedEdge in DlogObject.DlogGraph.AddedEdges) {
+            foreach (var addedEdge in DlogObject.GraphData.AddedEdges) {
                 AddEdge(addedEdge);
             }
             
-            foreach (var queuedNode in DlogObject.DlogGraph.NodeSelectionQueue) {
+            foreach (var queuedNode in DlogObject.GraphData.NodeSelectionQueue) {
                 GraphView.AddToSelection(queuedNode.Node);
             }
-            foreach (var queuedEdge in DlogObject.DlogGraph.EdgeSelectionQueue) {
+            foreach (var queuedEdge in DlogObject.GraphData.EdgeSelectionQueue) {
                 GraphView.AddToSelection(queuedEdge.Edge);
             }
         }

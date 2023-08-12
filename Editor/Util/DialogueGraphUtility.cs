@@ -18,26 +18,26 @@ namespace DialogueGraph {
             if (dlogObject == null || string.IsNullOrEmpty(path)) return false;
 
             var assetGuid = AssetDatabase.AssetPathToGUID(path);
-            dlogObject.DlogGraph.AssetGuid = assetGuid;
+            dlogObject.GraphData.AssetGuid = assetGuid;
 
             CreateFileNoUpdate(path, dlogObject, refreshAsset);
             return true;
         }
 
         public static void CreateFileNoUpdate(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {
-            var jsonString = JsonUtility.ToJson(dlogObject.DlogGraph, true);
+            var jsonString = JsonUtility.ToJson(dlogObject.GraphData, true);
             File.WriteAllText(path, jsonString);
             if (refreshAsset) AssetDatabase.ImportAsset(path);
         }
 
         public static bool SaveGraph(DlogGraphObject dlogObject, bool refreshAsset = true) {
             if (dlogObject == null) return false;
-            if (string.IsNullOrEmpty(dlogObject.DlogGraph.AssetGuid)) return false;
+            if (string.IsNullOrEmpty(dlogObject.GraphData.AssetGuid)) return false;
 
-            var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.DlogGraph.AssetGuid);
+            var assetPath = AssetDatabase.GUIDToAssetPath(dlogObject.GraphData.AssetGuid);
             if (string.IsNullOrEmpty(assetPath)) return false;
 
-            var jsonString = JsonUtility.ToJson(dlogObject.DlogGraph, true);
+            var jsonString = JsonUtility.ToJson(dlogObject.GraphData, true);
             File.WriteAllText(assetPath, jsonString);
             if (refreshAsset) AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
             return true;

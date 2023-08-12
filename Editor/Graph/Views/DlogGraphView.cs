@@ -9,7 +9,7 @@ namespace DialogueGraph {
     public class DlogGraphView : GraphView {
         public EditorView EditorView { get; }
 
-        public DlogGraphData DlogGraph => EditorView.DlogObject.DlogGraph;
+        public DlogGraphData DlogGraph => EditorView.DlogObject.GraphData;
 
         public DlogGraphView(EditorView editorView) {
             EditorView = editorView;
@@ -36,7 +36,7 @@ namespace DialogueGraph {
 
             // Collect the property nodes and get the corresponding properties
             var propertyNodeGuids = nodes.OfType<PropertyNode>().Select(x => x.PropertyGuid);
-            var metaProperties = EditorView.DlogObject.DlogGraph.Properties.Where(x => propertyNodeGuids.Contains(x.GUID));
+            var metaProperties = EditorView.DlogObject.GraphData.Properties.Where(x => propertyNodeGuids.Contains(x.GUID));
 
             var copyPasteData = new CopyPasteData(EditorView, nodes, edges, properties, metaProperties);
             return JsonUtility.ToJson(copyPasteData, true);
@@ -71,7 +71,7 @@ namespace DialogueGraph {
         private void DeleteSelectionImpl(string operation, AskUser askUser) {
             var nodesToDelete = selection.OfType<AbstractNode>().Select(node => node.Owner);
             EditorView.DlogObject.RegisterCompleteObjectUndo(operation);
-            EditorView.DlogObject.DlogGraph.RemoveElements(nodesToDelete.ToList(),
+            EditorView.DlogObject.GraphData.RemoveElements(nodesToDelete.ToList(),
                 selection.OfType<Edge>().Select(e => e.userData).OfType<SerializedEdge>().ToList());
             
             
@@ -79,7 +79,7 @@ namespace DialogueGraph {
                 if (!(selectable is BlackboardField field) || field.userData == null)
                     continue;
                 var property = (AbstractProperty) field.userData;
-                EditorView.DlogObject.DlogGraph.RemoveProperty(property);
+                EditorView.DlogObject.GraphData.RemoveProperty(property);
             }
             
             selection.Clear();
@@ -118,7 +118,7 @@ namespace DialogueGraph {
                 EditorView.DlogObject.RegisterCompleteObjectUndo("Drag Blackboard Field");
                 var property = blackboardField.userData as AbstractProperty;
                 var node = new SerializedNode(typeof(PropertyNode), new Rect(nodePosition, EditorView.DefaultNodeSize));
-                EditorView.DlogObject.DlogGraph.AddNode(node);
+                EditorView.DlogObject.GraphData.AddNode(node);
                 node.BuildNode(EditorView, EditorView.EdgeConnectorListener, false);
                 var propertyNode = node.Node as PropertyNode;
                 propertyNode.PropertyGuid = property.GUID;

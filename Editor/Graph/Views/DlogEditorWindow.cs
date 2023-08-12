@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -24,8 +24,8 @@ namespace DialogueGraph {
             get {
                 if (deleted) return false;
                 if (GraphObject == null) return false;
-                var current = JsonUtility.ToJson(GraphObject.DlogGraph, true);
-                var saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(SelectedAssetGuid));
+                string current = JsonUtility.ToJson(GraphObject.GraphData, true);
+                string saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(SelectedAssetGuid));
                 return !string.Equals(current, saved, StringComparison.Ordinal);
             }
         }
@@ -71,7 +71,7 @@ namespace DialogueGraph {
             var wasUndoRedoPerformed = GraphObject.WasUndoRedoPerformed;
             if (wasUndoRedoPerformed) {
                 editorView.HandleChanges();
-                GraphObject.DlogGraph.ClearChanges();
+                GraphObject.GraphData.ClearChanges();
                 GraphObject.HandleUndoRedo();
             }
 
@@ -81,7 +81,7 @@ namespace DialogueGraph {
             }
 
             editorView.HandleChanges();
-            GraphObject.DlogGraph.ClearChanges();
+            GraphObject.GraphData.ClearChanges();
         }
 
         private void DisplayDeletedFromDiskDialog() {
@@ -137,7 +137,7 @@ namespace DialogueGraph {
 
         #region Window Events
         private void SaveAsset() {
-            GraphObject.DlogGraph.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
+            GraphObject.GraphData.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
             DialogueGraphUtility.SaveGraph(GraphObject);
             UpdateTitle();
         }
