@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -10,39 +11,30 @@ namespace DialogueGraph {
     public class DlogGraphImporterEditor : ScriptedImporterEditor {
         protected override bool needsApplyRevert => false;
 
-        private static GUIStyle titleStyle;
-        private static GUIStyle wrapLabelStyle;
+        private static GUIStyle s_TitleStyle;
+        private static GUIStyle s_WrapLabelStyle;
 
         public override void OnInspectorGUI() {
-            var importer = target as DlogGraphImporter;
+            DlogGraphImporter importer = target as DlogGraphImporter;
 
             if (assetTarget is VersionMismatchObject) {
-                if (titleStyle == null) {
-                    titleStyle = new GUIStyle(EditorStyles.label) {
-                        fontSize = 20,
-                        fontStyle = FontStyle.Bold,
-                    };
-                }
+                s_TitleStyle ??= new GUIStyle(EditorStyles.label) { fontSize = 20, fontStyle = FontStyle.Bold };
+                s_WrapLabelStyle ??= new GUIStyle(EditorStyles.label) { wordWrap = true };
 
-                if (wrapLabelStyle == null) {
-                    wrapLabelStyle = new GUIStyle(EditorStyles.label) {
-                        wordWrap = true,
-                    };
-                }
-                GUILayout.Label("Version Mismatch", titleStyle);
-                GUILayout.Label("Unable to load graph due to version mismatch. Before using you must convert the graph to the latest version.", wrapLabelStyle);
+                GUILayout.Label("Version Mismatch", s_TitleStyle);
+                GUILayout.Label("Unable to load graph due to version mismatch. Before using you must convert the graph to the latest version.", s_WrapLabelStyle);
                 GUILayout.Space(8.0f);
 
                 Color oldColor = GUI.backgroundColor;
                 GUI.backgroundColor = Color.red;
 
                 if (GUILayout.Button("Convert Graph", GUILayout.Height(28.0f))) {
-                    JObject jsonObject = DialogueGraphUtility.LoadJObjectAtPath(importer.assetPath);
+                    JObject jsonObject = DialogueGraphUtility.LoadJObjectAtPath(importer!.assetPath);
                     if (jsonObject != null) {
                         SemVer fileVersion = (SemVer)jsonObject.Value<string>("DialogueGraphVersion");
                         JObject converted = DialogueGraphUtility.VersionConvert(fileVersion, jsonObject);
-                        DlogGraphObject dlogObject = DialogueGraphUtility.FromJObject(converted);
-                        DialogueGraphUtility.SaveGraph(dlogObject);
+                        DlogGraphObject graphObject = DialogueGraphUtility.FromJObject(converted);
+                        DialogueGraphUtility.SaveGraph(graphObject);
                     }
                 }
 
@@ -52,28 +44,24 @@ namespace DialogueGraph {
             }
 
             if (GUILayout.Button("Open Dialogue Graph Editor")) {
-                OpenEditorWindow(importer.assetPath);
+                OpenEditorWindow(importer!.assetPath);
             }
 
             ApplyRevertGUI();
         }
 
         public static bool OpenEditorWindow(string assetPath) {
-            var extension = Path.GetExtension(assetPath);
-            if (string.IsNullOrEmpty(extension))
-                return false;
+            string extension = Path.GetExtension(assetPath);
+            if (string.IsNullOrEmpty(extension)) return false;
 
-            extension = extension.Substring(1).ToLowerInvariant();
-            if (extension != DlogGraphImporter.Extension)
-                return false;
+            extension = extension[1..].ToLowerInvariant();
+            if (extension != DlogGraphImporter.EXTENSION) return false;
 
             JObject jsonObject = DialogueGraphUtility.LoadJObjectAtPath(assetPath);
-            if (jsonObject == null)
-                return false;
+            if (jsonObject == null) return false;
 
-            SemVer fileVersion = (SemVer)jsonObject.Value<string>("DialogueGraphVersion");
-            var comparison = fileVersion.CompareTo(DialogueGraphUtility.LatestVersion);
-            if (comparison >= 0) {
+            SemVer fileVersion = (SemVer) jsonObject.Value<string>("DialogueGraphVersion");
+            if (fileVersion >= DialogueGraphUtility.LatestVersion) {
                 DlogGraphObject dlogObject = DialogueGraphUtility.FromJObject(jsonObject);
                 OpenEditorWindow(dlogObject, assetPath);
                 return true;
@@ -92,40 +80,37 @@ namespace DialogueGraph {
             return false;
         }
 
-        private static void OpenEditorWindow(DlogGraphObject dlogObject, string assetPath) {
-            var guid = AssetDatabase.AssetPathToGUID(assetPath);
-            if (string.IsNullOrEmpty(dlogObject.AssetGuid)) {
-                dlogObject.RecalculateAssetGuid(assetPath);
-                DialogueGraphUtility.SaveGraph(dlogObject, false);
+        private static void OpenEditorWindow(DlogGraphObject graphObject, string assetPath) {
+            string guid = AssetDatabase.AssetPathToGUID(assetPath);
+            if (string.IsNullOrEmpty(graphObject.AssetGuid)) {
+                graphObject.RecalculateAssetGuid(assetPath);
+                DialogueGraphUtility.SaveGraph(graphObject, false);
             }
 
-            foreach (var activeWindow in Resources.FindObjectsOfTypeAll<DlogEditorWindow>()) {
+            foreach (DlogEditorWindow activeWindow in Resources.FindObjectsOfTypeAll<DlogEditorWindow>()) {
                 if (activeWindow.SelectedAssetGuid != guid)
                     continue;
 
                 // TODO: Ask user if they want to replace the current window (maybe ask to save before opening with cancel button)
-                activeWindow.SetDlogObject(dlogObject);
+                activeWindow.SetGraphObject(graphObject);
                 activeWindow.BuildWindow();
                 activeWindow.Focus();
                 return;
             }
 
-            var window = EditorWindow.CreateWindow<DlogEditorWindow>(typeof(DlogEditorWindow), typeof(SceneView));
-            window.titleContent = EditorGUIUtility.TrTextContentWithIcon(guid, Resources.Load<Texture2D>(ResourcesUtility.IconSmall));
-            window.SetDlogObject(dlogObject);
+            DlogEditorWindow window = EditorWindow.CreateWindow<DlogEditorWindow>(typeof(DlogEditorWindow), typeof(SceneView));
+            window.titleContent = EditorGUIUtility.TrTextContentWithIcon(guid, Resources.Load<Texture2D>(ResourcesUtility.ICON_SMALL));
+            window.SetGraphObject(graphObject);
             window.BuildWindow();
             window.Focus();
         }
 
         [OnOpenAsset]
-        public static bool OnOpenAsset(int instanceID, int line) {
-            var path = AssetDatabase.GetAssetPath(instanceID);
-            var extension = Path.GetExtension(path);
-            if (string.IsNullOrEmpty(extension))
-                return false;
+        private static bool OnOpenAsset(int instanceID, int line) {
+            string path = AssetDatabase.GetAssetPath(instanceID);
 
-            extension = extension.Substring(1).ToLowerInvariant();
-            if (extension != DlogGraphImporter.Extension)
+            string extension = Path.GetExtension(path)?[1..];
+            if (!string.Equals(extension, DlogGraphImporter.EXTENSION, StringComparison.OrdinalIgnoreCase))
                 return false;
 
             OpenEditorWindow(path);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DialogueGraph.Runtime;
 using Newtonsoft.Json;
@@ -15,121 +16,81 @@ namespace DialogueGraph {
 
         public override void OnImportAsset(AssetImportContext ctx) {
             try {
-                var dlogObject = DialogueGraphUtility.LoadGraphAtPath(ctx.assetPath);
-                var icon = Resources.Load<Texture2D>(ResourcesUtility.IconBig);
-                var runtimeIcon = Resources.Load<Texture2D>(ResourcesUtility.RuntimeIconBig);
+                string importedAssetPath = ctx.assetPath;
 
-                if (string.IsNullOrEmpty(dlogObject.AssetGuid) || dlogObject.AssetGuid != AssetDatabase.AssetPathToGUID(ctx.assetPath)) {
-                    dlogObject.RecalculateAssetGuid(ctx.assetPath);
-                    DialogueGraphUtility.SaveGraph(dlogObject, false);
+                DlogGraphObject graphObject = DialogueGraphUtility.LoadGraphAtPath(importedAssetPath);
+                graphObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable;
+
+                if (string.IsNullOrEmpty(graphObject.AssetGuid) || graphObject.AssetGuid != AssetDatabase.AssetPathToGUID(importedAssetPath)) {
+                    graphObject.RecalculateAssetGuid(importedAssetPath);
+                    DialogueGraphUtility.SaveGraph(graphObject, false);
                 }
 
-                ctx.AddObjectToAsset("EditorGraph", dlogObject, icon);
-                dlogObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable;
+                DlogObject runtimeObject = LoadRuntimeObject(importedAssetPath, graphObject.GraphData);
+                Texture2D runtimeIcon = Resources.Load<Texture2D>(ResourcesUtility.RUNTIME_ICON_BIG);
 
-                var runtimeObject = ScriptableObject.CreateInstance<DlogObject>();
-                var filePath = ctx.assetPath;
-                var assetNameSubStartIndex = filePath.LastIndexOf('/') + 1;
-                var assetNameSubEndIndex = filePath.LastIndexOf('.');
-                var assetName = filePath.Substring(assetNameSubStartIndex, assetNameSubEndIndex - assetNameSubStartIndex);
-                runtimeObject.name = assetName + " (Runtime)";
-
-                // Add properties
-                runtimeObject.Properties = new List<Property>();
-                runtimeObject.Properties.AddRange(dlogObject.DlogGraph.Properties.Select(
-                                                      property =>
-                                                          new Property {
-                                                              Type = property.Type, DisplayName = property.DisplayName, ReferenceName = property.ReferenceName, Guid = property.GUID
-                                                          }
-                                                  ));
-
-                // Add nodes
-                runtimeObject.Nodes = new List<Node>();
-                foreach (var node in dlogObject.DlogGraph.Nodes) {
-                    var nodeData = JObject.Parse(node.NodeData);
-
-                    var runtimeNode = new Node();
-                    runtimeNode.Guid = node.GUID;
-                    switch (node.Type) {
-                        case "DialogueGraph.SelfNode":
-                            runtimeNode.Type = NodeType.SELF;
-                            break;
-                        case "DialogueGraph.NpcNode":
-                            runtimeNode.Type = NodeType.NPC;
-                            break;
-                        case "DialogueGraph.PropertyNode":
-                            runtimeNode.Type = NodeType.PROP;
-                            runtimeNode.Temp_PropertyNodeGuid = nodeData.Value<string>("propertyGuid");
-                            break;
-                        case "DialogueGraph.NotBooleanNode":
-                            runtimeNode.Type = NodeType.BOOLEAN_NOT;
-                            break;
-                        case "DialogueGraph.AndBooleanNode":
-                            runtimeNode.Type = NodeType.BOOLEAN_AND;
-                            break;
-                        case "DialogueGraph.OrBooleanNode":
-                            runtimeNode.Type = NodeType.BOOLEAN_OR;
-                            break;
-                        case "DialogueGraph.XorBooleanNode":
-                            runtimeNode.Type = NodeType.BOOLEAN_XOR;
-                            break;
-                        case "DialogueGraph.NandBooleanNode":
-                            runtimeNode.Type = NodeType.BOOLEAN_NAND;
-                            break;
-                        case "DialogueGraph.NorBooleanNode":
-                            runtimeNode.Type = NodeType.BOOLEAN_NOR;
-                            break;
-                        case "DialogueGraph.XnorBooleanNode":
-                            runtimeNode.Type = NodeType.BOOLEAN_XNOR;
-                            break;
-                        default:
-                            throw new NotSupportedException($"Invalid node type {node.Type}.");
-                    }
-
-                    // Get lines
-                    if (runtimeNode.Type == NodeType.SELF) {
-                        runtimeNode.Lines = new List<ConversationLine>();
-                        var lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(nodeData.Value<string>("lines"));
-                        foreach (var line in lines) {
-                            var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = Guid.Empty.ToString()};
-                            runtimeNode.Lines.Add(runtimeLine);
-                        }
-                    } else if (runtimeNode.Type == NodeType.NPC) {
-                        runtimeNode.Lines = new List<ConversationLine>();
-                        var lines = JsonConvert.DeserializeObject<List<LineDataNpc>>(nodeData.Value<string>("lines"));
-                        foreach (var line in lines) {
-                            var runtimeLine = new ConversationLine {Message = line.Line, Next = line.PortGuidA, TriggerPort = line.PortGuidB, CheckPort = line.PortGuidC};
-                            runtimeNode.Lines.Add(runtimeLine);
-                        }
-                    }
-
-                    runtimeObject.Nodes.Add(runtimeNode);
-                }
-
-                // Add edges
-                runtimeObject.Edges = new List<Edge>();
-                runtimeObject.Edges.AddRange(dlogObject.DlogGraph.Edges.Select(
-                                                 edge =>
-                                                     new Edge {
-                                                         FromNode = edge.Output, FromPort = edge.OutputPort, ToNode = edge.Input, ToPort = edge.InputPort
-                                                     }
-                                             ));
-                runtimeObject.BuildGraph();
-
+                ctx.AddObjectToAsset("EditorGraph", graphObject);
                 ctx.AddObjectToAsset("MainAsset", runtimeObject, runtimeIcon);
                 ctx.SetMainObject(runtimeObject);
             } catch (Exception) {
-                if (DialogueGraphUtility.VersionMismatch(ctx.assetPath)) {
-                    ImportInvalidVersion(ctx);
-                    return;
+                if (!DialogueGraphUtility.VersionMismatch(ctx.assetPath)) {
+                    throw;
                 }
 
-                throw;
+                this.ImportInvalidVersion(ctx);
             }
         }
 
+        private static DlogObject LoadRuntimeObject(string importedAssetPath, DlogGraphData graphData) {
+            DlogObject runtimeObject = ScriptableObject.CreateInstance<DlogObject>();
+            string assetName = Path.GetFileNameWithoutExtension(importedAssetPath);
+            runtimeObject.name = assetName + " (Runtime)";
+
+            // Add properties
+            runtimeObject.Properties = graphData.Properties.Select(property => property.ToRuntime()).ToList();
+
+            // Add nodes
+            runtimeObject.Nodes = new List<Node>();
+            foreach (SerializedNode node in graphData.Nodes) {
+                JObject nodeData = JObject.Parse(node.NodeData);
+                Node runtimeNode = new() {
+                    Guid = node.GUID,
+                    Type = node.Type switch {
+                        "DialogueGraph.SelfNode" => NodeType.SELF,
+                        "DialogueGraph.NpcNode" => NodeType.NPC,
+                        "DialogueGraph.PropertyNode" => NodeType.PROP,
+                        "DialogueGraph.NotBooleanNode" => NodeType.BOOLEAN_NOT,
+                        "DialogueGraph.AndBooleanNode" => NodeType.BOOLEAN_AND,
+                        "DialogueGraph.OrBooleanNode" => NodeType.BOOLEAN_OR,
+                        "DialogueGraph.XorBooleanNode" => NodeType.BOOLEAN_XOR,
+                        "DialogueGraph.NandBooleanNode" => NodeType.BOOLEAN_NAND,
+                        "DialogueGraph.NorBooleanNode" => NodeType.BOOLEAN_NOR,
+                        "DialogueGraph.XnorBooleanNode" => NodeType.BOOLEAN_XNOR,
+                        _ => throw new NotSupportedException($"Invalid node type {node.Type}."),
+                    },
+                };
+
+                if (runtimeNode.Type == NodeType.SELF) {
+                    List<LineDataSelf> lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(nodeData.Value<string>("lines"));
+                    runtimeNode.Lines = lines.Select(line => line.ToRuntime()).ToList();
+                } else if (runtimeNode.Type == NodeType.NPC) {
+                    List<LineDataNpc> lines = JsonConvert.DeserializeObject<List<LineDataNpc>>(nodeData.Value<string>("lines"));
+                    runtimeNode.Lines = lines.Select(line => line.ToRuntime()).ToList();
+                } else if (runtimeNode.Type is NodeType.PROP) {
+                    runtimeNode.Temp_PropertyNodeGuid = nodeData.Value<string>("propertyGuid");
+                }
+
+                runtimeObject.Nodes.Add(runtimeNode);
+            }
+
+            // Add edges
+            runtimeObject.Edges = graphData.Edges.Select(edge => edge.ToRuntime()).ToList();
+            runtimeObject.BuildGraph();
+            return runtimeObject;
+        }
+
         private void ImportInvalidVersion(AssetImportContext ctx) {
-            var icon = Resources.Load<Texture2D>(ResourcesUtility.IconError);
+            Texture2D icon = Resources.Load<Texture2D>(ResourcesUtility.ICON_ERROR);
             VersionMismatchObject versionMismatchObject = ScriptableObject.CreateInstance<VersionMismatchObject>();
             ctx.AddObjectToAsset("MainAsset", versionMismatchObject, icon);
             ctx.SetMainObject(versionMismatchObject);
