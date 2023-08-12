@@ -9,9 +9,9 @@ using UnityEditor.AssetImporters;
 using UnityEngine;
 
 namespace DialogueGraph {
-    [ScriptedImporter(0, Extension, 3)]
+    [ScriptedImporter(0, EXTENSION, 3)]
     public class DlogGraphImporter : ScriptedImporter {
-        public const string Extension = "dlog";
+        public const string EXTENSION = "dlog";
 
         public override void OnImportAsset(AssetImportContext ctx) {
             try {
