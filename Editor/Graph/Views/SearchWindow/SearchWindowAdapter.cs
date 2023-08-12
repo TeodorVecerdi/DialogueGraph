@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using UnityEditor.Searcher;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace DialogueGraph {
     public class SearchWindowAdapter : SearcherAdapter {
@@ -12,9 +9,9 @@ namespace DialogueGraph {
     }
 
     internal class SearchNodeItem : SearcherItem {
-        public SearchWindowProvider.NodeEntry NodeEntry;
-        public SearchNodeItem(string name, SearchWindowProvider.NodeEntry nodeEntry, string help = "", List<SearchNodeItem> children = null) : base(name) {
-            NodeEntry = nodeEntry;
+        public readonly SearchWindowProvider.NodeEntry NodeEntry;
+        public SearchNodeItem(string name, SearchWindowProvider.NodeEntry nodeEntry) : base(name) {
+            this.NodeEntry = nodeEntry;
         }
     }
 }
