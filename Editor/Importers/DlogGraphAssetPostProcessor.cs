@@ -6,7 +6,7 @@ using UnityEngine;
 namespace DialogueGraph {
     public class DlogGraphAssetPostprocessor : AssetPostprocessor {
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths) {
-            var anyRemovedAssets = deletedAssets.Any(path => path.EndsWith(DlogGraphImporter.Extension, StringComparison.InvariantCultureIgnoreCase));
+            var anyRemovedAssets = deletedAssets.Any(path => path.EndsWith(DlogGraphImporter.EXTENSION, StringComparison.InvariantCultureIgnoreCase));
             if (anyRemovedAssets)
                 DisplayDeletionDialog(deletedAssets);
         }

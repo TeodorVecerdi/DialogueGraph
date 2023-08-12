@@ -8,7 +8,7 @@ namespace DialogueGraph {
         public static void CreateDialogueGraph()
         {
             ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreateDlogGraph>(),
-                $"New Dialogue Graph.{DlogGraphImporter.Extension}", Resources.Load<Texture2D>(ResourcesUtility.IconBig), null);
+                $"New Dialogue Graph.{DlogGraphImporter.EXTENSION}", Resources.Load<Texture2D>(ResourcesUtility.ICON_BIG), null);
         }
         public override void Action(int instanceId, string pathName, string resourceFile) {
             var dlogGraph = new DlogGraphData();

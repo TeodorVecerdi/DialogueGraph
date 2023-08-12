@@ -149,7 +149,7 @@ namespace DialogueGraph {
                     return false;
 
                 var directoryPath = Path.GetDirectoryName(assetPath);
-                var savePath = EditorUtility.SaveFilePanelInProject("Save As...", Path.GetFileNameWithoutExtension(assetPath), DlogGraphImporter.Extension, "", directoryPath);
+                var savePath = EditorUtility.SaveFilePanelInProject("Save As...", Path.GetFileNameWithoutExtension(assetPath), DlogGraphImporter.EXTENSION, "", directoryPath);
                 savePath = savePath.Replace(Application.dataPath, "Assets");
                 if (savePath != directoryPath) {
                     if (!string.IsNullOrEmpty(savePath)) {
