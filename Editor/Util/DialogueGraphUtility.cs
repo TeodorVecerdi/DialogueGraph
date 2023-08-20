@@ -11,7 +11,7 @@ using Debug = UnityEngine.Debug;
 
 namespace DialogueGraph {
     public static class DialogueGraphUtility {
-        internal static readonly SemVer LatestVersion = new SemVer(2, 0, 0);
+        internal static readonly SemVer LatestVersion = new(2, 0, 0);
 
         #region IO Utilities
         public static bool CreateFile(string path, DlogGraphObject dlogObject, bool refreshAsset = true) {

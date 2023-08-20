@@ -17,7 +17,7 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer
 	static GUIContent s_warningIconOther = IconContent ("console.infoicon.sml", "Conflicting key");
 	static GUIContent s_warningIconNull = IconContent ("console.warnicon.sml", "Null key, this entry will be lost");
 	static GUIStyle s_buttonStyle = GUIStyle.none;
-	static GUIContent s_tempContent = new GUIContent();
+	static GUIContent s_tempContent = new();
 
 
 	class ConflictState
@@ -43,7 +43,7 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer
 		public string propertyPath;
 	}
 
-	static Dictionary<PropertyIdentity, ConflictState> s_conflictStateDict = new Dictionary<PropertyIdentity, ConflictState>();
+	static Dictionary<PropertyIdentity, ConflictState> s_conflictStateDict = new();
 
 	enum Action
 	{
@@ -328,7 +328,7 @@ public class SerializableDictionaryPropertyDrawer : PropertyDrawer
 	static ConflictState GetConflictState(SerializedProperty property)
 	{
 		ConflictState conflictState;
-		PropertyIdentity propId = new PropertyIdentity(property);
+		PropertyIdentity propId = new(property);
 		if(!s_conflictStateDict.TryGetValue(propId, out conflictState))
 		{
 			conflictState = new ConflictState();

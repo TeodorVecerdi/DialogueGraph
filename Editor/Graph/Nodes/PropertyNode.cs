@@ -12,33 +12,33 @@ namespace DialogueGraph {
         private EdgeConnectorListener m_EdgeConnectorListener;
 
         public string PropertyGuid {
-            get => this.m_PropertyGuid;
+            get => m_PropertyGuid;
             set {
-                if (this.m_PropertyGuid == value) return;
-                this.m_PropertyGuid = value;
+                if (m_PropertyGuid == value) return;
+                m_PropertyGuid = value;
 
                 AbstractProperty property = Owner.EditorView.DlogObject.GraphData.Properties.FirstOrDefault(prop => prop.GUID == value);
                 if (property == null) return;
 
-                if (!string.IsNullOrEmpty(this.m_CurrentType)) {
-                    RemoveFromClassList(this.m_CurrentType);
+                if (!string.IsNullOrEmpty(m_CurrentType)) {
+                    RemoveFromClassList(m_CurrentType);
                 }
 
-                this.m_CurrentType = property.Type.ToString();
-                AddToClassList(this.m_CurrentType);
+                m_CurrentType = property.Type.ToString();
+                AddToClassList(m_CurrentType);
                 CreatePorts(property);
             }
         }
 
         public override void InitializeNode(EdgeConnectorListener edgeConnectorListener) {
             Initialize("", EditorView.DefaultNodePosition);
-            this.m_EdgeConnectorListener = edgeConnectorListener;
+            m_EdgeConnectorListener = edgeConnectorListener;
             Refresh();
         }
 
         public override string GetNodeData() {
             JObject root = new() {
-                ["propertyGuid"] = this.m_PropertyGuid,
+                ["propertyGuid"] = m_PropertyGuid,
             };
 
             string baseNodeData = base.GetNodeData();
@@ -59,9 +59,9 @@ namespace DialogueGraph {
 
         private void CreatePorts(AbstractProperty property) {
             Port createdPort = property.Type switch {
-                PropertyType.Trigger => DlogPort.Create("", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Trigger, false, this.m_EdgeConnectorListener),
-                PropertyType.Check => DlogPort.Create("", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Check, false, this.m_EdgeConnectorListener),
-                PropertyType.Actor => DlogPort.Create("", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Actor, false, this.m_EdgeConnectorListener),
+                PropertyType.Trigger => DlogPort.Create("", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, PortType.Trigger, false, m_EdgeConnectorListener),
+                PropertyType.Check => DlogPort.Create("", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Check, false, m_EdgeConnectorListener),
+                PropertyType.Actor => DlogPort.Create("", Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, PortType.Actor, false, m_EdgeConnectorListener),
                 _ => throw new ArgumentOutOfRangeException(nameof(property.Type), property.Type, null),
             };
 

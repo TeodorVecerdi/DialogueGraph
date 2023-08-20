@@ -99,7 +99,7 @@ namespace DialogueGraph {
         }
 
         private void OnDragPerformed(DragPerformEvent evt) {
-            Vector2 localPos = (evt.currentTarget as VisualElement).ChangeCoordinatesTo(this.contentViewContainer, evt.localMousePosition);
+            Vector2 localPos = (evt.currentTarget as VisualElement).ChangeCoordinatesTo(contentViewContainer, evt.localMousePosition);
 
             var selection = DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>;
             if (selection != null) {

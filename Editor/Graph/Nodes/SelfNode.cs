@@ -21,8 +21,8 @@ namespace DialogueGraph {
             base.InitializeNode(edgeConnectorListener);
             Initialize("Self", EditorView.DefaultNodePosition);
 
-            this.m_LineLabel = new Label { name = "lineTitle", text = "Lines" };
-            outputContainer.Add(this.m_LineLabel);
+            m_LineLabel = new Label { name = "lineTitle", text = "Lines" };
+            outputContainer.Add(m_LineLabel);
 
             Button button = new(() => AddConversationPort(true)) { text = "Create Dialogue Line" };
             extensionContainer.Add(button);
@@ -46,17 +46,17 @@ namespace DialogueGraph {
 
             JObject data = JObject.Parse(jsonData);
             List<LineDataSelf> lines = JsonConvert.DeserializeObject<List<LineDataSelf>>(data.Value<string>("lines"));
-            this.m_Lines.Clear();
-            this.m_Lines.AddRange(lines);
+            m_Lines.Clear();
+            m_Lines.AddRange(lines);
 
-            for (int i = 0; i < this.m_Lines.Count; i++) {
-                this.AddConversationPort(false, i);
+            for (int i = 0; i < m_Lines.Count; i++) {
+                AddConversationPort(false, i);
             }
         }
 
         public override string GetNodeData() {
             JObject root = new() {
-                ["lines"] = new JValue(JsonConvert.SerializeObject(this.m_Lines)),
+                ["lines"] = new JValue(JsonConvert.SerializeObject(m_Lines)),
             };
 
             string baseNodeData = base.GetNodeData();
@@ -69,17 +69,17 @@ namespace DialogueGraph {
 
         private void AddConversationPort(bool create, int index = -1) {
             VisualElement conversationContainer = new() { name = "conversation-container" };
-            this.m_LineLabel.AddToClassList("visible");
+            m_LineLabel.AddToClassList("visible");
 
             if (create) {
                 Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Created Dialogue Line");
-                index = this.m_Lines.Count;
-                this.m_Lines.Add(new LineDataSelf { Line = "" });
+                index = m_Lines.Count;
+                m_Lines.Add(new LineDataSelf { Line = "" });
             }
 
             TextField message = UIElementsFactory.TextField("conversation-item", "Line", new[] { "message" }, null, null, true);
             if (!create) {
-                message.SetValueWithoutNotify(this.m_Lines[index].Line);
+                message.SetValueWithoutNotify(m_Lines[index].Line);
             }
 
             DlogPort branchPort = DlogPort.Create("Branch", Orientation.Horizontal, Direction.Output, Port.Capacity.Single, PortType.Branch, true, EdgeConnectorListener);
@@ -92,24 +92,24 @@ namespace DialogueGraph {
 
             VisualElement flexBreak = UIElementsFactory.FlexBreaker();
             if (create) {
-                this.m_Lines[index].PortGuidA = branchPort.viewDataKey;
-                this.m_Lines[index].PortGuidB = triggerPort.viewDataKey;
+                m_Lines[index].PortGuidA = branchPort.viewDataKey;
+                m_Lines[index].PortGuidB = triggerPort.viewDataKey;
             } else {
-                branchPort.viewDataKey = this.m_Lines[index].PortGuidA;
-                triggerPort.viewDataKey = this.m_Lines[index].PortGuidB;
+                branchPort.viewDataKey = m_Lines[index].PortGuidA;
+                triggerPort.viewDataKey = m_Lines[index].PortGuidB;
             }
 
             message.RegisterCallback<FocusOutEvent>(_ => {
-                int lineIndex = this.m_Lines.FindIndex(data => data.PortGuidA == branchPort.viewDataKey);
-                if (message.value != this.m_Lines[lineIndex].Line) {
+                int lineIndex = m_Lines.FindIndex(data => data.PortGuidA == branchPort.viewDataKey);
+                if (message.value != m_Lines[lineIndex].Line) {
                     Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Changed Dialogue Line");
-                    this.m_Lines[lineIndex].Line = message.value;
+                    m_Lines[lineIndex].Line = message.value;
                 }
             });
 
             Button removeButton = UIElementsFactory.Button(
                 "x", "conversation-item", "Remove line", new[] { "remove-button" },
-                () => this.RemoveLine(this.m_Lines.FindIndex(data => data.PortGuidA == branchPort.viewDataKey))
+                () => RemoveLine(m_Lines.FindIndex(data => data.PortGuidA == branchPort.viewDataKey))
             );
 
             conversationContainer.Add(message);
@@ -138,30 +138,30 @@ namespace DialogueGraph {
         }
 
         private void RemoveLine(int index) {
-            if (this.m_Lines.Count == 1) {
-                this.m_LineLabel.RemoveFromClassList("visible");
+            if (m_Lines.Count == 1) {
+                m_LineLabel.RemoveFromClassList("visible");
             }
 
             VisualElement container = outputContainer.Children().Where(element => element.name == "conversation-container").ToList()[index];
             VisualElement separator = outputContainer.Children().Where(element => element.name == "divider" && element.ClassListContains("horizontal-divider")).ToList()[index];
             outputContainer.Remove(separator);
 
-            this.Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Removed Line");
+            Owner.EditorView.DlogObject.RegisterCompleteObjectUndo("Removed Line");
 
-            DlogGraphData graphData = this.Owner.EditorView.DlogObject.GraphData;
-            List<SerializedEdge> edgesToRemove = graphData.Edges.Where(edge => edge.InputPort == this.m_Lines[index].PortGuidA || edge.OutputPort == this.m_Lines[index].PortGuidA).ToList();
-            edgesToRemove.AddRange(graphData.Edges.Where(edge => edge.InputPort == this.m_Lines[index].PortGuidB || edge.OutputPort == this.m_Lines[index].PortGuidB));
+            DlogGraphData graphData = Owner.EditorView.DlogObject.GraphData;
+            List<SerializedEdge> edgesToRemove = graphData.Edges.Where(edge => edge.InputPort == m_Lines[index].PortGuidA || edge.OutputPort == m_Lines[index].PortGuidA).ToList();
+            edgesToRemove.AddRange(graphData.Edges.Where(edge => edge.InputPort == m_Lines[index].PortGuidB || edge.OutputPort == m_Lines[index].PortGuidB));
 
             graphData.RemoveElements(new List<SerializedNode>(), edgesToRemove);
-            Owner.PortData.Remove(this.m_Lines[index].PortGuidA);
-            Owner.PortData.Remove(this.m_Lines[index].PortGuidB);
-            Port portA = Owner.GuidPortDictionary[this.m_Lines[index].PortGuidA];
-            Port portB = Owner.GuidPortDictionary[this.m_Lines[index].PortGuidB];
-            Owner.GuidPortDictionary.Remove(this.m_Lines[index].PortGuidA);
-            Owner.GuidPortDictionary.Remove(this.m_Lines[index].PortGuidB);
+            Owner.PortData.Remove(m_Lines[index].PortGuidA);
+            Owner.PortData.Remove(m_Lines[index].PortGuidB);
+            Port portA = Owner.GuidPortDictionary[m_Lines[index].PortGuidA];
+            Port portB = Owner.GuidPortDictionary[m_Lines[index].PortGuidB];
+            Owner.GuidPortDictionary.Remove(m_Lines[index].PortGuidA);
+            Owner.GuidPortDictionary.Remove(m_Lines[index].PortGuidB);
             Ports.Remove(portA);
             Ports.Remove(portB);
-            this.m_Lines.RemoveAt(index);
+            m_Lines.RemoveAt(index);
             outputContainer.Remove(container);
 
             Refresh();

@@ -26,9 +26,9 @@ namespace DialogueGraph {
 
             if(!alsoAddToHierarchy) return;
             if (port.direction == Direction.Input) {
-                this.inputContainer.Add(port);
+                inputContainer.Add(port);
             } else {
-                this.outputContainer.Add(port);
+                outputContainer.Add(port);
             }
         }
 

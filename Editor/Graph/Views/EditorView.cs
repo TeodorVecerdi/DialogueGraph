@@ -10,8 +10,8 @@ using Object = UnityEngine.Object;
 
 namespace DialogueGraph {
     public class EditorView : VisualElement, IDisposable {
-        public static readonly Vector2 DefaultNodeSize = new Vector2(200, 150);
-        public static readonly Rect DefaultNodePosition = new Rect(Vector2.zero, DefaultNodeSize);
+        public static readonly Vector2 DefaultNodeSize = new(200, 150);
+        public static readonly Rect DefaultNodePosition = new(Vector2.zero, DefaultNodeSize);
 
         private readonly BlackboardProvider blackboardProvider;
         private SearchWindowProvider searchWindowProvider;

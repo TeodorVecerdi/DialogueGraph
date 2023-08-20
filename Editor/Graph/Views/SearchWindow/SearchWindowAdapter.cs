@@ -11,7 +11,7 @@ namespace DialogueGraph {
     internal class SearchNodeItem : SearcherItem {
         public readonly SearchWindowProvider.NodeEntry NodeEntry;
         public SearchNodeItem(string name, SearchWindowProvider.NodeEntry nodeEntry) : base(name) {
-            this.NodeEntry = nodeEntry;
+            NodeEntry = nodeEntry;
         }
     }
 }

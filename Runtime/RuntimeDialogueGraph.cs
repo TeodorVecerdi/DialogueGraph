@@ -9,8 +9,8 @@ namespace DialogueGraph.Runtime {
 
         #region Inspector Data
         public string CurrentAssetGuid;
-        public List<DlogObjectData> PersistentData = new List<DlogObjectData>();
-        public StringIntSerializableDictionary PersistentDataIndices = new StringIntSerializableDictionary();
+        public List<DlogObjectData> PersistentData = new();
+        public StringIntSerializableDictionary PersistentDataIndices = new();
         public DlogObjectData CurrentData {
             get {
                 if (string.IsNullOrEmpty(CurrentAssetGuid)) return null;

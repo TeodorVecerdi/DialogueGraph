@@ -18,7 +18,7 @@ namespace DialogueGraph {
             try {
                 string importedAssetPath = ctx.assetPath;
                 if (DialogueGraphUtility.VersionMismatch(importedAssetPath)) {
-                    this.ImportInvalidVersion(ctx);
+                    ImportInvalidVersion(ctx);
                     return;
                 }
 
@@ -41,7 +41,7 @@ namespace DialogueGraph {
                     throw;
                 }
 
-                this.ImportInvalidVersion(ctx);
+                ImportInvalidVersion(ctx);
             }
         }
 

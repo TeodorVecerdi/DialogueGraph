@@ -6,16 +6,16 @@ using UnityEngine;
 namespace DialogueGraph {
     [Serializable]
     public class CopyPasteData : ISerializationCallbackReceiver {
-        [NonSerialized] private HashSet<SerializedNode> nodes = new HashSet<SerializedNode>();
-        [NonSerialized] private HashSet<SerializedEdge> edges = new HashSet<SerializedEdge>();
-        [NonSerialized] private HashSet<AbstractProperty> properties = new HashSet<AbstractProperty>();
+        [NonSerialized] private HashSet<SerializedNode> nodes = new();
+        [NonSerialized] private HashSet<SerializedEdge> edges = new();
+        [NonSerialized] private HashSet<AbstractProperty> properties = new();
         // these are the properties that don't get copied but are required by property nodes that get copied
-        [NonSerialized] private HashSet<AbstractProperty> metaProperties = new HashSet<AbstractProperty>();
+        [NonSerialized] private HashSet<AbstractProperty> metaProperties = new();
 
-        [SerializeField] private List<SerializedNode> serializedNodes = new List<SerializedNode>();
-        [SerializeField] private List<SerializedEdge> serializedEdges = new List<SerializedEdge>();
-        [SerializeField] private List<SerializedProperty> serializedProperties = new List<SerializedProperty>();
-        [SerializeField] private List<SerializedProperty> serializedMetaProperties = new List<SerializedProperty>();
+        [SerializeField] private List<SerializedNode> serializedNodes = new();
+        [SerializeField] private List<SerializedEdge> serializedEdges = new();
+        [SerializeField] private List<SerializedProperty> serializedProperties = new();
+        [SerializeField] private List<SerializedProperty> serializedMetaProperties = new();
 
         public IEnumerable<SerializedNode> Nodes => nodes;
         public IEnumerable<SerializedEdge> Edges => edges;

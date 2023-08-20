@@ -29,7 +29,7 @@ public class SerializableCallbackDrawer : PropertyDrawer {
 		// Draw label
 		Rect pos = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
 
-		Rect targetRect = new Rect(pos.x, pos.y, pos.width, EditorGUIUtility.singleLineHeight);
+		Rect targetRect = new(pos.x, pos.y, pos.width, EditorGUIUtility.singleLineHeight);
 
 		// Get target
 		SerializedProperty targetProp = property.FindPropertyRelative("_target");
@@ -40,11 +40,11 @@ public class SerializableCallbackDrawer : PropertyDrawer {
 		} else EditorGUI.PropertyField(targetRect, targetProp, GUIContent.none);
 
 		if (target == null) {
-			Rect helpBoxRect = new Rect(position.x + 8, targetRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width - 16, EditorGUIUtility.singleLineHeight);
+			Rect helpBoxRect = new(position.x + 8, targetRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width - 16, EditorGUIUtility.singleLineHeight);
 			string msg = "Call not set. Execution will be slower.";
 			EditorGUI.HelpBox(helpBoxRect, msg, MessageType.Warning);
 		} else if (target is MonoScript) {
-			Rect helpBoxRect = new Rect(position.x + 8, targetRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width - 16, EditorGUIUtility.singleLineHeight + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+			Rect helpBoxRect = new(position.x + 8, targetRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width - 16, EditorGUIUtility.singleLineHeight + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
 			string msg = "Assign a GameObject, Component or a ScriptableObject, not a script.";
 			EditorGUI.HelpBox(helpBoxRect, msg, MessageType.Warning);
 		} else {
@@ -66,11 +66,11 @@ public class SerializableCallbackDrawer : PropertyDrawer {
 			// Get active method
 			MethodInfo activeMethod = GetMethod(target, methodName, argTypes);
 
-			GUIContent methodlabel = new GUIContent("n/a");
+			GUIContent methodlabel = new("n/a");
 			if (activeMethod != null) methodlabel = new GUIContent(PrettifyMethod(activeMethod));
 			else if (!string.IsNullOrEmpty(methodName)) methodlabel = new GUIContent("Missing (" + PrettifyMethod(methodName, argTypes) + ")");
 
-			Rect methodRect = new Rect(position.x, targetRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
+			Rect methodRect = new(position.x, targetRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
 
 			// Method select button
 			pos = EditorGUI.PrefixLabel(methodRect, GUIUtility.GetControlID(FocusType.Passive), new GUIContent(dynamic ? "Method (dynamic)" : "Method"));
@@ -81,11 +81,11 @@ public class SerializableCallbackDrawer : PropertyDrawer {
 			if (activeMethod != null && !dynamic) {
 				// Args
 				ParameterInfo[] activeParameters = activeMethod.GetParameters();
-				Rect argRect = new Rect(position.x, methodRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
+				Rect argRect = new(position.x, methodRect.max.y + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
 				string[] types = new string[argProps.arraySize];
 				for (int i = 0; i < types.Length; i++) {
 					SerializedProperty argProp = argProps.FindPropertyRelative("Array.data[" + i + "]");
-					GUIContent argLabel = new GUIContent(ObjectNames.NicifyVariableName(activeParameters[i].Name));
+					GUIContent argLabel = new(ObjectNames.NicifyVariableName(activeParameters[i].Name));
 
 					EditorGUI.BeginChangeCheck();
 					switch ((Arg.ArgType) argProp.FindPropertyRelative("argType").enumValueIndex) {
@@ -216,7 +216,7 @@ public class SerializableCallbackDrawer : PropertyDrawer {
 		}
 
 		// Construct and display context menu
-		GenericMenu menu = new GenericMenu();
+		GenericMenu menu = new();
 		if (dynamicItems.Count > 0) {
 			string[] paths = dynamicItems.GroupBy(x => x.path).Select(x => x.First().path).ToArray();
 			foreach (string path in paths) {

@@ -14,18 +14,18 @@ namespace DialogueGraph {
         [SerializeField] private bool isDirty;
 
         public DlogGraphData GraphData {
-            get => this.m_GraphData;
+            get => m_GraphData;
             private set {
-                this.m_GraphData = value;
-                if (this.m_GraphData != null) {
-                    this.m_GraphData.Owner = this;
+                m_GraphData = value;
+                if (m_GraphData != null) {
+                    m_GraphData.Owner = this;
                 }
             }
         }
 
         public void Initialize(DlogGraphData graphData) {
-            this.GraphData = graphData;
-            this.IsBlackboardVisible = this.m_GraphData.IsBlackboardVisible;
+            GraphData = graphData;
+            IsBlackboardVisible = m_GraphData.IsBlackboardVisible;
         }
 
         public bool IsDirty {
@@ -33,48 +33,48 @@ namespace DialogueGraph {
             set => isDirty = value;
         }
 
-        public bool WasUndoRedoPerformed => this.m_ObjectVersion != this.fileVersion;
+        public bool WasUndoRedoPerformed => m_ObjectVersion != fileVersion;
 
         public void RegisterCompleteObjectUndo(string operationName) {
             Undo.RegisterCompleteObjectUndo(this, operationName);
-            this.fileVersion++;
-            this.m_ObjectVersion++;
-            this.isDirty = true;
+            fileVersion++;
+            m_ObjectVersion++;
+            isDirty = true;
         }
 
         public void OnBeforeSerialize() {
-            if(this.m_GraphData == null) return;
+            if(m_GraphData == null) return;
 
-            this.serializedGraph = JsonUtility.ToJson(this.m_GraphData, true);
-            this.AssetGuid = this.m_GraphData.AssetGuid;
+            serializedGraph = JsonUtility.ToJson(m_GraphData, true);
+            AssetGuid = m_GraphData.AssetGuid;
         }
 
         public void OnAfterDeserialize() {
-            if(this.m_GraphData != null) return;
-            this.GraphData = Deserialize();
+            if(m_GraphData != null) return;
+            GraphData = Deserialize();
         }
 
         public void HandleUndoRedo() {
-            if (!this.WasUndoRedoPerformed) {
+            if (!WasUndoRedoPerformed) {
                 Debug.LogError("Trying to handle undo/redo when undo/redo was not performed", this);
                 return;
             }
 
             DlogGraphData graphData = Deserialize();
-            this.m_GraphData.ReplaceWith(graphData);
+            m_GraphData.ReplaceWith(graphData);
         }
 
         private DlogGraphData Deserialize() {
-            DlogGraphData graphData = JsonUtility.FromJson<DlogGraphData>(this.serializedGraph);
-            graphData.AssetGuid = this.AssetGuid;
-            this.m_ObjectVersion = this.fileVersion;
-            this.serializedGraph = "";
+            DlogGraphData graphData = JsonUtility.FromJson<DlogGraphData>(serializedGraph);
+            graphData.AssetGuid = AssetGuid;
+            m_ObjectVersion = fileVersion;
+            serializedGraph = "";
             return graphData;
         }
 
         public void RecalculateAssetGuid(string assetPath) {
-            this.AssetGuid = AssetDatabase.AssetPathToGUID(assetPath);
-            this.m_GraphData.AssetGuid = this.AssetGuid;
+            AssetGuid = AssetDatabase.AssetPathToGUID(assetPath);
+            m_GraphData.AssetGuid = AssetGuid;
         }
     }
 }

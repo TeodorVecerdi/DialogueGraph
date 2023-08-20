@@ -15,35 +15,35 @@ namespace DialogueGraph {
         [SerializeField] public string DialogueGraphVersion;
 
 
-        [NonSerialized] private Dictionary<string, SerializedNode> nodeDictionary = new Dictionary<string, SerializedNode>();
-        [SerializeField] private List<SerializedNode> nodes = new List<SerializedNode>();
-        [NonSerialized] private List<SerializedNode> addedNodes = new List<SerializedNode>();
-        [NonSerialized] private List<SerializedNode> removedNodes = new List<SerializedNode>();
-        [NonSerialized] private List<SerializedNode> pastedNodes = new List<SerializedNode>();
+        [NonSerialized] private Dictionary<string, SerializedNode> nodeDictionary = new();
+        [SerializeField] private List<SerializedNode> nodes = new();
+        [NonSerialized] private List<SerializedNode> addedNodes = new();
+        [NonSerialized] private List<SerializedNode> removedNodes = new();
+        [NonSerialized] private List<SerializedNode> pastedNodes = new();
         public List<SerializedNode> Nodes => nodes;
         public List<SerializedNode> AddedNodes => addedNodes;
         public List<SerializedNode> RemovedNodes => removedNodes;
         public List<SerializedNode> PastedNodes => pastedNodes;
 
-        [SerializeField] private List<SerializedEdge> edges = new List<SerializedEdge>();
-        [NonSerialized] private List<SerializedEdge> addedEdges = new List<SerializedEdge>();
-        [NonSerialized] private List<SerializedEdge> removedEdges = new List<SerializedEdge>();
+        [SerializeField] private List<SerializedEdge> edges = new();
+        [NonSerialized] private List<SerializedEdge> addedEdges = new();
+        [NonSerialized] private List<SerializedEdge> removedEdges = new();
         public List<SerializedEdge> Edges => edges;
         public List<SerializedEdge> AddedEdges => addedEdges;
         public List<SerializedEdge> RemovedEdges => removedEdges;
 
-        [NonSerialized] private List<AbstractProperty> properties = new List<AbstractProperty>();
-        [NonSerialized] private List<AbstractProperty> addedProperties = new List<AbstractProperty>();
-        [NonSerialized] private List<AbstractProperty> removedProperties = new List<AbstractProperty>();
-        [NonSerialized] private List<AbstractProperty> movedProperties = new List<AbstractProperty>();
-        [SerializeField] private List<SerializedProperty> serializedProperties = new List<SerializedProperty>();
+        [NonSerialized] private List<AbstractProperty> properties = new();
+        [NonSerialized] private List<AbstractProperty> addedProperties = new();
+        [NonSerialized] private List<AbstractProperty> removedProperties = new();
+        [NonSerialized] private List<AbstractProperty> movedProperties = new();
+        [SerializeField] private List<SerializedProperty> serializedProperties = new();
         public List<AbstractProperty> Properties => properties;
         public List<AbstractProperty> AddedProperties => addedProperties;
         public List<AbstractProperty> RemovedProperties => removedProperties;
         public List<AbstractProperty> MovedProperties => movedProperties;
 
-        [NonSerialized] private List<SerializedNode> nodeSelectionQueue = new List<SerializedNode>();
-        [NonSerialized] private List<SerializedEdge> edgeSelectionQueue = new List<SerializedEdge>();
+        [NonSerialized] private List<SerializedNode> nodeSelectionQueue = new();
+        [NonSerialized] private List<SerializedEdge> edgeSelectionQueue = new();
         public List<SerializedNode> NodeSelectionQueue => nodeSelectionQueue;
         public List<SerializedEdge> EdgeSelectionQueue => edgeSelectionQueue;
 

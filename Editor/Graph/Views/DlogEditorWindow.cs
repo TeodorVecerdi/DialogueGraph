@@ -19,8 +19,8 @@ namespace DialogueGraph {
 
         public bool IsDirty {
             get {
-                if (this.m_Deleted) return false;
-                if (this.GraphObject == null) return false;
+                if (m_Deleted) return false;
+                if (GraphObject == null) return false;
                 string current = JsonUtility.ToJson(GraphObject.GraphData, true);
                 string saved = File.ReadAllText(AssetDatabase.GUIDToAssetPath(SelectedAssetGuid));
                 return !string.Equals(current, saved, StringComparison.Ordinal);
@@ -28,58 +28,58 @@ namespace DialogueGraph {
         }
 
         public void BuildWindow() {
-            this.rootVisualElement.Clear();
-            this.Events = new DlogWindowEvents { SaveRequested = SaveAsset, SaveAsRequested = SaveAs, ShowInProjectRequested = ShowInProject };
+            rootVisualElement.Clear();
+            Events = new DlogWindowEvents { SaveRequested = SaveAsset, SaveAsRequested = SaveAs, ShowInProjectRequested = ShowInProject };
 
-            this.m_EditorView = new EditorView(this) {
+            m_EditorView = new EditorView(this) {
                 name = "Dialogue Graph",
-                IsBlackboardVisible = this.GraphObject.IsBlackboardVisible,
+                IsBlackboardVisible = GraphObject.IsBlackboardVisible,
             };
-            this.rootVisualElement.Add(this.m_EditorView);
+            rootVisualElement.Add(m_EditorView);
             Refresh();
         }
 
         private void Update() {
-            if (focusedWindow == this && this.m_Deleted) {
+            if (focusedWindow == this && m_Deleted) {
                 DisplayDeletedFromDiskDialog();
             }
 
-            if (this.GraphObject == null && this.SelectedAssetGuid != null) {
-                string assetGuid = this.SelectedAssetGuid;
-                this.SelectedAssetGuid = null;
+            if (GraphObject == null && SelectedAssetGuid != null) {
+                string assetGuid = SelectedAssetGuid;
+                SelectedAssetGuid = null;
                 DlogGraphObject newObject = DialogueGraphUtility.LoadGraphAtGuid(assetGuid);
-                this.SetGraphObject(newObject);
+                SetGraphObject(newObject);
                 Refresh();
             }
 
-            if (this.GraphObject == null) {
+            if (GraphObject == null) {
                 Close();
                 return;
             }
 
-            if (this.m_EditorView == null && this.GraphObject != null) {
+            if (m_EditorView == null && GraphObject != null) {
                 BuildWindow();
             }
 
-            if (this.m_EditorView == null) {
+            if (m_EditorView == null) {
                 Close();
                 return;
             }
 
-            bool wasUndoRedoPerformed = this.GraphObject.WasUndoRedoPerformed;
+            bool wasUndoRedoPerformed = GraphObject.WasUndoRedoPerformed;
             if (wasUndoRedoPerformed) {
-                this.m_EditorView.HandleChanges();
-                this.GraphObject.GraphData.ClearChanges();
-                this.GraphObject.HandleUndoRedo();
+                m_EditorView.HandleChanges();
+                GraphObject.GraphData.ClearChanges();
+                GraphObject.HandleUndoRedo();
             }
 
-            if (this.GraphObject.IsDirty || wasUndoRedoPerformed) {
+            if (GraphObject.IsDirty || wasUndoRedoPerformed) {
                 UpdateTitle();
-                this.GraphObject.IsDirty = false;
+                GraphObject.IsDirty = false;
             }
 
-            this.m_EditorView.HandleChanges();
-            this.GraphObject.GraphData.ClearChanges();
+            m_EditorView.HandleChanges();
+            GraphObject.GraphData.ClearChanges();
         }
 
         private void DisplayDeletedFromDiskDialog() {
@@ -94,50 +94,69 @@ namespace DialogueGraph {
                 Close();
             } else {
                 // Was restored
-                this.m_Deleted = false;
+                m_Deleted = false;
             }
         }
 
         public void SetGraphObject(DlogGraphObject graphObject) {
-            this.SelectedAssetGuid = graphObject.AssetGuid;
-            this.GraphObject = graphObject;
+            SelectedAssetGuid = graphObject.AssetGuid;
+            GraphObject = graphObject;
         }
 
         public void Refresh() {
             UpdateTitle();
 
-            this.m_EditorView ??= this.rootVisualElement.Q<EditorView>();
+            m_EditorView ??= rootVisualElement.Q<EditorView>();
 
-            if (this.m_EditorView == null) {
+            if (m_EditorView == null) {
                 BuildWindow();
             }
 
-            this.m_EditorView!.BuildGraph();
+            m_EditorView!.BuildGraph();
         }
 
         public void GraphDeleted() {
-            this.m_Deleted = true;
+            m_Deleted = true;
         }
 
         private void UpdateTitle() {
-            Object asset = AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(this.SelectedAssetGuid));
-            titleContent.text = asset.name.Split('/').Last() + (this.IsDirty ? "*" : "");
+            Object asset = AssetDatabase.LoadAssetAtPath<Object>(AssetDatabase.GUIDToAssetPath(SelectedAssetGuid));
+            titleContent.text = asset.name.Split('/').Last() + (IsDirty ? "*" : "");
         }
 
-        private void OnEnable() {
+        void OnGUI()
+        {
+            if (Event.current != null)
+            {
+                if (Event.current.type == EventType.ExecuteCommand)
+                {
+                    if (Event.current.commandName == "Save")
+                    {
+                    }
+                }
+            }
+        }
+
+        private void OnEnable()
+        {
             this.SetAntiAliasing(4);
         }
 
         private void OnDestroy() {
-            if (!this.m_SkipOnDestroyCheck && this.IsDirty && EditorUtility.DisplayDialog("Dialogue Graph has been modified", "Do you want to save the changes you made in the Dialogue Graph?\nYour changes will be lost if you don't save them.", "Save", "Don't Save")) {
+            if (!m_SkipOnDestroyCheck && IsDirty && EditorUtility.DisplayDialog("Dialogue Graph has been modified", "Do you want to save the changes you made in the Dialogue Graph?\nYour changes will be lost if you don't save them.", "Save", "Don't Save")) {
                 SaveAsset();
             }
         }
 
+        public override void SaveChanges()
+        {
+            SaveAsset();
+        }
+
         #region Window Events
         private void SaveAsset() {
-            this.GraphObject.GraphData.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
-            DialogueGraphUtility.SaveGraph(this.GraphObject);
+            GraphObject.GraphData.DialogueGraphVersion = DialogueGraphUtility.LatestVersion;
+            DialogueGraphUtility.SaveGraph(GraphObject);
             UpdateTitle();
         }
 

@@ -16,9 +16,9 @@ namespace DialogueGraph {
         private readonly BlackboardSection checkSection;
         private readonly BlackboardSection triggerSection;
         private readonly BlackboardSection actorSection;
-        private List<Node> selectedNodes = new List<Node>();
+        private List<Node> selectedNodes = new();
 
-        public Dictionary<string, bool> ExpandedInputs { get; } = new Dictionary<string, bool>();
+        public Dictionary<string, bool> ExpandedInputs { get; } = new();
 
         public string AssetName {
             get => Blackboard.title;
