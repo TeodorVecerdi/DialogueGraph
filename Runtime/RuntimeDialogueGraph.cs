@@ -11,17 +11,8 @@ namespace DialogueGraph.Runtime {
         public string CurrentAssetGuid;
         public List<DlogObjectData> PersistentData = new();
         public StringIntSerializableDictionary PersistentDataIndices = new();
-        public DlogObjectData CurrentData {
-            get {
-                if (string.IsNullOrEmpty(CurrentAssetGuid)) return null;
-                if (!PersistentDataIndices.ContainsKey(CurrentAssetGuid)) {
-                    PersistentDataIndices[CurrentAssetGuid] = PersistentData.Count;
-                    PersistentData.Add(new DlogObjectData());
-                }
+        public DlogObjectData CurrentData => PersistentData[CurrentIndex];
 
-                return PersistentData[PersistentDataIndices[CurrentAssetGuid]];
-            }
-        }
         public int CurrentIndex {
             get {
                 if (string.IsNullOrEmpty(CurrentAssetGuid)) return -1;
