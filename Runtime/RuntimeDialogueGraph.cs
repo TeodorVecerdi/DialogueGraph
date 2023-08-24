@@ -63,7 +63,7 @@ namespace DialogueGraph.Runtime {
 
         public ActorData GetCurrentActor() {
             var currentNode = DlogObject.NodeDictionary[currentNodeGuid];
-            if (currentNode.Type != NodeType.NPC) return null;
+            if (currentNode.Type != NodeType.NPC || string.IsNullOrEmpty(currentNode.ActorGuid)) return null;
             var currentNodeActorGuid = currentNode.ActorGuid;
             var actor = CurrentData.ActorData[CurrentData.ActorDataIndices[currentNodeActorGuid]];
             return actor;
